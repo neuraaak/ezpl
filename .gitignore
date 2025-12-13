@@ -1,0 +1,176 @@
+# =============================================================================
+# GITIGNORE RACINE - ROBOTS PARIS AUTOMATISATION
+# =============================================================================
+# Ce fichier contient les exclusions GLOBALES et COMMUNES
+# Les sous-dossiers robots ont leurs propres .gitignore pour les exclusions spécifiques
+
+# =============================================================================
+# PYTHON - FICHIERS DE BASE (COMMUNS À TOUS LES ROBOTS)
+# =============================================================================
+# Bytecode Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environnements virtuels
+.venv/
+env/
+venv/
+ENV/
+
+# =============================================================================
+# BUILD ET DISTRIBUTION (COMMUNS)
+# =============================================================================
+# Artifacts de build
+build/
+dist/
+*.egg-info/
+*.egg
+*.spec
+
+# =============================================================================
+# CACHE ET FICHIERS TEMPORAIRES (COMMUNS)
+# =============================================================================
+# Caches des outils de développement
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.black_cache/
+
+# =============================================================================
+# RAPPORTS ET ANALYSES DE QUALITÉ DE CODE (COMMUNS)
+# =============================================================================
+# Rapports de sécurité (Bandit)
+bandit-report.json
+bandit-report.xml
+bandit-report.html
+
+# Rapports de couverture de code (pytest-cov, coverage)
+.coverage
+coverage.xml
+htmlcov/
+.coverage.*
+
+# Rapports de linting et formatage
+ruff-report.json
+flake8-report.txt
+black-report.txt
+mypy-report.txt
+
+# Rapports de tests
+test-results/
+.pytest_cache/
+junit.xml
+test-report.xml
+
+# Rapports de documentation
+doc8-report.txt
+doc8-report.html
+
+# Rapports de complexité et métriques
+radon-report.json
+mccabe-report.txt
+complexity-report.html
+
+# Rapports de dépendances
+safety-report.json
+pip-audit-report.json
+dependency-check-report.xml
+
+# Rapports de performance
+py-spy-report.svg
+py-spy-report.txt
+memory-profiler-report.txt
+
+# Rapports de type checking avancés
+pyre-report.json
+pyright-report.json
+pytype-report.txt
+
+# Rapports de formatage et style
+autopep8-report.txt
+yapf-report.txt
+isort-report.txt
+
+# Rapports de sécurité avancés
+semgrep-report.json
+semgrep-report.sarif
+codeql-report.json
+
+# Rapports de qualité générale
+sonarqube-report.json
+codeclimate-report.json
+codacy-report.json
+
+# =============================================================================
+# LOGS ET FICHIERS TEMPORAIRES (SPÉCIFIQUES AU ROBOT)
+# =============================================================================
+# Logs d'application
+.logs/
+*.log
+*.xlsx
+version_info.txt
+
+# =============================================================================
+# IDE ET ÉDITEURS (COMMUNS)
+# =============================================================================
+# Cursor
+.cursorignore
+.cursor/
+.cursor_cache/
+
+# Visual Studio Code
+.vscode/
+.vscode-server/
+
+# PyCharm/IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim/Neovim
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# FICHIERS SYSTÈME (COMMUNS)
+# =============================================================================
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# EXCLUSIONS GLOBALES (COMMUNES)
+# =============================================================================
+# Fichiers de sauvegarde
+*.bak
+*.backup
+*.old
+
+# =============================================================================
+# EXCLUSIONS SPÉCIFIQUES AU PROJET RACINE
+# =============================================================================
+# Fichiers de configuration globaux
+.env
+.env.local
+.env.*.local
+
+# Fichiers métier spécifiques à la racine
+/zz-Divers
+MouseMachine.exe
+No_Screen_Save.exe
+*FarefoxPortable*
+
+# =============================================================================
+# NOTE IMPORTANTE
+# =============================================================================
+# Les sous-dossiers robots (capex/, cpt_23/, cu_brcht_hanais/, etc.)
+# ont leurs propres .gitignore pour les exclusions spécifiques :
+# - Logs d'application (*.log)
+# - Configurations locales (*_config.yaml)
+# - Fichiers temporaires spécifiques
+# - Exclusions métier du robot
