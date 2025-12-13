@@ -11,25 +11,27 @@ This module provides commands for viewing, searching, analyzing,
 and managing log files.
 """
 
+import json
+import time
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Optional
+
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import click
-import json
-import time
-from pathlib import Path
-from typing import Optional
-from datetime import datetime, timedelta
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
 from rich.console import Console
 from rich.table import Table
 
+from ...config import ConfigurationManager
+
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from ..utils.log_parser import LogParser
 from ..utils.log_stats import LogStatistics
-from ...config import ConfigurationManager
 
 ## ==> GLOBALS
 # ///////////////////////////////////////////////////////////////

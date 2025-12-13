@@ -9,20 +9,23 @@ from __future__ import annotations
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import sys
-from pathlib import Path
-from typing import Generator, Optional, TypeVar, Dict, Any
-from loguru import logger
+import threading
 from contextlib import contextmanager
+from pathlib import Path
+from typing import Any, Dict, Generator, Optional, TypeVar
+
+from loguru import logger
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
 from loguru._logger import Logger
 
+from .config import ConfigurationManager
+
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
-from .handlers import EzPrinter, EzLogger
+from .handlers import EzLogger, EzPrinter
 from .handlers.console import ConsolePrinterWrapper
-from .config import ConfigurationManager
 
 ## ==> GLOBALS
 # ///////////////////////////////////////////////////////////////
@@ -39,8 +42,8 @@ T = TypeVar("T", bound="Ezpl")
 
 
 class Ezpl:
-
     _instance: Optional[Ezpl] = None
+    _lock: threading.Lock = threading.Lock()
     _log_file: Path
     _printer: EzPrinter
     _logger: EzLogger
@@ -98,119 +101,136 @@ class Ezpl:
         """
 
         # //////
+        # Double-checked locking pattern for thread-safe singleton
         if cls._instance is None:
-            logger.remove()
+            with cls._lock:
+                # Check again after acquiring lock (double-checked locking)
+                if cls._instance is None:
+                    logger.remove()
 
-            # Initialize configuration manager
-            cls._config_manager = ConfigurationManager()
+                    # Initialize configuration manager
+                    cls._config_manager = ConfigurationManager()
 
-            # Determine configuration values with priority: arg > env > config file > default
-            # Helper function to get value with priority order
-            def get_config_value(arg_value, config_key: str, getter_method):
-                """
-                Get configuration value with priority: arg > env > config file > default
+                    # Determine configuration values with priority: arg > env > config file > default
+                    # Helper function to get value with priority order
+                    def get_config_value(arg_value, config_key: str, getter_method):
+                        """
+                        Get configuration value with priority: arg > env > config file > default
 
-                Args:
-                    arg_value: Value from argument (can be None)
-                    config_key: Configuration key name
-                    getter_method: Method to get default value from config manager
+                        Args:
+                            arg_value: Value from argument (can be None)
+                            config_key: Configuration key name
+                            getter_method: Method to get default value from config manager
 
-                Returns:
-                    Final configuration value
-                """
-                # Priority 1: Argument direct
-                if arg_value is not None:
-                    return arg_value
+                        Returns:
+                            Final configuration value
+                        """
+                        # Priority 1: Argument direct
+                        if arg_value is not None:
+                            return arg_value
 
-                # Priority 2: Environment variable (already loaded in config_manager)
-                # Priority 3: Config file (already loaded in config_manager)
-                # Priority 4: Default (via getter method)
-                # The config_manager already has the correct priority (env > file > default)
-                config_value = cls._config_manager.get(config_key)
-                if config_value is not None:
-                    return config_value
+                        # Priority 2: Environment variable (already loaded in config_manager)
+                        # Priority 3: Config file (already loaded in config_manager)
+                        # Priority 4: Default (via getter method)
+                        # The config_manager already has the correct priority (env > file > default)
+                        config_value = cls._config_manager.get(config_key)
+                        if config_value is not None:
+                            return config_value
 
-                # Fallback to default via getter
-                return getter_method()
+                        # Fallback to default via getter
+                        return getter_method()
 
-            # Log file
-            if log_file:
-                cls._log_file = Path(log_file)
-            else:
-                cls._log_file = cls._config_manager.get_log_file()
+                    # Log file
+                    if log_file:
+                        cls._log_file = Path(log_file)
+                    else:
+                        cls._log_file = cls._config_manager.get_log_file()
 
-            # Log level (global)
-            final_log_level = get_config_value(
-                log_level, "log-level", cls._config_manager.get_log_level
-            )
+                    # Log level (global)
+                    final_log_level = get_config_value(
+                        log_level, "log-level", cls._config_manager.get_log_level
+                    )
 
-            # Printer level
-            final_printer_level = get_config_value(
-                printer_level, "printer-level", cls._config_manager.get_printer_level
-            )
+                    # Printer level
+                    final_printer_level = get_config_value(
+                        printer_level,
+                        "printer-level",
+                        cls._config_manager.get_printer_level,
+                    )
 
-            # File logger level
-            final_file_logger_level = get_config_value(
-                file_logger_level,
-                "file-logger-level",
-                cls._config_manager.get_file_logger_level,
-            )
+                    # File logger level
+                    final_file_logger_level = get_config_value(
+                        file_logger_level,
+                        "file-logger-level",
+                        cls._config_manager.get_file_logger_level,
+                    )
 
-            # Rotation settings (can be None)
-            # Priority: arg > env > config file > default
-            # Note: If arg is None (default), we check env/config/default
-            # If user wants to explicitly set None, they can pass None or use configure()
-            final_rotation = (
-                log_rotation
-                if log_rotation is not None
-                else cls._config_manager.get_log_rotation()
-            )
-            final_retention = (
-                log_retention
-                if log_retention is not None
-                else cls._config_manager.get_log_retention()
-            )
-            final_compression = (
-                log_compression
-                if log_compression is not None
-                else cls._config_manager.get_log_compression()
-            )
+                    # Rotation settings (can be None)
+                    # Priority: arg > env > config file > default
+                    # Note: If arg is None (default), we check env/config/default
+                    # If user wants to explicitly set None, they can pass None or use configure()
+                    final_rotation = (
+                        log_rotation
+                        if log_rotation is not None
+                        else cls._config_manager.get_log_rotation()
+                    )
+                    final_retention = (
+                        log_retention
+                        if log_retention is not None
+                        else cls._config_manager.get_log_retention()
+                    )
+                    final_compression = (
+                        log_compression
+                        if log_compression is not None
+                        else cls._config_manager.get_log_compression()
+                    )
 
-            # Indent settings
-            final_indent_step = get_config_value(
-                indent_step, "indent-step", cls._config_manager.get_indent_step
-            )
-            final_indent_symbol = get_config_value(
-                indent_symbol, "indent-symbol", cls._config_manager.get_indent_symbol
-            )
-            final_base_indent_symbol = get_config_value(
-                base_indent_symbol,
-                "base-indent-symbol",
-                cls._config_manager.get_base_indent_symbol,
-            )
+                    # Indent settings
+                    final_indent_step = get_config_value(
+                        indent_step, "indent-step", cls._config_manager.get_indent_step
+                    )
+                    final_indent_symbol = get_config_value(
+                        indent_symbol,
+                        "indent-symbol",
+                        cls._config_manager.get_indent_symbol,
+                    )
+                    final_base_indent_symbol = get_config_value(
+                        base_indent_symbol,
+                        "base-indent-symbol",
+                        cls._config_manager.get_base_indent_symbol,
+                    )
 
-            cls._instance = super(Ezpl, cls).__new__(cls)
+                    cls._instance = super(Ezpl, cls).__new__(cls)
 
-            # Initialize printer with resolved configuration
-            cls._printer = EzPrinter(
-                level=final_printer_level,
-                indent_step=final_indent_step,
-                indent_symbol=final_indent_symbol,
-                base_indent_symbol=final_base_indent_symbol,
-            )
+                    # Initialize printer with resolved configuration
+                    cls._printer = EzPrinter(
+                        level=final_printer_level,
+                        indent_step=final_indent_step,
+                        indent_symbol=final_indent_symbol,
+                        base_indent_symbol=final_base_indent_symbol,
+                    )
 
-            # Initialize logger with resolved configuration
-            cls._logger = EzLogger(
-                log_file=cls._log_file,
-                level=final_file_logger_level,
-                rotation=final_rotation,
-                retention=final_retention,
-                compression=final_compression,
-            )
+                    # Initialize logger with resolved configuration
+                    cls._logger = EzLogger(
+                        log_file=cls._log_file,
+                        level=final_file_logger_level,
+                        rotation=final_rotation,
+                        retention=final_retention,
+                        compression=final_compression,
+                    )
 
-            # Apply global log level if specified
-            if final_log_level:
-                cls._instance.set_level(final_log_level)
+                    # Apply global log level if specified, but only if specific levels were not set
+                    # Priority: printer_level/file_logger_level > log_level
+                    if final_log_level:
+                        # Only apply global level if specific levels were not provided
+                        if printer_level is None and file_logger_level is None:
+                            cls._instance.set_level(final_log_level)
+                        elif printer_level is None:
+                            # Only apply to printer if printer_level was not specified
+                            cls._instance.set_printer_level(final_log_level)
+                        elif file_logger_level is None:
+                            # Only apply to logger if file_logger_level was not specified
+                            cls._instance.set_logger_level(final_log_level)
 
         return cls._instance
 
@@ -333,6 +353,13 @@ class Ezpl:
         Warning: This will destroy the current instance and all its state.
         """
         if cls._instance is not None:
+            # Close logger handlers to release file handles (important on Windows)
+            try:
+                if hasattr(cls._instance, "_logger") and cls._instance._logger:
+                    cls._instance._logger.close()
+            except Exception:
+                # Ignore errors during cleanup
+                pass
             cls._instance = None
 
     def set_log_file(self, log_file: Path | str) -> None:
@@ -357,6 +384,15 @@ class Ezpl:
                 retention=self._config_manager.get_log_retention(),
                 compression=self._config_manager.get_log_compression(),
             )
+
+    def get_log_file(self) -> Path:
+        """
+        Get the current log file path.
+
+        Returns:
+            Path to the current log file
+        """
+        return self._log_file
 
     def get_config(self) -> ConfigurationManager:
         """

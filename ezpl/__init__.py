@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Main Package
 # Project: ezpl
@@ -33,36 +32,30 @@ suitable for professional and industrial applications.
 # ///////////////////////////////////////////////////////////////
 from __future__ import annotations
 
+from .config import ConfigurationManager
+from .core.exceptions import (
+    ConfigurationError,
+    EzplError,
+    FileOperationError,
+    HandlerError,
+    InitializationError,
+    LoggingError,
+    ValidationError,
+)
+
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
-
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from .ezpl import Ezpl
-from .handlers import (
-    EzPrinter,
-    EzLogger,
-    ConsolePrinter,
-    FileLogger,
-    RichWizard,
-)
+from .handlers import ConsolePrinter, EzLogger, EzPrinter, FileLogger, RichWizard
 from .handlers.console import ConsolePrinterWrapper
-from .config import ConfigurationManager
 from .types import (
+    PATTERN_COLORS,
     LogLevel,
     Pattern,
-    PATTERN_COLORS,
     get_pattern_color,
     get_pattern_color_by_name,
-)
-from .core.exceptions import (
-    EzplError,
-    ConfigurationError,
-    LoggingError,
-    ValidationError,
-    InitializationError,
-    FileOperationError,
-    HandlerError,
 )
 
 ## ==> TYPE ALIASES
@@ -92,7 +85,7 @@ Example:
 ## ==> METADATA
 # ///////////////////////////////////////////////////////////////
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __license__ = "MIT"

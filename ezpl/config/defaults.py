@@ -15,7 +15,7 @@ This module defines all default configuration values used throughout the applica
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 ## ==> FUNCTIONS
 # ///////////////////////////////////////////////////////////////

@@ -14,7 +14,7 @@ This module provides all progress bar-related methods for the RichWizard class.
 # ///////////////////////////////////////////////////////////////
 import time
 from contextlib import contextmanager
-from typing import Any, Optional, List, Dict, Tuple, Generator
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
@@ -235,7 +235,9 @@ class ProgressMixin:
             TextColumn(self._progress_prefix),
             SpinnerColumn(),
             TextColumn("[bold green]{task.description}"),
-            TextColumn("[dim]Dependency {task.fields[current]}/{task.fields[total]}"),
+            TextColumn(
+                "[dim]Dependency {task.fields[current]}/{task.fields[total_deps]}"
+            ),
             TextColumn("[dim]{task.fields[dependency]}"),
             BarColumn(),
             TaskProgressColumn(),
@@ -289,7 +291,9 @@ class ProgressMixin:
             TextColumn(self._progress_prefix),
             SpinnerColumn(),
             TextColumn("[bold cyan]{task.description}"),
-            TextColumn("[dim]Package {task.fields[current]}/{task.fields[total]}"),
+            TextColumn(
+                "[dim]Package {task.fields[current]}/{task.fields[total_packages]}"
+            ),
             TextColumn("[dim]{task.fields[package]}"),
             TextColumn("[dim]{task.fields[version]}"),
             BarColumn(),

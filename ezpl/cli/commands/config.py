@@ -11,10 +11,11 @@ This module provides commands for getting, setting, and resetting
 Ezpl configuration with support for user environment variables.
 """
 
+from typing import Optional
+
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import click
-from typing import Optional
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////

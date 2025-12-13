@@ -11,10 +11,11 @@ This module provides a file-based logging handler with advanced formatting,
 session separation, and structured output.
 """
 
+from datetime import datetime
+
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 from pathlib import Path
-from datetime import datetime
 from typing import Any, Optional
 
 # IMPORT SPECS
@@ -22,12 +23,13 @@ from typing import Any, Optional
 from loguru import logger
 from loguru._logger import Logger
 
+from ..core.exceptions import FileOperationError, LoggingError, ValidationError
+from ..core.interfaces import LoggingHandler
+
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from ..types import LogLevel
-from ..core.interfaces import LoggingHandler
 from .utils import safe_str_convert, sanitize_for_file
-from ..core.exceptions import LoggingError, ValidationError, FileOperationError
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
@@ -233,6 +235,34 @@ class FileLogger(LoggingHandler):
             return 0
         except Exception:
             return 0
+
+    def close(self) -> None:
+        """
+        Close the logger handler and release file handles.
+
+        This method removes the loguru handler to release file handles,
+        which is especially important on Windows where files can remain locked.
+        """
+        try:
+            if self._logger_id is not None:
+                # Remove the specific handler
+                self._logger.remove(self._logger_id)
+                self._logger_id = None
+
+                # Force flush and close on Windows
+                import sys
+                import time
+
+                if sys.platform == "win32":
+                    # Force garbage collection to release file handles
+                    import gc
+
+                    gc.collect()
+                    # Give Windows time to release file locks
+                    time.sleep(0.1)
+        except Exception:
+            # Ignore errors during cleanup
+            pass
 
     # ///////////////////////////////////////////////////////////////
     # FILE OPERATIONS

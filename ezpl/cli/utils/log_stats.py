@@ -10,21 +10,21 @@ Log statistics utility for CLI operations.
 This module provides functionality to calculate statistics from log files.
 """
 
+from collections import Counter, defaultdict
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 from ezpl.cli.utils.log_parser import LogEntry
 
-
-from pathlib import Path
-from typing import Dict, Any, List, Optional
-from collections import Counter, defaultdict
+# IMPORT / GUI AND MODULES AND WIDGETS
+# ///////////////////////////////////////////////////////////////
+from .log_parser import LogParser
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
-from .log_parser import LogParser
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////

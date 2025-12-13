@@ -11,25 +11,27 @@ This module provides a console-based logging handler with advanced formatting,
 indentation management, and color support using Rich.
 """
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
-from typing import Generator, Any, Optional, List, Dict, Union
 from contextlib import contextmanager
 
-# IMPORT SPECS
+# IMPORT BASE
 # ///////////////////////////////////////////////////////////////
+from typing import Any, Dict, Generator, List, Optional, Union
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from rich.console import Console
-from rich.text import Text
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.text import Text
 
-from ..types import LogLevel, Pattern, get_pattern_color
-from ..core.interfaces import LoggingHandler, IndentationManager
 from ..core.exceptions import ValidationError
+from ..core.interfaces import IndentationManager, LoggingHandler
+from ..types import LogLevel, Pattern, get_pattern_color
 from .utils import safe_str_convert, sanitize_for_console
 from .wizard import RichWizard
+
+# IMPORT SPECS
+# ///////////////////////////////////////////////////////////////
+
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
@@ -147,6 +149,25 @@ class ConsolePrinterWrapper:
             >>> printer.wizard.dependency_table({"tool": "1.0.0"})
         """
         return self._console_printer._wizard
+
+    # ---
+    # DELEGATION TO CONSOLE PRINTER
+    # ---
+
+    def __getattr__(self, name: str) -> Any:
+        """
+        Delegate attribute access to the underlying ConsolePrinter.
+
+        This allows the wrapper to transparently expose indentation methods
+        and other attributes from ConsolePrinter.
+
+        Args:
+            name: Attribute name to access
+
+        Returns:
+            The requested attribute from ConsolePrinter
+        """
+        return getattr(self._console_printer, name)
 
 
 class ConsolePrinter(LoggingHandler, IndentationManager):
@@ -381,19 +402,18 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
             text.append("• ", style=pattern_color)
             text.append(pattern_name.ljust(8), style=f"bold {pattern_color}")
             text.append(":: ", style="dim white")
-            text.append(str(message), style="white")
 
-            # Handle indentation
+            # Handle indentation - add it just before the message (after ":: ")
             indent_str = self.get_indent()
             if indent_str and indent_str != "~":
-                # Add indentation before the pattern
-                indent_text = Text()
-                indent_text.append(indent_str, style="dim")
-                indent_text.append(" ")
-                indent_text.append(text)
-                self._console.print(indent_text)
-            else:
-                self._console.print(text)
+                # Add indentation just before the message
+                text.append(indent_str, style="dim")
+                text.append(" ", style="dim")
+
+            # Add the message
+            text.append(str(message), style="white")
+
+            self._console.print(text)
 
         except Exception as e:
             # Robust error handling: never raise exception

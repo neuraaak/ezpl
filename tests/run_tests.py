@@ -4,16 +4,17 @@
 """
 Script de lancement des tests unitaires pour Ezpl.
 """
-import sys
-import subprocess
+
 import argparse
+import subprocess
+import sys
 from pathlib import Path
 
 
 def run_command(cmd, description) -> bool:
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"🚀 {description}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     try:
         result = subprocess.run(
             cmd, shell=True, check=False, capture_output=True, text=True
@@ -31,7 +32,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Lanceur de tests pour Ezpl")
     parser.add_argument(
         "--type",
-        choices=["unit", "integration", "all"],
+        choices=["unit", "integration", "robustness", "all"],
         default="unit",
         help="Type de tests à exécuter",
     )
@@ -40,6 +41,16 @@ def main() -> None:
     )
     parser.add_argument("--verbose", action="store_true", help="Mode verbeux")
     parser.add_argument("--fast", action="store_true", help="Exclure les tests lents")
+    parser.add_argument(
+        "--parallel",
+        action="store_true",
+        help="Exécuter les tests en parallèle (pytest-xdist)",
+    )
+    parser.add_argument(
+        "--marker",
+        type=str,
+        help="Exécuter uniquement les tests avec ce marker (ex: wizard, config)",
+    )
     args = parser.parse_args()
 
     if not Path("pyproject.toml").exists():
@@ -53,10 +64,16 @@ def main() -> None:
         cmd_parts.append("-v")
     if args.fast:
         cmd_parts.extend(["-m", "not slow"])
+    if args.marker:
+        cmd_parts.extend(["-m", args.marker])
+    if args.parallel:
+        cmd_parts.extend(["-n", "auto"])
     if args.type == "unit":
         cmd_parts.append("tests/unit/")
     elif args.type == "integration":
         cmd_parts.append("tests/integration/")
+    elif args.type == "robustness":
+        cmd_parts.append("tests/robustness/")
     else:
         cmd_parts.append("tests/")
     if args.coverage:

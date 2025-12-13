@@ -1,125 +1,127 @@
-# Git Hooks - Enelog
+# Git Hooks
 
-Ce dossier contient les hooks Git personnalisés pour le projet Enelog.
+Ce dossier contient les hooks Git pour le projet **Ezpl**.
 
-## Hook post-commit - Création automatique de tags
+## Hooks Disponibles
 
-### 🎯 Objectif
-Créer automatiquement **deux tags Git** à chaque commit lorsque la version change dans `pyproject.toml` :
+### `pre-commit`
+- **Objectif** : Formatage automatique du code avant commit
+- **Actions** :
+  - Exécute `black` pour le formatage du code
+  - Exécute `isort` pour l'organisation des imports
+  - Exécute `ruff format` pour le formatage supplémentaire
+  - Ajoute automatiquement les fichiers formatés au staging area
+  - Bloque le commit si des erreurs de formatage sont détectées
 
-1. **Tag de version classique** : `v3.1.6` (version complète)
-2. **Tag "latest" de version majeure** : `v3-latest` (dernière version de la branche majeure)
+### `post-commit`
+- **Objectif** : Création automatique de tags après commit réussi
+- **Actions** :
+  - Lit la version depuis `pyproject.toml`
+  - Crée ou met à jour le tag de version (ex: `v1.0.0`)
+  - Crée ou met à jour le tag "latest" pour la version majeure (ex: `v1-latest`)
+  - Construit le package localement
+  - Push les tags vers le dépôt distant
 
-### 📦 Contenu
-- `post-commit` - Hook PowerShell principal
-- `install-hook.bat` - Script d'installation
-- `uninstall-hook.bat` - Script de désinstallation
-- `README.md` - Cette documentation
+## Installation
 
-### 🚀 Installation
+### Méthode recommandée : Script d'installation
 
-1. **Exécuter l'installation :**
-   ```cmd
-   cd c:\Dev\__Outils\__PY\.lib\enelog
-   .hooks\install-hook.bat
-   ```
+**Utilisez le script d'installation** pour configurer automatiquement les hooks :
 
-2. **Vérification :**
-   - Le hook est copié dans `.git/hooks/post-commit`
-   - Un backup de l'ancien hook est créé si nécessaire
-
-### 🔧 Fonctionnement
-
-**Déclenchement :** À chaque `git commit`
-
-**Logique :**
-1. Lit la version dans `pyproject.toml` (priorité)
-2. Fallback vers `setup.py` si nécessaire
-3. Extrait le numéro de version majeure
-4. Crée/met à jour **deux tags** :
-   - `v{version}` (ex: `v3.1.6`)
-   - `v{major}-latest` (ex: `v3-latest`)
-
-**Exemple :**
-```cmd
-# Modifier la version
-echo 'version = "3.1.6"' >> pyproject.toml
-
-# Committer
-git add pyproject.toml
-git commit -m "Bump version to 3.1.6"
-
-# → Le hook s'exécute automatiquement
-# ✓ [AUTO-TAG] Créé: v3.1.6
-# ✓ [AUTO-TAG] Créé: v3-latest
+**Linux/macOS :**
+```bash
+chmod +x .hooks/install.sh
+./.hooks/install.sh
 ```
 
-### 🏷️ Types de tags créés
+**Windows :**
+```cmd
+.hooks\install.bat
+```
 
-| Version | Tag classique | Tag latest |
-|---------|---------------|------------|
-| `3.1.6` | `v3.1.6` | `v3-latest` |
-| `3.2.0` | `v3.2.0` | `v3-latest` |
-| `4.0.0` | `v4.0.0` | `v4-latest` |
+### Méthode manuelle : `git config core.hooksPath`
+
+**Cette méthode est recommandée** car elle permet de versionner les hooks dans le dépôt Git :
+
+```bash
+# Configurer Git pour utiliser les hooks du répertoire .hooks
+git config core.hooksPath .hooks
+
+# Vérifier la configuration
+git config core.hooksPath
+# Devrait afficher: .hooks
+```
 
 **Avantages :**
-- **Tag classique** : Point de référence stable pour chaque version
-- **Tag latest** : Pointe toujours vers la dernière version de la branche majeure
+- Les hooks sont versionnés dans le dépôt
+- Tous les contributeurs utilisent les mêmes hooks
+- Pas besoin de copier manuellement les fichiers
+- Configuration partagée via Git
 
-### ⚙️ Configuration
+### Méthode alternative : Copie manuelle
 
-**Push automatique des tags :**
-Pour pousser automatiquement les tags vers le distant (avec force pour les mises à jour), éditez `.git/hooks/post-commit` et décommentez :
-```powershell
-& git push origin "$tagName" --force 2>$null
-& git push origin "$latestTagName" --force 2>$null
+Si vous préférez copier les hooks dans `.git/hooks/` :
+
+```bash
+# Rendre les hooks exécutables
+chmod +x .hooks/pre-commit
+chmod +x .hooks/post-commit
+
+# Copier vers .git/hooks/
+cp .hooks/pre-commit .git/hooks/pre-commit
+cp .hooks/post-commit .git/hooks/post-commit
 ```
 
-### 🗑️ Désinstallation
+**Note :** Cette méthode n'est pas recommandée car les hooks ne sont pas versionnés et doivent être recopiés après chaque clonage.
 
-```cmd
-.hooks\uninstall-hook.bat
+## Vérification
+
+Vérifiez que les hooks sont bien installés :
+
+```bash
+# Vérifier la configuration
+git config core.hooksPath
+
+# Tester les hooks manuellement
+.hooks/pre-commit
+.hooks/post-commit
 ```
 
-### 📋 Messages du hook
+## Désinstallation
 
-- `✓ [AUTO-TAG] Créé: v3.1.6` - Nouveau tag de version créé
-- `✓ [AUTO-TAG] Créé: v3-latest` - Nouveau tag latest créé
-- `✓ [AUTO-TAG] Mis à jour: v3.1.6` - Tag de version mis à jour
-- `✓ [AUTO-TAG] Mis à jour: v3-latest` - Tag latest mis à jour
-- `→ [AUTO-TAG] Aucune version trouvée` - Pas de version détectée
-- `❌ [AUTO-TAG] Erreur création/mise à jour` - Erreur lors de l'opération
+Pour désactiver les hooks :
 
-### 🔍 Dépannage
+```bash
+# Retirer la configuration
+git config --unset core.hooksPath
 
-**Le hook ne s'exécute pas :**
-- Vérifier que le fichier `.git/hooks/post-commit` existe
-- Vérifier les permissions du fichier
-
-**Version non détectée :**
-- Vérifier le format dans `pyproject.toml` : `version = "x.y.z"`
-- Vérifier la syntaxe du fichier
-
-**Tag non créé :**
-- Vérifier que vous êtes dans un repository Git
-- Vérifier que le tag n'existe pas déjà : `git tag -l`
-
-**Tag latest non créé :**
-- Vérifier que la version suit le format `x.y.z` (au moins 2 points)
-- Le numéro de version majeure doit être extrait correctement
-
-### 📁 Structure
-
-```
-.hooks/
-├── post-commit           # Hook PowerShell principal
-├── install-hook.bat      # Installation automatique
-├── uninstall-hook.bat    # Désinstallation
-└── README.md             # Documentation
+# Ou utiliser les hooks par défaut
+git config core.hooksPath .git/hooks
 ```
 
----
+## Développement
 
-**Auteur :** GitHub Copilot  
-**Projet :** Enelog  
-**Date :** 19 août 2025
+### Ajouter un nouveau hook
+
+1. Créez le fichier dans `.hooks/` (ex: `.hooks/pre-push`)
+2. Rendez-le exécutable : `chmod +x .hooks/pre-push`
+3. Documentez-le dans ce README
+
+### Tests
+
+Testez un hook manuellement :
+
+```bash
+# Test pre-commit
+.hooks/pre-commit
+
+# Test post-commit
+.hooks/post-commit
+```
+
+## Extensions Futures
+
+- `pre-push` : Tests avant push
+- `commit-msg` : Validation du message de commit
+- `post-merge` : Actions après merge
+- `pre-rebase` : Vérifications avant rebase

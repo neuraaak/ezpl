@@ -12,8 +12,8 @@ This module contains type definitions and enumerations.
 
 from .log_level import LogLevel
 from .patterns import (
-    Pattern,
     PATTERN_COLORS,
+    Pattern,
     get_pattern_color,
     get_pattern_color_by_name,
 )

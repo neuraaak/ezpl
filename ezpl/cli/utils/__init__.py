@@ -19,11 +19,12 @@ This module contains utility functions and classes for CLI operations:
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
 
+from .env_manager import UserEnvManager
+
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
-from .log_parser import LogParser, LogEntry
+from .log_parser import LogEntry, LogParser
 from .log_stats import LogStatistics
-from .env_manager import UserEnvManager
 
 ## ==> EXPORTS
 # ///////////////////////////////////////////////////////////////

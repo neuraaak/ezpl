@@ -21,17 +21,19 @@ from rich.console import Console
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from ...types import Pattern, get_pattern_color
-from .panels import PanelMixin
-from .tables import TableMixin
-from .json import JsonMixin
-from .progress import ProgressMixin
 from .dynamic import DynamicProgressMixin
+from .json import JsonMixin
+from .panels import PanelMixin
+from .progress import ProgressMixin
+from .tables import TableMixin
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
-class RichWizard(PanelMixin, TableMixin, JsonMixin, ProgressMixin, DynamicProgressMixin):
+class RichWizard(
+    PanelMixin, TableMixin, JsonMixin, ProgressMixin, DynamicProgressMixin
+):
     """
     Rich Wizard for advanced console display capabilities.
 

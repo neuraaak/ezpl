@@ -14,7 +14,7 @@ This module defines the core interfaces and protocols used throughout the applic
 # ///////////////////////////////////////////////////////////////
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Protocol, Any, Generator
+from typing import Any, Generator, Protocol
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////

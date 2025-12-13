@@ -14,11 +14,12 @@ This module provides all panel-related methods for the RichWizard class.
 # ///////////////////////////////////////////////////////////////
 from typing import Any, Optional
 
+from rich.align import Align
+
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
 from rich.panel import Panel
 from rich.text import Text
-from rich.align import Align
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////

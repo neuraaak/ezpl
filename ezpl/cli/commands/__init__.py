@@ -16,12 +16,13 @@ This module contains all CLI command implementations.
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
 
+from .config import config_group
+from .info import info_command
+
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from .logs import logs_group
-from .config import config_group
 from .version import version_command
-from .info import info_command
 
 ## ==> EXPORTS
 # ///////////////////////////////////////////////////////////////

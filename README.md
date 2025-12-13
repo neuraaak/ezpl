@@ -1,8 +1,10 @@
 # 🚀 Ezpl
 
-[![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)](https://github.com/neuraaak/ezpl)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-1.1.0-blue?style=for-the-badge)](https://github.com/neuraaak/ezpl)
+[![Status](https://img.shields.io/badge/Status-Beta-yellow.svg?style=for-the-badge)](https://github.com/neuraaak/ezpl)
+[![Tests](https://img.shields.io/badge/Tests-200%2B%20passing-success?style=for-the-badge)](https://github.com/neuraaak/ezpl)
 
 **Ezpl** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
 
@@ -59,20 +61,60 @@ printer.wizard.table([{"Name": "Alice", "Age": 30}], title="Users")
 - **[📋 API Summary](docs/api/SUMMARY.md)** – Quick API overview
 - **[🖥️ CLI Documentation](docs/cli/CLI_DOCUMENTATION.md)** – Command-line interface guide
 - **[⚙️ Configuration Guide](docs/cli/CONFIG_GUIDE.md)** – Configuration management
+- **[💡 Examples](docs/examples/EXAMPLES.md)** – Usage examples and demonstrations
+- **[🧪 Test Documentation](docs/tests/TEST_DOCUMENTATION.md)** – Complete test suite documentation
+- **[📊 Test Summary](docs/tests/SUMMARY.md)** – Quick test overview
 
 ## 🧪 Testing
 
-**Note**: Comprehensive test suite will be implemented in a future update. The library is currently in active development with focus on API stability and feature completeness.
-
-For development testing:
+Comprehensive test suite with 200+ test cases covering unit, integration, and robustness scenarios.
 
 ```bash
 # Install dev dependencies
 pip install -e ".[dev]"
 
-# Run tests (when available)
+# Run all tests
 pytest tests/
+
+# Run specific test types
+python tests/run_tests.py --type unit
+python tests/run_tests.py --type integration
+python tests/run_tests.py --type robustness
+
+# With coverage
+python tests/run_tests.py --coverage
 ```
+
+See **[Test Documentation](docs/tests/TEST_DOCUMENTATION.md)** for complete details.
+
+## 🛠️ Development Setup
+
+For contributors and developers:
+
+```bash
+# Install in development mode with all dependencies
+pip install -e ".[dev]"
+
+# Install pre-commit hooks (code formatting, linting)
+pip install pre-commit
+pre-commit install
+
+# Install Git hooks (auto-formatting, auto-tagging)
+# Linux/macOS:
+./.hooks/install.sh
+
+# Windows:
+.hooks\install.bat
+
+# Or manually:
+git config core.hooksPath .hooks
+```
+
+**Git Hooks:**
+- **pre-commit**: Automatically formats code (black, isort, ruff) before commit
+- **post-commit**: Automatically creates version tags after commit
+
+See **[.hooks/README.md](.hooks/README.md)** for detailed hook documentation.
 
 ## 🎨 Main Components
 
@@ -114,6 +156,7 @@ ezpl.configure(log_rotation="10 MB", log_retention="7 days")
 ## 🛡️ Robustness
 
 Ezpl is designed to never crash, even with problematic input:
+
 - Automatic string conversion for non-string messages
 - Robust error handling in formatters
 - Safe handling of special characters and Unicode

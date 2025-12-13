@@ -24,5 +24,5 @@ __all__ = [
     "FileLogger",
     "RichWizard",
     "EzPrinter",  # Alias pour compatibilité
-    "EzLogger",   # Alias pour compatibilité
+    "EzLogger",  # Alias pour compatibilité
 ]

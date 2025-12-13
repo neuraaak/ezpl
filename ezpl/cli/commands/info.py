@@ -10,10 +10,11 @@ CLI command for displaying package information.
 This module provides the info command for Ezpl.
 """
 
+from pathlib import Path
+
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import click
-from pathlib import Path
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
@@ -129,9 +130,9 @@ def info_command() -> None:
 
         # Dependencies table
         try:
+            import click as click_module
             import loguru
             import rich
-            import click as click_module
 
             deps_table = Table(
                 title="Dependencies", show_header=True, header_style="bold blue"

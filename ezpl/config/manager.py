@@ -16,15 +16,17 @@ file-based configuration, environment variables, and runtime configuration.
 import json
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+from ..core.exceptions import FileOperationError
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from .defaults import DefaultConfiguration
-from ..core.exceptions import FileOperationError
+
+# IMPORT SPECS
+# ///////////////////////////////////////////////////////////////
+
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////

@@ -1,9 +1,14 @@
 #!/bin/sh
-# Hook post-commit bash pour création automatique de tags
-# Projet: Enelog
-# Utilisation: Copier ce fichier dans .git/hooks/post-commit (sans extension)
+# Post-commit bash hook for automatic tag creation
+# Project: Ezpl
+# 
+# Installation:
+#   git config core.hooksPath .hooks
+# 
+# This hook is automatically used when core.hooksPath is set to .hooks
+# No manual copy to .git/hooks/ is needed.
 
-# Fonction pour récupérer la version depuis pyproject.toml
+# Function to get version from pyproject.toml
 get_version_from_pyproject() {
     if [ -f "pyproject.toml" ]; then
         version=$(grep -E '^version\s*=\s*"' pyproject.toml | sed 's/.*version\s*=\s*"\([^"]*\)".*/\1/')
@@ -15,7 +20,7 @@ get_version_from_pyproject() {
     return 1
 }
 
-# Fonction pour récupérer la version depuis setup.py
+# Function to get version from setup.py
 get_version_from_setup() {
     if [ -f "setup.py" ]; then
         version=$(grep -E "version\s*=\s*['\"]" setup.py | sed "s/.*version\s*=\s*['\"]\([^'\"]*\)['\"].*/\1/")
@@ -27,43 +32,58 @@ get_version_from_setup() {
     return 1
 }
 
-# Fonction pour créer ou mettre à jour un tag
+# Function to create or update a tag
 create_or_update_tag() {
     local tag_name="$1"
     
-    # Vérifier si le tag existe déjà
+    # Check if tag already exists
     if git rev-parse "$tag_name" >/dev/null 2>&1; then
-        # Mettre à jour le tag existant (force update)
+        # Update existing tag (force update)
         if git tag -f "$tag_name"; then
-            echo "✓ [AUTO-TAG] Mis à jour: $tag_name"
+            echo "✓ [AUTO-TAG] Updated: $tag_name"
         else
-            echo "❌ [AUTO-TAG] Erreur mise à jour: $tag_name"
+            echo "❌ [AUTO-TAG] Update error: $tag_name"
             return 1
         fi
     else
-        # Créer le tag léger
+        # Create lightweight tag
         if git tag "$tag_name"; then
-            echo "✓ [AUTO-TAG] Créé: $tag_name"
+            echo "✓ [AUTO-TAG] Created: $tag_name"
         else
-            echo "❌ [AUTO-TAG] Erreur création: $tag_name"
+            echo "❌ [AUTO-TAG] Creation error: $tag_name"
             return 1
         fi
     fi
     return 0
 }
 
-# Récupérer la version (priorité: pyproject.toml puis setup.py)
+# Function to check if a tag already points to HEAD
+tag_points_to_head() {
+    local tag_name="$1"
+    if git rev-parse "$tag_name" >/dev/null 2>&1; then
+        local tag_sha
+        local head_sha
+        tag_sha="$(git rev-parse "$tag_name")"
+        head_sha="$(git rev-parse HEAD)"
+        if [ "$tag_sha" = "$head_sha" ]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# Get version (priority: pyproject.toml then setup.py)
 version=$(get_version_from_pyproject)
 if [ $? -ne 0 ]; then
     version=$(get_version_from_setup)
 fi
 
 if [ -n "$version" ]; then
-    # Tag de version classique
+    # Classic version tag
     tag_name="v$version"
     create_or_update_tag "$tag_name"
     
-    # Tag "latest" de version majeure
+    # Major version "latest" tag
     major_version=$(echo "$version" | sed 's/^\([0-9]*\)\..*/\1/')
     latest_tag_name=""
     if [ -n "$major_version" ]; then
@@ -71,20 +91,26 @@ if [ -n "$version" ]; then
         create_or_update_tag "$latest_tag_name"
     fi
     
-    # Push automatique des tags (toujours exécuté)
-    if git push origin "$tag_name" --force >/dev/null 2>&1; then
-        echo "✓ [AUTO-TAG] Poussé: $tag_name"
+    # Build package locally (GitHub Actions will handle PyPI upload)
+    echo "🔨 [AUTO-TAG] Building package locally..."
+    if ! python build_package.py build >/dev/null 2>&1; then
+        echo "⚠️  [AUTO-TAG] build_package.py build failed; continuing with tag push anyway"
+    fi
+
+    # Automatic tag push (after successful builds)
+    if git push origin "$tag_name" -f >/dev/null 2>&1; then
+        echo "✓ [AUTO-TAG] Pushed: $tag_name"
     else
-        echo "⚠️  [AUTO-TAG] Erreur push: $tag_name"
+        echo "⚠️  [AUTO-TAG] Push error: $tag_name"
     fi
     
     if [ -n "$latest_tag_name" ]; then
-        if git push origin "$latest_tag_name" --force >/dev/null 2>&1; then
-            echo "✓ [AUTO-TAG] Poussé: $latest_tag_name"
+        if git push origin "$latest_tag_name" -f >/dev/null 2>&1; then
+            echo "✓ [AUTO-TAG] Pushed: $latest_tag_name"
         else
-            echo "⚠️  [AUTO-TAG] Erreur push: $latest_tag_name"
+            echo "⚠️  [AUTO-TAG] Push error: $latest_tag_name"
         fi
     fi
 else
-    echo "→ [AUTO-TAG] Aucune version trouvée"
+    echo "→ [AUTO-TAG] No version found"
 fi

@@ -13,12 +13,13 @@ This module provides JSON display functionality for the RichWizard class.
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import json
-from typing import Optional, Dict, List, Union
+from typing import Dict, List, Optional, Union
+
+from rich.json import JSON
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
 from rich.panel import Panel
-from rich.json import JSON
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////

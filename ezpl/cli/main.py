@@ -31,7 +31,7 @@ except ImportError:
     EZPL_AVAILABLE = False
     ezpl = None
 
-from .commands import logs, config, version, info
+from .commands import config, info, logs, version
 
 ## ==> GLOBALS
 # ///////////////////////////////////////////////////////////////

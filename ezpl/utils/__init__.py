@@ -14,6 +14,7 @@ This module provides compatibility imports for the handlers module.
 """
 
 # Imports de compatibilité - les classes ont été déplacées vers handlers
-from ..handlers import ConsolePrinter as EzPrinter, FileLogger as EzLogger
+from ..handlers import ConsolePrinter as EzPrinter
+from ..handlers import FileLogger as EzLogger
 
 __all__ = ["EzPrinter", "EzLogger"]
