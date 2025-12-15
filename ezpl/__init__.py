@@ -93,7 +93,7 @@ Example:
 ## ==> METADATA
 # ///////////////////////////////////////////////////////////////
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __license__ = "MIT"

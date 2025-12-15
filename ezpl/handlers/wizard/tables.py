@@ -11,7 +11,7 @@ This module provides all table-related methods for the RichWizard class.
 
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
-from typing import Any, Optional, dict, list
+from typing import Any, Optional
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////

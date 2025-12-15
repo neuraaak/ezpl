@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Pattern definitions
 # Project: ezpl
@@ -14,7 +13,6 @@ This module defines contextual patterns for enhanced console output with the for
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 from enum import Enum
-from typing import Dict
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
@@ -48,7 +46,7 @@ class Pattern(Enum):
 # ///////////////////////////////////////////////////////////////
 
 # Color mapping for patterns (Rich color names)
-PATTERN_COLORS: Dict[Pattern, str] = {
+PATTERN_COLORS: dict[Pattern, str] = {
     # Main patterns
     Pattern.SUCCESS: "bright_green",  # 🟢 Success
     Pattern.ERROR: "bright_red",  # 🔴 Error
