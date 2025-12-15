@@ -375,7 +375,13 @@ class Ezpl:
             self._log_file = new_log_file
             # Update configuration
             self._config_manager.set("log-file", str(new_log_file))
-            # Réinitialiser le logger avec le nouveau fichier et tous les paramètres
+            # Safely close previous logger to avoid duplicated loguru handlers
+            try:
+                if hasattr(self, "_logger") and self._logger:
+                    self._logger.close()
+            except Exception as e:
+                logger.error(f"Error while closing previous logger: {e}")
+            # Reinitialize logger with the new file and current parameters
             self._logger = EzLogger(
                 log_file=self._log_file,
                 level=self._logger._level,
@@ -419,7 +425,12 @@ class Ezpl:
         self.set_printer_level(self._config_manager.get_printer_level())
         self.set_logger_level(self._config_manager.get_file_logger_level())
 
-        # Reinitialize logger if rotation settings exist
+        # Reinitialize logger with new rotation / retention / compression settings
+        try:
+            if hasattr(self, "_logger") and self._logger:
+                self._logger.close()
+        except Exception as e:
+            logger.error(f"Error while closing logger during reload_config: {e}")
         self._logger = EzLogger(
             log_file=self._log_file,
             level=self._config_manager.get_file_logger_level(),
@@ -507,6 +518,12 @@ class Ezpl:
             for key in ["log-rotation", "log-retention", "log-compression"]
         )
         if rotation_changed:
+            # Close previous logger before creating a new one to avoid duplicate handlers
+            try:
+                if hasattr(self, "_logger") and self._logger:
+                    self._logger.close()
+            except Exception as e:
+                logger.error(f"Error while closing logger during configure(): {e}")
             self._logger = EzLogger(
                 log_file=self._log_file,
                 level=self._logger._level,
