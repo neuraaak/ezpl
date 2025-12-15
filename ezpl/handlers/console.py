@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Console Printer Handler
 # Project: ezpl
@@ -11,11 +10,12 @@ This module provides a console-based logging handler with advanced formatting,
 indentation management, and color support using Rich.
 """
 
+from collections.abc import Generator
 from contextlib import contextmanager
 
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
-from typing import Any, Dict, Generator, List, Optional, Union
+from typing import Any, Optional, Union
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ class ConsolePrinterWrapper:
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, console_printer: "ConsolePrinter"):
+    def __init__(self, console_printer: "ConsolePrinter") -> None:
         self._console_printer = console_printer
 
     # ///////////////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ class ConsolePrinterWrapper:
 
     def print_json(
         self,
-        data: Union[str, Dict, List],
+        data: Union[str, dict, list],
         title: Optional[str] = None,
         indent: Optional[int] = None,
         highlight: bool = True,
@@ -299,8 +299,8 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
                 self._console.print(
                     f"[bold red]LOGGING ERROR:[/bold red] {type(e).__name__}"
                 )
-            except Exception:
-                pass  # Dernier recours : ignorer silencieusement
+            except Exception as e:
+                raise ValueError(f"Failed to print logging error: {e}") from e
 
     # ///////////////////////////////////////////////////////////////
     # LOGGING METHODS (API primaire)
@@ -420,8 +420,8 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
             try:
                 error_msg = f"[bold red]PATTERN ERROR:[/bold red] {type(e).__name__}"
                 self._console.print(error_msg)
-            except Exception:
-                pass  # Last resort: ignore silently
+            except Exception as e:
+                raise ValueError(f"Failed to print pattern: {e}") from e
 
     # ///////////////////////////////////////////////////////////////
     # INDENTATION MANAGEMENT
@@ -474,7 +474,7 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
     # ///////////////////////////////////////////////////////////////
 
     def print_table(
-        self, data: List[Dict[str, Any]], title: Optional[str] = None
+        self, data: list[dict[str, Any]], title: Optional[str] = None
     ) -> None:
         """
         Display a table using Rich (delegates to RichWizard).
@@ -517,12 +517,12 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
         except Exception as e:
             try:
                 self._console.print(f"[red]Progress error:[/red] {type(e).__name__}")
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to print progress: {e}") from e
 
     def print_json(
         self,
-        data: Union[str, Dict, List],
+        data: Union[str, dict, list],
         title: Optional[str] = None,
         indent: Optional[int] = None,
         highlight: bool = True,

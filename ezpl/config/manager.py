@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Configuration Manager
 # Project: ezpl
@@ -16,7 +15,7 @@ file-based configuration, environment variables, and runtime configuration.
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from ..core.exceptions import FileOperationError
 
@@ -53,7 +52,7 @@ class ConfigurationManager:
                         Defaults to ~/.ezpl/config.json
         """
         self._config_file = config_file or DefaultConfiguration.CONFIG_FILE
-        self._config: Dict[str, Any] = {}
+        self._config: dict[str, Any] = {}
         self._load_configuration()
 
     # ---
@@ -75,10 +74,10 @@ class ConfigurationManager:
         # Load from file if it exists
         if self._config_file.exists():
             try:
-                with open(self._config_file, "r", encoding="utf-8") as f:
+                with open(self._config_file, encoding="utf-8") as f:
                     file_config = json.load(f)
                     self._config.update(file_config)
-            except (json.JSONDecodeError, IOError) as e:
+            except (OSError, json.JSONDecodeError) as e:
                 # If file is corrupted, use defaults
                 print(f"Warning: Could not load config file {self._config_file}: {e}")
 
@@ -114,8 +113,8 @@ class ConfigurationManager:
                 if config_key in ["indent-step"]:
                     try:
                         self._config[config_key] = int(value)
-                    except ValueError:
-                        pass  # Keep default if conversion fails
+                    except ValueError as e:
+                        raise ValueError(f"Failed to convert {value} to int: {e}") from e
                 else:
                     self._config[config_key] = value
 
@@ -190,7 +189,7 @@ class ConfigurationManager:
         """Get the current log compression setting."""
         return self.get("log-compression", DefaultConfiguration.LOG_COMPRESSION)
 
-    def get_all(self) -> Dict[str, Any]:
+    def get_all(self) -> dict[str, Any]:
         """
         Get all configuration values.
 
@@ -213,7 +212,7 @@ class ConfigurationManager:
         """
         self._config[key] = value
 
-    def update(self, config_dict: Dict[str, Any]) -> None:
+    def update(self, config_dict: dict[str, Any]) -> None:
         """
         Update configuration with new values.
 
@@ -240,12 +239,12 @@ class ConfigurationManager:
             # Save configuration
             with open(self._config_file, "w", encoding="utf-8") as f:
                 json.dump(self._config, f, indent=4, ensure_ascii=False)
-        except (IOError, OSError) as e:
+        except OSError as e:
             raise FileOperationError(
                 f"Could not save configuration to {self._config_file}: {e}",
                 str(self._config_file),
                 "save",
-            )
+            ) from e
 
     def reset_to_defaults(self) -> None:
         """Reset configuration to default values."""
@@ -291,12 +290,12 @@ class ConfigurationManager:
                     f.write("#!/bin/bash\n")
                     for key, value in self._config.items():
                         f.write(f"export {key}={value}\n")
-        except (IOError, OSError) as e:
+        except OSError as e:
             raise FileOperationError(
                 f"Could not write to {output_path}: {e}",
                 str(output_path),
                 "export",
-            )
+            ) from e
 
     # ///////////////////////////////////////////////////////////////
     # REPRESENTATION METHODS

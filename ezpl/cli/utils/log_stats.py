@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Log Statistics Utility
 # Project: ezpl
@@ -12,7 +11,7 @@ This module provides functionality to calculate statistics from log files.
 
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
@@ -48,13 +47,13 @@ class LogStatistics:
         """
         self.log_file = Path(log_file)
         self.parser = LogParser(self.log_file)
-        self._entries: Optional[List[LogEntry]] = None
+        self._entries: Optional[list[LogEntry]] = None
 
     # ---
     # PRIVATE HELPER METHODS
     # ---
 
-    def _get_entries(self) -> List[LogEntry]:
+    def _get_entries(self) -> list[LogEntry]:
         """Get all log entries (cached)."""
         if self._entries is None:
             self._entries = list[LogEntry](self.parser.parse())
@@ -64,7 +63,7 @@ class LogStatistics:
     # STATISTICS METHODS
     # ///////////////////////////////////////////////////////////////
 
-    def get_level_counts(self) -> Dict[str, int]:
+    def get_level_counts(self) -> dict[str, int]:
         """
         Get count of messages by level.
 
@@ -75,7 +74,7 @@ class LogStatistics:
         counter = Counter(entry.level for entry in entries)
         return dict(counter)
 
-    def get_file_info(self) -> Dict[str, Any]:
+    def get_file_info(self) -> dict[str, Any]:
         """
         Get basic file information.
 
@@ -114,7 +113,7 @@ class LogStatistics:
                 "date_range": None,
             }
 
-    def get_temporal_distribution(self, period: str = "hour") -> Dict[str, int]:
+    def get_temporal_distribution(self, period: str = "hour") -> dict[str, int]:
         """
         Get distribution of logs over time.
 
@@ -125,7 +124,7 @@ class LogStatistics:
             Dictionary mapping time periods to log counts
         """
         entries = self._get_entries()
-        distribution: Dict[str, int] = defaultdict(int)
+        distribution: dict[str, int] = defaultdict(int)
 
         for entry in entries:
             if entry.timestamp is None:
@@ -142,7 +141,7 @@ class LogStatistics:
 
         return dict(distribution)
 
-    def get_all_stats(self) -> Dict[str, Any]:
+    def get_all_stats(self) -> dict[str, Any]:
         """
         Get all statistics in a single dictionary.
 

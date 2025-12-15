@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Core Exceptions
 # Project: ezpl
@@ -25,7 +24,7 @@ class EzplError(Exception):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, error_code: str = None):
+    def __init__(self, message: str, error_code: str = None) -> None:
         """
         Initialize the Ezpl error.
 
@@ -60,7 +59,7 @@ class ConfigurationError(EzplError):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, config_key: str = None):
+    def __init__(self, message: str, config_key: str = None) -> None:
         """
         Initialize the configuration error.
 
@@ -84,7 +83,7 @@ class LoggingError(EzplError):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, handler_type: str = None):
+    def __init__(self, message: str, handler_type: str = None) -> None:
         """
         Initialize the logging error.
 
@@ -108,7 +107,7 @@ class ValidationError(EzplError):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, field_name: str = None, value: str = None):
+    def __init__(self, message: str, field_name: str = None, value: str = None) -> None:
         """
         Initialize the validation error.
 
@@ -134,7 +133,7 @@ class InitializationError(EzplError):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, component: str = None):
+    def __init__(self, message: str, component: str = None) -> None:
         """
         Initialize the initialization error.
 
@@ -158,7 +157,7 @@ class FileOperationError(EzplError):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, file_path: str = None, operation: str = None):
+    def __init__(self, message: str, file_path: str = None, operation: str = None) -> None:
         """
         Initialize the file operation error.
 
@@ -184,7 +183,7 @@ class HandlerError(EzplError):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, handler_name: str = None):
+    def __init__(self, message: str, handler_name: str = None) -> None:
         """
         Initialize the handler error.
 

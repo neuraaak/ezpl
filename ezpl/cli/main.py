@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - CLI Main Entry Point
 # Project: ezpl
@@ -117,12 +116,12 @@ def main() -> None:
     """
     try:
         cli()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as e:
         console.print("\n[yellow]Interrupted by user[/yellow]")
-        raise SystemExit(1)
+        raise SystemExit(1) from e
     except Exception as e:
         console.print(f"[bold red]Error:[/bold red] {e}")
-        raise SystemExit(1)
+        raise SystemExit(1) from e
 
 
 if __name__ == "__main__":

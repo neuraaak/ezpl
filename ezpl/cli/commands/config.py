@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - CLI Config Commands
 # Project: ezpl
@@ -44,7 +43,6 @@ def config_group() -> None:
     Get, set, and reset Ezpl configuration with support for
     user environment variables.
     """
-    pass
 
 
 ## ==> COMMANDS
@@ -194,12 +192,11 @@ def reset_command(confirm: bool) -> None:
     and remove all user environment variables.
     """
     try:
-        if not confirm:
-            if not click.confirm(
-                "Are you sure you want to reset all configuration to defaults?"
-            ):
-                console.print("[yellow]Reset cancelled[/yellow]")
-                return
+        if not confirm and not click.confirm(
+            "Are you sure you want to reset all configuration to defaults?"
+        ):
+            console.print("[yellow]Reset cancelled[/yellow]")
+            return
 
         config_manager = ConfigurationManager()
         config_manager.reset_to_defaults()

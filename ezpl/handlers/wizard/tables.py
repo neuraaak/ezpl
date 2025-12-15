@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Wizard Tables Mixin
 # Project: ezpl
@@ -12,7 +11,7 @@ This module provides all table-related methods for the RichWizard class.
 
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional, dict, list
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
@@ -39,7 +38,7 @@ class TableMixin:
 
     def table(
         self,
-        data: List[Dict[str, Any]],
+        data: list[dict[str, Any]],
         title: Optional[str] = None,
         show_header: bool = True,
         **kwargs,
@@ -48,7 +47,7 @@ class TableMixin:
         Display a table from a list of dictionaries.
 
         Args:
-            data: List of dictionaries representing table rows
+            data: list of dictionaries representing table rows
             title: Optional table title
             show_header: Whether to show column headers
             **kwargs: Additional Table arguments
@@ -73,14 +72,14 @@ class TableMixin:
         except Exception as e:
             try:
                 self._console.print(f"[red]Table error:[/red] {type(e).__name__}")
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display table: {e}") from e
 
     def table_from_columns(
         self,
         title: str,
-        columns: List[str],
-        rows: List[List[Any]],
+        columns: list[str],
+        rows: list[list[Any]],
         show_header: bool = True,
         **kwargs,
     ) -> None:
@@ -89,8 +88,8 @@ class TableMixin:
 
         Args:
             title: Table title
-            columns: List of column names
-            rows: List of row data (each row is a list of values)
+            columns: list of column names
+            rows: list of row data (each row is a list of values)
             show_header: Whether to show column headers
             **kwargs: Additional Table arguments
         """
@@ -109,13 +108,13 @@ class TableMixin:
         except Exception as e:
             try:
                 self._console.print(f"[red]Table error:[/red] {type(e).__name__}")
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display table: {e}") from e
 
     def status_table(
         self,
         title: str,
-        data: List[Dict[str, Any]],
+        data: list[dict[str, Any]],
         status_column: str = "Status",
         **kwargs,
     ) -> None:
@@ -124,7 +123,7 @@ class TableMixin:
 
         Args:
             title: Table title
-            data: List of dictionaries representing table rows
+            data: list of dictionaries representing table rows
             status_column: Name of the status column
             **kwargs: Additional Table arguments
         """
@@ -170,10 +169,10 @@ class TableMixin:
                 self._console.print(
                     f"[red]Status table error:[/red] {type(e).__name__}"
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display status table: {e}") from e
 
-    def dependency_table(self, dependencies: Dict[str, str]) -> None:
+    def dependency_table(self, dependencies: dict[str, str]) -> None:
         """
         Display a table for displaying dependencies.
 
@@ -198,15 +197,15 @@ class TableMixin:
                 self._console.print(
                     f"[red]Dependency table error:[/red] {type(e).__name__}"
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display dependency table: {e}") from e
 
-    def command_table(self, commands: List[Dict[str, str]]) -> None:
+    def command_table(self, commands: list[dict[str, str]]) -> None:
         """
         Display a table for displaying available commands.
 
         Args:
-            commands: List of command dictionaries with keys: command, description, category
+            commands: list of command dictionaries with keys: command, description, category
         """
         try:
             table = Table(title="Available Commands", show_header=True)
@@ -227,5 +226,5 @@ class TableMixin:
                 self._console.print(
                     f"[red]Command table error:[/red] {type(e).__name__}"
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display command table: {e}") from e

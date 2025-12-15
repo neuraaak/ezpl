@@ -61,13 +61,13 @@ from .types import (
 ## ==> TYPE ALIASES
 # ///////////////////////////////////////////////////////////////
 
-# Type aliases for better IDE support and type checking
-# These aliases make it easier to type hint variables in user code
+# Canonical type aliases for users.
+# They mirror the internal EzPrinter / EzLogger types.
 
-# Re-export ConsolePrinterWrapper as Printer for convenience
-Printer = ConsolePrinterWrapper
-"""Type alias for ConsolePrinterWrapper.
-Use this type hint when you want to indicate that a variable holds a printer instance.
+# Canonical printer (console)
+Printer = EzPrinter
+"""Type alias for EzPrinter (console printer handler).
+Use this type when you want to annotate a variable that represents a printer.
 
 Example:
     >>> from ezpl import Ezpl, Printer
@@ -78,14 +78,22 @@ Example:
     >>> printer.print_json({"key": "value"})
 """
 
-# Note: For the logger, users should import Logger directly from loguru
-# Example: from loguru import Logger
-#          logger: Logger = ezpl.get_logger()
+# Canonical logger (file)
+Logger = EzLogger
+"""Type alias for EzLogger (file logger handler).
+Use this type when you want to annotate a variable that represents a logger.
+
+Example:
+    >>> from ezpl import Ezpl, Logger
+    >>> ezpl = Ezpl()
+    >>> logger: Logger = ezpl.get_logger()
+    >>> logger.info("Logged to file")
+"""
 
 ## ==> METADATA
 # ///////////////////////////////////////////////////////////////
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __license__ = "MIT"
@@ -103,6 +111,7 @@ __all__ = [
     # Handlers
     "EzPrinter",
     "EzLogger",
+    "Logger",
     "ConsolePrinter",
     "FileLogger",
     "ConsolePrinterWrapper",

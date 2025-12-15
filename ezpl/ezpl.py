@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Main logging singleton
 # Project: ezpl
@@ -10,9 +9,10 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 import sys
 import threading
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Generator, Optional, TypeVar
+from typing import Any, TypeVar
 
 from loguru import logger
 
@@ -42,7 +42,7 @@ T = TypeVar("T", bound="Ezpl")
 
 
 class Ezpl:
-    _instance: Optional[Ezpl] = None
+    _instance: Ezpl | None = None
     _lock: threading.Lock = threading.Lock()
     _log_file: Path
     _printer: EzPrinter
@@ -200,7 +200,7 @@ class Ezpl:
                         cls._config_manager.get_base_indent_symbol,
                     )
 
-                    cls._instance = super(Ezpl, cls).__new__(cls)
+                    cls._instance = super().__new__(cls)
 
                     # Initialize printer with resolved configuration
                     cls._printer = EzPrinter(
@@ -357,9 +357,8 @@ class Ezpl:
             try:
                 if hasattr(cls._instance, "_logger") and cls._instance._logger:
                     cls._instance._logger.close()
-            except Exception:
-                # Ignore errors during cleanup
-                pass
+            except Exception as e:
+                logger.error(f"Error during cleanup: {e}")
             cls._instance = None
 
     def set_log_file(self, log_file: Path | str) -> None:
@@ -441,7 +440,7 @@ class Ezpl:
         global_log_level = self._config_manager.get_log_level()
         self.set_level(global_log_level)
 
-    def configure(self, config_dict: Dict[str, Any] = None, **kwargs) -> None:
+    def configure(self, config_dict: dict[str, Any] = None, **kwargs) -> None:
         """
         Configure Ezpl dynamically.
 

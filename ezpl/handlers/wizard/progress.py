@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Wizard Progress Mixin
 # Project: ezpl
@@ -13,8 +12,9 @@ This module provides all progress bar-related methods for the RichWizard class.
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Dict, Generator, List, Optional, Tuple
+from typing import Any, Optional, dict, list, tuple
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ class ProgressMixin:
         description: str = "Working...",
         total: Optional[int] = None,
         transient: bool = False,
-    ) -> Generator[Tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, int], None, None]:
         """
         Create a progress bar context manager.
 
@@ -66,7 +66,7 @@ class ProgressMixin:
             transient: Whether to clear progress on exit
 
         Yields:
-            Tuple of (Progress, task_id)
+            tuple of (Progress, task_id)
 
         Example:
             >>> with printer.wizard.progress("Processing...", total=100) as (progress, task):
@@ -90,7 +90,7 @@ class ProgressMixin:
     @contextmanager
     def spinner(
         self, description: str = "Working..."
-    ) -> Generator[Tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, int], None, None]:
         """
         Create a simple spinner with description.
 
@@ -98,7 +98,7 @@ class ProgressMixin:
             description: Spinner description
 
         Yields:
-            Tuple of (Progress, task_id)
+            tuple of (Progress, task_id)
 
         Example:
             >>> with printer.wizard.spinner("Loading...") as (progress, task):
@@ -119,7 +119,7 @@ class ProgressMixin:
     @contextmanager
     def spinner_with_status(
         self, description: str = "Working..."
-    ) -> Generator[Tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, int], None, None]:
         """
         Create a spinner that can update status messages.
 
@@ -127,7 +127,7 @@ class ProgressMixin:
             description: Spinner description
 
         Yields:
-            Tuple of (Progress, task_id)
+            tuple of (Progress, task_id)
 
         Example:
             >>> with printer.wizard.spinner_with_status("Processing...") as (progress, task):
@@ -148,7 +148,7 @@ class ProgressMixin:
     @contextmanager
     def download_progress(
         self, description: str = "Downloading..."
-    ) -> Generator[Tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, int], None, None]:
         """
         Create a download progress bar with speed and size information.
 
@@ -156,7 +156,7 @@ class ProgressMixin:
             description: Download description
 
         Yields:
-            Tuple of (Progress, task_id)
+            tuple of (Progress, task_id)
 
         Example:
             >>> with printer.wizard.download_progress() as (progress, task):
@@ -180,7 +180,7 @@ class ProgressMixin:
     @contextmanager
     def file_download_progress(
         self, filename: str, total_size: int, description: str = "Downloading file..."
-    ) -> Generator[Tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, int], None, None]:
         """
         Create a progress bar for downloading a specific file.
 
@@ -190,7 +190,7 @@ class ProgressMixin:
             description: Main description
 
         Yields:
-            Tuple of (Progress, task_id)
+            tuple of (Progress, task_id)
 
         Example:
             >>> with printer.wizard.file_download_progress("file.zip", 1024000) as (progress, task):
@@ -213,17 +213,17 @@ class ProgressMixin:
 
     @contextmanager
     def dependency_progress(
-        self, dependencies: List[str], description: str = "Installing dependencies..."
-    ) -> Generator[Tuple[Progress, int, str], None, None]:
+        self, dependencies: list[str], description: str = "Installing dependencies..."
+    ) -> Generator[tuple[Progress, int, str], None, None]:
         """
         Create a progress bar for dependency installation.
 
         Args:
-            dependencies: List of dependency names
+            dependencies: list of dependency names
             description: Main description
 
         Yields:
-            Tuple of (Progress, task_id, dependency_name) for each dependency
+            tuple of (Progress, task_id, dependency_name) for each dependency
 
         Example:
             >>> deps = ["package1", "package2", "package3"]
@@ -268,18 +268,18 @@ class ProgressMixin:
     @contextmanager
     def package_install_progress(
         self,
-        packages: List[Tuple[str, str]],
+        packages: list[tuple[str, str]],
         description: str = "Installing packages...",
-    ) -> Generator[Tuple[Progress, int, str, str], None, None]:
+    ) -> Generator[tuple[Progress, int, str, str], None, None]:
         """
         Create a progress bar for package installation with version info.
 
         Args:
-            packages: List of tuples (package_name, version)
+            packages: list of tuples (package_name, version)
             description: Main description
 
         Yields:
-            Tuple of (Progress, task_id, package_name, version) for each package
+            tuple of (Progress, task_id, package_name, version) for each package
 
         Example:
             >>> packages = [("requests", "2.31.0"), ("click", "8.1.0")]
@@ -327,22 +327,22 @@ class ProgressMixin:
     @contextmanager
     def step_progress(
         self,
-        steps: List[str],
+        steps: list[str],
         description: str = "Processing...",
         show_step_numbers: bool = True,
         show_time: bool = True,
-    ) -> Generator[Tuple[Progress, int, List[str]], None, None]:
+    ) -> Generator[tuple[Progress, int, list[str]], None, None]:
         """
         Create a step-based progress bar with detailed step information.
 
         Args:
-            steps: List of step names
+            steps: list of step names
             description: Main description
             show_step_numbers: Show step numbers (e.g., "Step 1/5")
             show_time: Show elapsed and remaining time
 
         Yields:
-            Tuple of (Progress, task_id, steps_list)
+            tuple of (Progress, task_id, steps_list)
 
         Example:
             >>> steps = ["Step 1", "Step 2", "Step 3"]
@@ -394,17 +394,17 @@ class ProgressMixin:
 
     @contextmanager
     def file_copy_progress(
-        self, files: List[str], description: str = "Copying files..."
-    ) -> Generator[Tuple[Progress, int, List[str]], None, None]:
+        self, files: list[str], description: str = "Copying files..."
+    ) -> Generator[tuple[Progress, int, list[str]], None, None]:
         """
         Create a progress bar specifically for file copying operations.
 
         Args:
-            files: List of file paths to copy
+            files: list of file paths to copy
             description: Main description
 
         Yields:
-            Tuple of (Progress, task_id, files_list)
+            tuple of (Progress, task_id, files_list)
 
         Example:
             >>> files = ["file1.txt", "file2.txt"]
@@ -430,18 +430,18 @@ class ProgressMixin:
     @contextmanager
     def installation_progress(
         self,
-        steps: List[Tuple[str, str]],
+        steps: list[tuple[str, str]],
         description: str = "Installation in progress...",
-    ) -> Generator[Tuple[Progress, int, str, str], None, None]:
+    ) -> Generator[tuple[Progress, int, str, str], None, None]:
         """
         Create a progress bar for installation processes with step details.
 
         Args:
-            steps: List of tuples (step_name, step_description)
+            steps: list of tuples (step_name, step_description)
             description: Main description
 
         Yields:
-            Tuple of (Progress, task_id, step_name, step_description) for each step
+            tuple of (Progress, task_id, step_name, step_description) for each step
 
         Example:
             >>> steps = [("Init", "Initializing..."), ("Install", "Installing...")]
@@ -483,17 +483,17 @@ class ProgressMixin:
 
     @contextmanager
     def build_progress(
-        self, phases: List[Tuple[str, int]], description: str = "Building project..."
-    ) -> Generator[Tuple[Progress, int, str, int], None, None]:
+        self, phases: list[tuple[str, int]], description: str = "Building project..."
+    ) -> Generator[tuple[Progress, int, str, int], None, None]:
         """
         Create a progress bar for build processes with weighted phases.
 
         Args:
-            phases: List of tuples (phase_name, weight_percentage)
+            phases: list of tuples (phase_name, weight_percentage)
             description: Main description
 
         Yields:
-            Tuple of (Progress, task_id, phase_name, weight) for each phase
+            tuple of (Progress, task_id, phase_name, weight) for each phase
 
         Example:
             >>> phases = [("Compile", 40), ("Test", 30), ("Package", 30)]
@@ -525,17 +525,17 @@ class ProgressMixin:
 
     @contextmanager
     def deployment_progress(
-        self, stages: List[str], description: str = "Deploying..."
-    ) -> Generator[Tuple[Progress, int, str], None, None]:
+        self, stages: list[str], description: str = "Deploying..."
+    ) -> Generator[tuple[Progress, int, str], None, None]:
         """
         Create a progress bar for deployment processes.
 
         Args:
-            stages: List of deployment stage names
+            stages: list of deployment stage names
             description: Main description
 
         Yields:
-            Tuple of (Progress, task_id, stage_name) for each stage
+            tuple of (Progress, task_id, stage_name) for each stage
 
         Example:
             >>> stages = ["Build", "Test", "Deploy"]
@@ -579,24 +579,24 @@ class ProgressMixin:
     @contextmanager
     def layered_progress(
         self,
-        layers: List[Dict[str, Any]],
+        layers: list[dict[str, Any]],
         show_time: bool = True,
-    ) -> Generator[Tuple[Progress, Dict[str, int]], None, None]:
+    ) -> Generator[tuple[Progress, dict[str, int]], None, None]:
         """
         Create a multi-level progress bar with dynamic layers.
 
         Args:
-            layers: List of layer configurations, each containing:
+            layers: list of layer configurations, each containing:
                 - 'name': Layer name/description
                 - 'total': Total items for this layer (optional, None for indeterminate)
                 - 'description': Display description for the layer
                 - 'style': Rich style for this layer (optional)
                 - 'type': Layer type - 'progress' (default) or 'steps'
-                - 'steps': List of step names (required if type='steps')
+                - 'steps': list of step names (required if type='steps')
             show_time: Show elapsed and remaining time
 
         Yields:
-            Tuple of (Progress, task_ids_dict) where task_ids_dict maps layer names to task IDs
+            tuple of (Progress, task_ids_dict) where task_ids_dict maps layer names to task IDs
 
         Example:
             >>> layers = [

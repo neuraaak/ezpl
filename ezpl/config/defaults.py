@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Default Configuration
 # Project: ezpl
@@ -15,7 +14,7 @@ This module defines all default configuration values used throughout the applica
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 ## ==> FUNCTIONS
 # ///////////////////////////////////////////////////////////////
@@ -112,7 +111,7 @@ class DefaultConfiguration:
     # ///////////////////////////////////////////////////////////////
 
     @classmethod
-    def get_all_defaults(cls) -> Dict[str, Any]:
+    def get_all_defaults(cls) -> dict[str, Any]:
         """
         Get all default configuration values as a dictionary.
 
@@ -139,7 +138,7 @@ class DefaultConfiguration:
         }
 
     @classmethod
-    def get_logging_defaults(cls) -> Dict[str, Any]:
+    def get_logging_defaults(cls) -> dict[str, Any]:
         """
         Get logging-specific default values.
 
@@ -153,7 +152,7 @@ class DefaultConfiguration:
         }
 
     @classmethod
-    def get_printer_defaults(cls) -> Dict[str, Any]:
+    def get_printer_defaults(cls) -> dict[str, Any]:
         """
         Get printer-specific default values.
 
@@ -168,7 +167,7 @@ class DefaultConfiguration:
         }
 
     @classmethod
-    def get_file_logger_defaults(cls) -> Dict[str, Any]:
+    def get_file_logger_defaults(cls) -> dict[str, Any]:
         """
         Get file logger-specific default values.
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Wizard Panels Mixin
 # Project: ezpl
@@ -71,8 +70,8 @@ class PanelMixin:
         except Exception as e:
             try:
                 self._console.print(f"[red]Panel error:[/red] {type(e).__name__}")
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display panel: {e}") from e
 
     def info_panel(
         self,
@@ -107,8 +106,8 @@ class PanelMixin:
         except Exception as e:
             try:
                 self._console.print(f"[red]Info panel error:[/red] {type(e).__name__}")
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display info panel: {e}") from e
 
     def success_panel(
         self,
@@ -143,8 +142,8 @@ class PanelMixin:
                 self._console.print(
                     f"[red]Success panel error:[/red] {type(e).__name__}"
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display success panel: {e}") from e
 
     def error_panel(
         self,
@@ -177,8 +176,8 @@ class PanelMixin:
         except Exception as e:
             try:
                 self._console.print(f"[red]Error panel error:[/red] {type(e).__name__}")
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display error panel: {e}") from e
 
     def warning_panel(
         self,
@@ -213,8 +212,8 @@ class PanelMixin:
                 self._console.print(
                     f"[red]Warning panel error:[/red] {type(e).__name__}"
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display warning panel: {e}") from e
 
     def installation_panel(
         self,
@@ -264,5 +263,5 @@ class PanelMixin:
                 self._console.print(
                     f"[red]Installation panel error:[/red] {type(e).__name__}"
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                raise ValueError(f"Failed to display installation panel: {e}") from e

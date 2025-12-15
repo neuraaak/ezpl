@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Core Interfaces
 # Project: ezpl
@@ -13,8 +12,9 @@ This module defines the core interfaces and protocols used throughout the applic
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator, Protocol
+from typing import Any, Protocol
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////

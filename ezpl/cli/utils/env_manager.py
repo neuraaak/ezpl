@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Environment Variable Manager
 # Project: ezpl
@@ -16,7 +15,7 @@ for Ezpl configuration.
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
@@ -58,7 +57,7 @@ class UserEnvManager:
     def __init__(self) -> None:
         """Initialize the environment variable manager."""
         self.env_file = self._get_env_file_path()
-        self._tracked_vars: List[str] = []
+        self._tracked_vars: list[str] = []
 
     # ---
     # PRIVATE HELPER METHODS
@@ -79,7 +78,7 @@ class UserEnvManager:
             # Linux/macOS: ~/.ezpl/.env
             return Path.home() / ".ezpl" / ".env"
 
-    def _load_env_file(self) -> Dict[str, str]:
+    def _load_env_file(self) -> dict[str, str]:
         """
         Load environment variables from .env file.
 
@@ -89,17 +88,17 @@ class UserEnvManager:
         env_vars = {}
         if self.env_file.exists():
             try:
-                with open(self.env_file, "r", encoding="utf-8") as f:
+                with open(self.env_file, encoding="utf-8") as f:
                     for line in f:
                         line = line.strip()
                         if line and not line.startswith("#") and "=" in line:
                             key, value = line.split("=", 1)
                             env_vars[key.strip()] = value.strip()
-            except (IOError, ValueError):
+            except (OSError, ValueError):
                 pass
         return env_vars
 
-    def _save_env_file(self, env_vars: Dict[str, str]) -> None:
+    def _save_env_file(self, env_vars: dict[str, str]) -> None:
         """
         Save environment variables to .env file.
 
@@ -123,10 +122,10 @@ class UserEnvManager:
                 for key, value in sorted(existing.items()):
                     if key.startswith("EZPL_"):
                         f.write(f"{key}={value}\n")
-        except IOError:
+        except OSError:
             pass
 
-    def _get_tracked_vars(self) -> List[str]:
+    def _get_tracked_vars(self) -> list[str]:
         """
         Get list of tracked environment variables.
 
@@ -136,9 +135,7 @@ class UserEnvManager:
         if not self._tracked_vars:
             # Load from file if exists
             env_vars = self._load_env_file()
-            self._tracked_vars = [
-                key for key in env_vars.keys() if key.startswith("EZPL_")
-            ]
+            self._tracked_vars = [key for key in env_vars if key.startswith("EZPL_")]
         return self._tracked_vars
 
     # ///////////////////////////////////////////////////////////////
@@ -243,7 +240,7 @@ class UserEnvManager:
         except Exception:
             return False
 
-    def list_user_env(self) -> Dict[str, str]:
+    def list_user_env(self) -> dict[str, str]:
         """
         List all user environment variables managed by Ezpl.
 

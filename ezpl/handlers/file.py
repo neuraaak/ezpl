@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - File Logger Handler
 # Project: ezpl
@@ -91,7 +90,7 @@ class FileLogger(LoggingHandler):
                 f"Cannot create log directory: {e}",
                 str(self._log_file.parent),
                 "create_directory",
-            )
+            ) from e
 
         # Valider que le fichier peut être créé/écrit
         try:
@@ -103,7 +102,7 @@ class FileLogger(LoggingHandler):
         except (PermissionError, OSError) as e:
             raise FileOperationError(
                 f"Cannot write to log file: {e}", str(self._log_file), "write"
-            )
+            ) from e
 
         self._initialize_logger()
 
@@ -145,7 +144,7 @@ class FileLogger(LoggingHandler):
 
             self._logger_id = self._logger.add(**add_kwargs)
         except Exception as e:
-            raise LoggingError(f"Failed to initialize file logger: {e}", "file")
+            raise LoggingError(f"Failed to initialize file logger: {e}", "file") from e
 
     # ///////////////////////////////////////////////////////////////
     # UTILS METHODS
@@ -169,7 +168,7 @@ class FileLogger(LoggingHandler):
             self._level = level.upper()
             self._initialize_logger()
         except Exception as e:
-            raise LoggingError(f"Failed to update log level: {e}", "file")
+            raise LoggingError(f"Failed to update log level: {e}", "file") from e
 
     def log(self, level: str, message: Any) -> None:
         """
@@ -193,7 +192,7 @@ class FileLogger(LoggingHandler):
             log_method = getattr(self._logger, level.lower())
             log_method(message)
         except Exception as e:
-            raise LoggingError(f"Failed to log message: {e}", "file")
+            raise LoggingError(f"Failed to log message: {e}", "file") from e
 
     # ///////////////////////////////////////////////////////////////
     # GETTER
@@ -260,9 +259,8 @@ class FileLogger(LoggingHandler):
                     gc.collect()
                     # Give Windows time to release file locks
                     time.sleep(0.1)
-        except Exception:
-            # Ignore errors during cleanup
-            pass
+        except Exception as e:
+            raise LoggingError("Failed to close logger", "file") from e
 
     # ///////////////////////////////////////////////////////////////
     # FILE OPERATIONS
@@ -285,7 +283,7 @@ class FileLogger(LoggingHandler):
                 f"Failed to add separator to log file: {e}",
                 str(self._log_file),
                 "write",
-            )
+            ) from e
 
     # ///////////////////////////////////////////////////////////////
     # FORMATTING METHODS

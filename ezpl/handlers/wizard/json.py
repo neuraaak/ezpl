@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Wizard JSON Mixin
 # Project: ezpl
@@ -13,7 +12,7 @@ This module provides JSON display functionality for the RichWizard class.
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import json
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from rich.json import JSON
 
@@ -43,7 +42,7 @@ class JsonMixin:
 
     def json(
         self,
-        data: Union[str, Dict, List],
+        data: Union[str, dict, list],
         title: Optional[str] = None,
         indent: Optional[int] = None,
         highlight: bool = True,
@@ -104,5 +103,5 @@ class JsonMixin:
                     self._console.print(fallback_msg)
                 # Also try to print the raw data
                 self._console.print(f"[dim]Raw data:[/dim] {safe_str_convert(data)}")
-            except Exception:
-                pass  # Last resort: ignore silently
+            except Exception as e:
+                raise ValueError(f"Failed to display JSON: {e}") from e

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Handler Utilities
 # Project: ezpl
@@ -38,20 +37,20 @@ def safe_str_convert(obj: Any) -> str:
     # Try str() first (most common case)
     try:
         return str(obj)
-    except Exception:
-        pass
+    except Exception as e:
+        raise ValueError(f"Failed to convert object to string: {obj}") from e
 
     # Fallback to repr() if str() fails
     try:
         return repr(obj)
-    except Exception:
-        pass
+    except Exception as e:
+        raise ValueError(f"Failed to convert object to string: {obj}") from e
 
     # Last resort: type name
     try:
         return f"<{type(obj).__name__} object>"
-    except Exception:
-        return "<unknown object>"
+    except Exception as e:
+        raise ValueError(f"Failed to convert object to string: {obj}") from e
 
 
 def sanitize_for_file(message: str) -> str:

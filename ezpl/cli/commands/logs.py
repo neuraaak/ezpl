@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - CLI Logs Commands
 # Project: ezpl
@@ -105,14 +104,14 @@ def _parse_size(size_str: str) -> int:
             try:
                 value = float(size_str[: -len(unit)])
                 return int(value * multiplier)
-            except ValueError:
-                raise click.ClickException(f"Invalid size format: {size_str}")
+            except ValueError as e:
+                raise click.ClickException(f"Invalid size format: {size_str}") from e
 
     # Try to parse as bytes
     try:
         return int(size_str)
-    except ValueError:
-        raise click.ClickException(f"Invalid size format: {size_str}")
+    except ValueError as e:
+        raise click.ClickException(f"Invalid size format: {size_str}") from e
 
 
 ## ==> COMMAND GROUP
@@ -126,7 +125,6 @@ def logs_group() -> None:
 
     View, search, analyze, and manage Ezpl log files.
     """
-    pass
 
 
 ## ==> COMMANDS
@@ -171,7 +169,7 @@ def view_command(
             console.print("[dim]Press Ctrl+C to stop[/dim]\n")
 
             try:
-                with open(log_file, "r", encoding="utf-8") as f:
+                with open(log_file, encoding="utf-8") as f:
                     # Go to end of file
                     f.seek(0, 2)
 
@@ -179,7 +177,7 @@ def view_command(
                         line = f.readline()
                         if line:
                             entry = parser.parse_line(line, 0)
-                            if entry:
+                            if entry:  # noqa: SIM102
                                 if not level or entry.level.upper() == level.upper():
                                     console.print(entry.raw_line)
                         else:
@@ -446,8 +444,8 @@ def list_command(dir: Optional[Path]) -> None:
                     f"{size_mb:.2f} MB",
                     modified.strftime("%Y-%m-%d %H:%M:%S"),
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                console.print(f"[bold red]Error:[/bold red] {e}")
 
         console.print(table)
 

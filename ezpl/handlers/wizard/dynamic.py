@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Wizard Dynamic Progress Mixin
 # Project: ezpl
@@ -14,8 +13,9 @@ layers that can appear, progress, and disappear automatically.
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, Optional
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
@@ -75,9 +75,9 @@ class DynamicLayeredProgress:
         self,
         console,
         progress_prefix: str,
-        stages: List[Dict],
+        stages: list[dict],
         show_time: bool = True,
-    ):
+    ) -> None:
         """
         Initialize the dynamic layered progress bar.
 
@@ -102,7 +102,7 @@ class DynamicLayeredProgress:
         # Detect main layer and setup hierarchy
         self._setup_hierarchy()
 
-    def _setup_hierarchy(self):
+    def _setup_hierarchy(self) -> None:
         """Setup layer hierarchy and detect main layer."""
         self.has_main_layer = False
         self.main_layer_name = None
@@ -128,7 +128,7 @@ class DynamicLayeredProgress:
                         for i, s in enumerate(self.sub_layers)
                     ]
 
-    def _create_progress_bar(self):
+    def _create_progress_bar(self) -> Progress:
         """Create the Rich Progress instance with proper columns."""
         # Build columns for the main progress bar
         columns = [
@@ -161,7 +161,7 @@ class DynamicLayeredProgress:
 
         return Progress(*columns, console=self._console)
 
-    def _create_layer(self, layer_config: Dict) -> int:
+    def _create_layer(self, layer_config: dict) -> int:
         """Create a new layer in the progress bar.
 
         Args:
@@ -246,7 +246,7 @@ class DynamicLayeredProgress:
         self.task_ids[layer_name] = task_id
         return task_id
 
-    def update_layer(self, layer_name: str, progress: int, details: str = ""):
+    def update_layer(self, layer_name: str, progress: int, details: str = "") -> None:
         """Update a specific layer's progress.
 
         Args:
@@ -298,7 +298,7 @@ class DynamicLayeredProgress:
             # Handle regular progress layer
             self.progress.update(task_id, completed=progress, details=details)
 
-    def complete_layer(self, layer_name: str):
+    def complete_layer(self, layer_name: str) -> None:
         """Mark a layer as completed and animate its success.
 
         Args:
@@ -340,7 +340,9 @@ class DynamicLayeredProgress:
         if self.has_main_layer:
             self._update_main_layer_progress()
 
-    def _animate_layer_success(self, task_id: int, metadata: dict):  # noqa: ARG002
+    def _animate_layer_success(
+        self, task_id: int, metadata: dict  # noqa: ARG002
+    ) -> None:
         """Animate success for a specific layer and then remove it.
 
         Args:
@@ -401,7 +403,7 @@ class DynamicLayeredProgress:
                         del self.task_ids[name]
                         break
 
-    def _update_main_layer_progress(self):
+    def _update_main_layer_progress(self) -> None:
         """Update main layer progress based on completed sub-layers."""
         if not self.has_main_layer or not self.main_layer_name:
             return
@@ -428,7 +430,7 @@ class DynamicLayeredProgress:
         # Update main layer
         self.progress.update(main_task_id, completed=completed_sub_layers)
 
-    def handle_error(self, layer_name: str, error: str):
+    def handle_error(self, layer_name: str, error: str) -> None:
         """Handle errors in a specific layer.
 
         Args:
@@ -454,7 +456,7 @@ class DynamicLayeredProgress:
                 details=error_details,
             )
 
-    def emergency_stop(self, error_message: str = "Critical error occurred"):
+    def emergency_stop(self, error_message: str = "Critical error occurred") -> None:
         """Emergency stop all layers with animated failure effects.
 
         Args:
@@ -543,7 +545,7 @@ class DynamicLayeredProgress:
         """
         return self._emergency_message
 
-    def start(self):
+    def start(self) -> None:
         """Start the progress bar and create initial layers."""
         self.progress = self._create_progress_bar()
         self.progress.start()
@@ -566,7 +568,7 @@ class DynamicLayeredProgress:
             for stage in self.stages:
                 self._create_layer(stage)
 
-    def stop(self, success: bool = True, show_success_animation: bool = True):
+    def stop(self, success: bool = True, show_success_animation: bool = True) -> None:
         """Stop the progress bar with appropriate animations.
 
         Args:
@@ -617,7 +619,7 @@ class DynamicProgressMixin:
     @contextmanager
     def dynamic_layered_progress(
         self,
-        stages: List[Dict[str, Any]],
+        stages: list[dict[str, Any]],
         show_time: bool = True,
     ) -> Generator[DynamicLayeredProgress, None, None]:
         """

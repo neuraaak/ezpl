@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - CLI Info Command
 # Project: ezpl
@@ -146,8 +145,8 @@ def info_command() -> None:
 
             console.print("\n")
             console.print(deps_table)
-        except Exception:
-            pass  # Skip dependencies if not available
+        except Exception as e:
+            console.print(f"[bold red]Error:[/bold red] {e}")
 
     except Exception as e:
         console.print(f"[bold red]Error:[/bold red] {e}")
