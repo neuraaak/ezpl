@@ -14,7 +14,7 @@ This module provides all progress bar-related methods for the RichWizard class.
 import time
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Optional, dict, list, tuple
+from typing import Any, Optional
 
 # IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
