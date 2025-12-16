@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Test rapide interactif
 # Project: ezpl
@@ -131,7 +130,7 @@ def test_progress_bars(wizard):
     import time
 
     with wizard.progress("Traitement...", total=50) as (progress, task):
-        for i in range(50):
+        for _i in range(50):
             progress.update(task, advance=1)
             time.sleep(0.02)
 

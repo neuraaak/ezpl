@@ -9,8 +9,9 @@ Utility functions for message handling in handlers.
 This module provides robust message conversion and sanitization functions.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import re
 from typing import Any
 

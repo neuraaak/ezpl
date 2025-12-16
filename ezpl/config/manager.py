@@ -10,22 +10,17 @@ This module provides centralized configuration management with support for
 file-based configuration, environment variables, and runtime configuration.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import json
 import os
 from pathlib import Path
 from typing import Any, Optional, Union
 
+# Internal modules
 from ..core.exceptions import FileOperationError
-
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
 from .defaults import DefaultConfiguration
-
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
-
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
@@ -55,9 +50,9 @@ class ConfigurationManager:
         self._config: dict[str, Any] = {}
         self._load_configuration()
 
-    # ---
+    # ------------------------------------------------
     # PRIVATE HELPER METHODS
-    # ---
+    # ------------------------------------------------
 
     def _load_configuration(self) -> None:
         """
@@ -114,7 +109,9 @@ class ConfigurationManager:
                     try:
                         self._config[config_key] = int(value)
                     except ValueError as e:
-                        raise ValueError(f"Failed to convert {value} to int: {e}") from e
+                        raise ValueError(
+                            f"Failed to convert {value} to int: {e}"
+                        ) from e
                 else:
                     self._config[config_key] = value
 

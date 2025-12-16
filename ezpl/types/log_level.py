@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - LogLevel enumeration
 # Project: ezpl
@@ -10,17 +9,16 @@ LogLevel enumeration for Ezpl logging framework.
 This module defines the logging levels with their associated colors and properties.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 from enum import Enum
 from typing import Any
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from loguru import logger
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 from ..core.exceptions import ValidationError
 
 ## ==> CLASSES
@@ -130,12 +128,12 @@ class LogLevel(Enum):
         try:
             lvl = cls[level.upper()]
             return getattr(lvl, attribute)
-        except KeyError:
-            raise ValidationError(f"Unknown level '{level}'", "level", level)
-        except AttributeError:
+        except KeyError as e:
+            raise ValidationError(f"Unknown level '{level}'", "level", level) from e
+        except AttributeError as e:
             raise ValidationError(
                 f"Invalid attribute '{attribute}'", "attribute", attribute
-            )
+            ) from e
 
     @classmethod
     def get_label(cls, level: str) -> str:

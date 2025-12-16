@@ -10,18 +10,17 @@ This module provides functionality to manage user environment variables
 for Ezpl configuration.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import os
 import sys
 from pathlib import Path
 from typing import Optional
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
@@ -59,9 +58,9 @@ class UserEnvManager:
         self.env_file = self._get_env_file_path()
         self._tracked_vars: list[str] = []
 
-    # ---
+    # ------------------------------------------------
     # PRIVATE HELPER METHODS
-    # ---
+    # ------------------------------------------------
 
     def _get_env_file_path(self) -> Path:
         """

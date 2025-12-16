@@ -1,14 +1,16 @@
-# ///////////////////////////////////////////////////////////////
-# EZPL - Core module
-# Project: ezpl
-# ///////////////////////////////////////////////////////////////
-
 """
 Core module for Ezpl logging framework.
 
 This module contains the core business logic and interfaces.
 """
 
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+# ------------------------------------------------
+# CORE EXCEPTIONS
+# ------------------------------------------------
 from .exceptions import (
     ConfigurationError,
     EzplError,
@@ -18,6 +20,10 @@ from .exceptions import (
     LoggingError,
     ValidationError,
 )
+
+# ------------------------------------------------
+# CORE INTERFACES
+# ------------------------------------------------
 from .interfaces import (
     ConfigurationManager,
     EzplCore,
@@ -25,13 +31,21 @@ from .interfaces import (
     LoggingHandler,
 )
 
+# =============================================================================
+# MODULE EXPORTS
+# =============================================================================
+
 __all__ = [
-    # Interfaces
+    # ------------------------------------------------
+    # INTERFACE EXPORTS
+    # ------------------------------------------------
     "LoggingHandler",
     "IndentationManager",
     "ConfigurationManager",
     "EzplCore",
-    # Exceptions
+    # ------------------------------------------------
+    # EXCEPTION EXPORTS
+    # ------------------------------------------------
     "EzplError",
     "ConfigurationError",
     "LoggingError",

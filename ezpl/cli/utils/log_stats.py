@@ -9,21 +9,17 @@ Log statistics utility for CLI operations.
 This module provides functionality to calculate statistics from log files.
 """
 
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Base imports
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Optional
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 from ezpl.cli.utils.log_parser import LogEntry
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
 from .log_parser import LogParser
-
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
-
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
@@ -49,9 +45,9 @@ class LogStatistics:
         self.parser = LogParser(self.log_file)
         self._entries: Optional[list[LogEntry]] = None
 
-    # ---
+    # ------------------------------------------------
     # PRIVATE HELPER METHODS
-    # ---
+    # ------------------------------------------------
 
     def _get_entries(self) -> list[LogEntry]:
         """Get all log entries (cached)."""

@@ -9,21 +9,20 @@ CLI command for displaying package information.
 This module provides the info command for Ezpl.
 """
 
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Base imports
 from pathlib import Path
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
 import click
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 try:
     import ezpl
 

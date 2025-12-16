@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Script de démonstration
 # Project: ezpl
@@ -172,7 +171,7 @@ print("=" * 80 + "\n")
 # Progress bar simple
 print("Progress bar simple:")
 with wizard.progress("Traitement en cours...", total=100) as (progress, task):
-    for i in range(100):
+    for _i in range(100):
         progress.update(task, advance=1)
         time.sleep(0.01)
 
@@ -184,14 +183,14 @@ with wizard.spinner("Chargement...") as (progress, task):
 # Download progress
 print("\nDownload progress:")
 with wizard.download_progress("Téléchargement de fichier.zip") as (progress, task):
-    for i in range(0, 100, 10):
+    for _i in range(0, 100, 10):
         progress.update(task, advance=10, total=100)
         time.sleep(0.1)
 
 # File download progress
 print("\nFile download progress:")
 with wizard.file_download_progress("large_file.zip", 1024000) as (progress, task):
-    for i in range(0, 1024000, 102400):
+    for _i in range(0, 1024000, 102400):
         progress.update(task, advance=102400)
         time.sleep(0.1)
 
@@ -215,7 +214,7 @@ gen.__exit__(None, None, None)
 print("\nStep progress:")
 steps = [("Init", "Initialisation"), ("Process", "Traitement"), ("Done", "Terminé")]
 with wizard.step_progress(steps) as (progress, task, steps_list):
-    for i in range(len(steps)):
+    for _i in range(len(steps)):
         progress.advance(task)
         time.sleep(0.2)
 

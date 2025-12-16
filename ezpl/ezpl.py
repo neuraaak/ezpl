@@ -5,8 +5,9 @@
 
 from __future__ import annotations
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import sys
 import threading
 from collections.abc import Generator
@@ -14,16 +15,12 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, TypeVar
 
+# External libraries
 from loguru import logger
-
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
 from loguru._logger import Logger
 
+# Internal modules
 from .config import ConfigurationManager
-
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
 from .handlers import EzLogger, EzPrinter
 from .handlers.console import ConsolePrinterWrapper
 

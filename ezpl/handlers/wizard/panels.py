@@ -9,19 +9,17 @@ Panel methods mixin for Rich Wizard.
 This module provides all panel-related methods for the RichWizard class.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 from typing import Any, Optional
 
+# External libraries
 from rich.align import Align
-
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
 from rich.panel import Panel
 from rich.text import Text
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 from ..utils import safe_str_convert
 
 ## ==> CLASSES

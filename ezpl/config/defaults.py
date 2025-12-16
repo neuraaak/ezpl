@@ -9,8 +9,9 @@ Default configuration values for Ezpl logging framework.
 This module defines all default configuration values used throughout the application.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import os
 import sys
 from pathlib import Path
