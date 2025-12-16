@@ -9,15 +9,15 @@ Progress methods mixin for Rich Wizard.
 This module provides all progress bar-related methods for the RichWizard class.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import time
 from collections.abc import Generator
 from contextlib import contextmanager
 from typing import Any, Optional
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from rich.progress import (
     BarColumn,
     DownloadColumn,
@@ -30,8 +30,7 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////

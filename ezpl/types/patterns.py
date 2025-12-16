@@ -10,8 +10,9 @@ This module defines contextual patterns for enhanced console output with the for
 • PATTERN :: message
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 from enum import Enum
 
 ## ==> CLASSES

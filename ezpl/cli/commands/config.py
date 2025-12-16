@@ -10,19 +10,18 @@ This module provides commands for getting, setting, and resetting
 Ezpl configuration with support for user environment variables.
 """
 
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Base imports
 from typing import Optional
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
 import click
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from rich.console import Console
 from rich.table import Table
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 from ...config import ConfigurationManager
 from ..utils.env_manager import UserEnvManager
 

@@ -10,28 +10,24 @@ This module provides a console-based logging handler with advanced formatting,
 indentation management, and color support using Rich.
 """
 
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Base imports
 from collections.abc import Generator
 from contextlib import contextmanager
-
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
 from typing import Any, Optional, Union
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 
+# Internal modules
 from ..core.exceptions import ValidationError
 from ..core.interfaces import IndentationManager, LoggingHandler
 from ..types import LogLevel, Pattern, get_pattern_color
 from .utils import safe_str_convert, sanitize_for_console
 from .wizard import RichWizard
-
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
-
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////
@@ -83,9 +79,9 @@ class ConsolePrinterWrapper:
         """Log a critical message with pattern format."""
         self._console_printer.print_pattern(Pattern.ERROR, message, "CRITICAL")
 
-    # ---
+    # ------------------------------------------------
     # ADDITIONAL PATTERN METHODS
-    # ---
+    # ------------------------------------------------
 
     def tip(self, message: Any) -> None:
         """Display a tip message with pattern format."""
@@ -111,9 +107,9 @@ class ConsolePrinterWrapper:
         """Display a dependencies message with pattern format."""
         self._console_printer.print_pattern(Pattern.DEPS, message, "INFO")
 
-    # ---
+    # ------------------------------------------------
     # ENHANCED METHODS
-    # ---
+    # ------------------------------------------------
 
     def print_pattern(
         self, pattern: Union[str, Pattern], message: Any, level: str = "INFO"
@@ -131,9 +127,9 @@ class ConsolePrinterWrapper:
         """Display JSON data in a formatted and syntax-highlighted way."""
         self._console_printer.print_json(data, title, indent, highlight)
 
-    # ---
+    # ------------------------------------------------
     # WIZARD ACCESS
-    # ---
+    # ------------------------------------------------
 
     @property
     def wizard(self) -> "RichWizard":
@@ -150,9 +146,9 @@ class ConsolePrinterWrapper:
         """
         return self._console_printer._wizard
 
-    # ---
+    # ------------------------------------------------
     # DELEGATION TO CONSOLE PRINTER
-    # ---
+    # ------------------------------------------------
 
     def __getattr__(self, name: str) -> Any:
         """
@@ -334,9 +330,9 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
         """Log a critical message with pattern format."""
         self.print_pattern(Pattern.ERROR, message, "CRITICAL")
 
-    # ---
+    # ------------------------------------------------
     # ADDITIONAL PATTERN METHODS
-    # ---
+    # ------------------------------------------------
 
     def tip(self, message: Any) -> None:
         """Display a tip message with pattern format."""

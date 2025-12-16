@@ -10,18 +10,17 @@ This module provides the command-line interface for managing Ezpl
 configuration, viewing logs, and performing various operations.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import click
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 try:
     import ezpl
 

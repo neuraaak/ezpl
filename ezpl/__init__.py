@@ -1,8 +1,3 @@
-# ///////////////////////////////////////////////////////////////
-# EZPL - Main Package
-# Project: ezpl
-# ///////////////////////////////////////////////////////////////
-
 """
 Ezpl - Modern Python logging framework.
 
@@ -28,10 +23,41 @@ suitable for professional and industrial applications.
     >>> logger.info("Logged to file")
 """
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
 from __future__ import annotations
 
+import sys
+
+# =============================================================================
+# META INFORMATIONS
+# =============================================================================
+
+__version__ = "1.1.4"
+__author__ = "Neuraaak"
+__maintainer__ = "Neuraaak"
+__license__ = "MIT"
+__description__ = "A module for easier logging"
+__keywords__ = ["logging", "rich", "loguru", "console", "file"]
+__url__ = "https://github.com/neuraaak/ezpl"
+__repository__ = "https://github.com/neuraaak/ezpl"
+__python_requires__ = ">=3.10"
+
+# =============================================================================
+# PYTHON VERSION CHECK
+# =============================================================================
+
+if sys.version_info < (3, 10):
+    raise RuntimeError(
+        f"ezpl {__version__} requires Python 3.10 or higher. "
+        f"Current version: {sys.version}"
+    )
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+# ------------------------------------------------
+# CORE CONFIG & EXCEPTIONS
+# ------------------------------------------------
 from .config import ConfigurationManager
 from .core.exceptions import (
     ConfigurationError,
@@ -43,13 +69,16 @@ from .core.exceptions import (
     ValidationError,
 )
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# ------------------------------------------------
+# MAIN CLASS & HANDLERS
+# ------------------------------------------------
 from .ezpl import Ezpl
 from .handlers import ConsolePrinter, EzLogger, EzPrinter, FileLogger, RichWizard
 from .handlers.console import ConsolePrinterWrapper
+
+# ------------------------------------------------
+# TYPES
+# ------------------------------------------------
 from .types import (
     PATTERN_COLORS,
     LogLevel,
@@ -58,13 +87,16 @@ from .types import (
     get_pattern_color_by_name,
 )
 
-## ==> TYPE ALIASES
-# ///////////////////////////////////////////////////////////////
+# =============================================================================
+# TYPE ALIASES
+# =============================================================================
 
 # Canonical type aliases for users.
 # They mirror the internal EzPrinter / EzLogger types.
 
-# Canonical printer (console)
+# ------------------------------------------------
+# PRINTER TYPE ALIAS
+# ------------------------------------------------
 Printer = EzPrinter
 """Type alias for EzPrinter (console printer handler).
 Use this type when you want to annotate a variable that represents a printer.
@@ -78,7 +110,9 @@ Example:
     >>> printer.print_json({"key": "value"})
 """
 
-# Canonical logger (file)
+# ------------------------------------------------
+# LOGGER TYPE ALIAS
+# ------------------------------------------------
 Logger = EzLogger
 """Type alias for EzLogger (file logger handler).
 Use this type when you want to annotate a variable that represents a logger.
@@ -90,25 +124,18 @@ Example:
     >>> logger.info("Logged to file")
 """
 
-## ==> METADATA
-# ///////////////////////////////////////////////////////////////
-
-__version__ = "1.1.3"
-__author__ = "Neuraaak"
-__maintainer__ = "Neuraaak"
-__license__ = "MIT"
-__description__ = "A module for easier logging"
-__keywords__ = ["logging", "rich", "loguru", "console", "file"]
-__url__ = "https://github.com/neuraaak/ezpl"
-__repository__ = "https://github.com/neuraaak/ezpl"
-
-## ==> EXPORTS
-# ///////////////////////////////////////////////////////////////
+# =============================================================================
+# MODULE EXPORTS
+# =============================================================================
 
 __all__ = [
-    # Main class
+    # ------------------------------------------------
+    # MAIN CLASS EXPORTS
+    # ------------------------------------------------
     "Ezpl",
-    # Handlers
+    # ------------------------------------------------
+    # HANDLER CLASS EXPORTS
+    # ------------------------------------------------
     "EzPrinter",
     "EzLogger",
     "Logger",
@@ -116,17 +143,25 @@ __all__ = [
     "FileLogger",
     "ConsolePrinterWrapper",
     "RichWizard",
-    # Configuration
+    # ------------------------------------------------
+    # CONFIGURATION EXPORTS
+    # ------------------------------------------------
     "ConfigurationManager",
-    # Type aliases
+    # ------------------------------------------------
+    # TYPE ALIASES EXPORTS
+    # ------------------------------------------------
     "Printer",
-    # Types
+    # ------------------------------------------------
+    # TYPE & PATTERN EXPORTS
+    # ------------------------------------------------
     "LogLevel",
     "Pattern",
     "PATTERN_COLORS",
     "get_pattern_color",
     "get_pattern_color_by_name",
-    # Exceptions
+    # ------------------------------------------------
+    # EXCEPTION EXPORTS
+    # ------------------------------------------------
     "EzplError",
     "ConfigurationError",
     "LoggingError",
@@ -134,7 +169,9 @@ __all__ = [
     "InitializationError",
     "FileOperationError",
     "HandlerError",
-    # Metadata
+    # ------------------------------------------------
+    # METADATA EXPORTS
+    # ------------------------------------------------
     "__version__",
     "__author__",
     "__maintainer__",
@@ -143,4 +180,5 @@ __all__ = [
     "__keywords__",
     "__url__",
     "__repository__",
+    "__python_requires__",
 ]

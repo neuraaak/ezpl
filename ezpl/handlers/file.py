@@ -10,23 +10,20 @@ This module provides a file-based logging handler with advanced formatting,
 session separation, and structured output.
 """
 
-from datetime import datetime
-
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from loguru import logger
 from loguru._logger import Logger
 
+# Internal modules
 from ..core.exceptions import FileOperationError, LoggingError, ValidationError
 from ..core.interfaces import LoggingHandler
-
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
 from ..types import LogLevel
 from .utils import safe_str_convert, sanitize_for_file
 
@@ -106,9 +103,9 @@ class FileLogger(LoggingHandler):
 
         self._initialize_logger()
 
-    # ---
+    # ------------------------------------------------
     # PRIVATE HELPER METHODS
-    # ---
+    # ------------------------------------------------
 
     def _initialize_logger(self) -> None:
         """

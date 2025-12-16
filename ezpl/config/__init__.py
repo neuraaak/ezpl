@@ -1,15 +1,27 @@
-# ///////////////////////////////////////////////////////////////
-# EZPL - Configuration module
-# Project: ezpl
-# ///////////////////////////////////////////////////////////////
-
 """
 Configuration module for Ezpl logging framework.
 
 This module handles all configuration management.
 """
 
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+# ------------------------------------------------
+# CONFIGURATION IMPLEMENTATIONS
+# ------------------------------------------------
 from .defaults import DefaultConfiguration
 from .manager import ConfigurationManager
 
-__all__ = ["ConfigurationManager", "DefaultConfiguration"]
+# =============================================================================
+# MODULE EXPORTS
+# =============================================================================
+
+__all__ = [
+    # ------------------------------------------------
+    # CONFIGURATION PUBLIC API
+    # ------------------------------------------------
+    "ConfigurationManager",
+    "DefaultConfiguration",
+]

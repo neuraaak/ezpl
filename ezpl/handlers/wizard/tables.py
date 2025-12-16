@@ -9,16 +9,15 @@ Table methods mixin for Rich Wizard.
 This module provides all table-related methods for the RichWizard class.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 from typing import Any, Optional
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from rich.table import Table
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////

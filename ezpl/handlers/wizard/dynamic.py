@@ -10,15 +10,15 @@ This module provides dynamic layered progress bar functionality with
 layers that can appear, progress, and disappear automatically.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import time
 from collections.abc import Generator
 from contextlib import contextmanager
 from typing import Any, Optional
 
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
+# External libraries
 from rich.progress import (
     BarColumn,
     DownloadColumn,
@@ -32,8 +32,7 @@ from rich.progress import (
 )
 from rich.text import Text
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 
 ## ==> CLASSES
 # ///////////////////////////////////////////////////////////////

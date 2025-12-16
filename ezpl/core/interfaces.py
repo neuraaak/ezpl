@@ -9,8 +9,9 @@ Core interfaces for Ezpl logging framework.
 This module defines the core interfaces and protocols used throughout the application.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 from pathlib import Path

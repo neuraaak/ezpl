@@ -9,19 +9,17 @@ JSON methods mixin for Rich Wizard.
 This module provides JSON display functionality for the RichWizard class.
 """
 
-# IMPORT BASE
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Base imports
 import json
 from typing import Optional, Union
 
+# External libraries
 from rich.json import JSON
-
-# IMPORT SPECS
-# ///////////////////////////////////////////////////////////////
 from rich.panel import Panel
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Internal modules
 from ..utils import safe_str_convert
 
 ## ==> CLASSES
