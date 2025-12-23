@@ -157,7 +157,9 @@ class FileOperationError(EzplError):
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, file_path: str = None, operation: str = None) -> None:
+    def __init__(
+        self, message: str, file_path: str = None, operation: str = None
+    ) -> None:
         """
         Initialize the file operation error.
 

@@ -340,7 +340,9 @@ class DynamicLayeredProgress:
             self._update_main_layer_progress()
 
     def _animate_layer_success(
-        self, task_id: int, metadata: dict  # noqa: ARG002
+        self,
+        task_id: int,
+        metadata: dict,  # noqa: ARG002
     ) -> None:
         """Animate success for a specific layer and then remove it.
 

@@ -132,6 +132,23 @@ class ConfigurationManager:
         """
         return self._config.get(key, default)
 
+    def has_key(self, key: str) -> bool:
+        """
+        Check if a configuration key is explicitly set (not just a default).
+
+        Args:
+            key: Configuration key to check
+
+        Returns:
+            True if the key is explicitly set in config or environment, False otherwise
+        """
+        # Check if key exists in config (from file or explicitly set)
+        if key in self._config:
+            return True
+        # Check if corresponding environment variable exists
+        env_key = f"EZPL_{key.replace('-', '_').upper()}"
+        return env_key in os.environ
+
     def get_log_level(self) -> str:
         """Get the current log level."""
         return self.get("log-level", DefaultConfiguration.LOG_LEVEL)

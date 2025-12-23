@@ -3,11 +3,11 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "Ezpl"
-version = "1.1.4"
+name = "ezpl"
+version = "1.2.0"
 description = "Modern Python logging framework with Rich console output and loguru file logging, featuring advanced display capabilities, configuration management, and a simple typed API."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Neuraaak" }]
 maintainers = [{ name = "Neuraaak" }]
@@ -105,7 +105,7 @@ exclude = [
 # Configuration Black
 [tool.black]
 line-length = 88
-target-version = ['py39', 'py310', 'py311', 'py312']
+target-version = ['py310', 'py311', 'py312', 'py313']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -161,7 +161,7 @@ skip = [
 
 # Configuration MyPy
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false

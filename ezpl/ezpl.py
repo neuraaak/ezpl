@@ -41,6 +41,7 @@ T = TypeVar("T", bound="Ezpl")
 class Ezpl:
     _instance: Ezpl | None = None
     _lock: threading.Lock = threading.Lock()
+    _config_locked: bool = False
     _log_file: Path
     _printer: EzPrinter
     _logger: EzLogger
@@ -49,6 +50,16 @@ class Ezpl:
     # ///////////////////////////////////////////////////////////////
     # INIT
     # ///////////////////////////////////////////////////////////////
+
+    @classmethod
+    def is_initialized(cls) -> bool:
+        """
+        Return True if the Ezpl singleton has already been created.
+
+        Useful for libraries that want to know whether they are the first
+        to initialize Ezpl or if they should avoid re-configuring it.
+        """
+        return cls._instance is not None
 
     def __new__(
         cls: type[T],
@@ -110,7 +121,9 @@ class Ezpl:
 
                     # Determine configuration values with priority: arg > env > config file > default
                     # Helper function to get value with priority order
-                    def get_config_value(arg_value, config_key: str, getter_method):
+                    def get_config_value(
+                        arg_value, config_key: str, getter_method
+                    ) -> Any:
                         """
                         Get configuration value with priority: arg > env > config file > default
 
@@ -357,6 +370,35 @@ class Ezpl:
             except Exception as e:
                 logger.error(f"Error during cleanup: {e}")
             cls._instance = None
+        # Also reset configuration lock
+        cls._config_locked = False
+
+    # ------------------------------------------------
+    # CONFIG LOCK CONTROL
+    # ------------------------------------------------
+
+    @classmethod
+    def lock_config(cls) -> None:
+        """
+        Lock Ezpl configuration so that future configure() calls are ignored
+        unless explicitly forced.
+
+        Intended usage:
+            1. Root application configures Ezpl once
+            2. Calls Ezpl.lock_config()
+            3. Libraries calling configure() later will not override settings
+        """
+        cls._config_locked = True
+
+    @classmethod
+    def unlock_config(cls) -> None:
+        """
+        Unlock Ezpl configuration.
+
+        Use with care: this allows configure() to change global logging
+        configuration again.
+        """
+        cls._config_locked = False
 
     def set_log_file(self, log_file: Path | str) -> None:
         """
@@ -418,11 +460,54 @@ class Ezpl:
         # Reload configuration
         self._config_manager.reload()
 
-        # Reapply to handlers
-        self.set_printer_level(self._config_manager.get_printer_level())
-        self.set_logger_level(self._config_manager.get_file_logger_level())
+        # Get configuration values
+        printer_level = self._config_manager.get_printer_level()
+        file_logger_level = self._config_manager.get_file_logger_level()
+        global_log_level = self._config_manager.get_log_level()
+
+        # Check if specific levels are explicitly set (not just defaults)
+        # Priority: specific levels > global level
+        # Only apply global level if specific levels are not explicitly set
+        printer_level_explicit = self._config_manager.has_key("printer-level")
+        file_logger_level_explicit = self._config_manager.has_key("file-logger-level")
+        global_log_level_explicit = self._config_manager.has_key("log-level")
+
+        # Reapply to handlers with priority logic
+        if printer_level_explicit and file_logger_level_explicit:
+            # Both specific levels are explicitly set, use them
+            self.set_printer_level(printer_level)
+            self.set_logger_level(file_logger_level)
+        elif printer_level_explicit:
+            # Only printer level is explicitly set
+            self.set_printer_level(printer_level)
+            # Apply global level to logger if it's explicitly set, otherwise use file_logger_level
+            if global_log_level_explicit:
+                self.set_logger_level(global_log_level)
+            else:
+                self.set_logger_level(file_logger_level)
+        elif file_logger_level_explicit:
+            # Only file logger level is explicitly set
+            self.set_logger_level(file_logger_level)
+            # Apply global level to printer if it's explicitly set, otherwise use printer_level
+            if global_log_level_explicit:
+                self.set_printer_level(global_log_level)
+            else:
+                self.set_printer_level(printer_level)
+        elif global_log_level_explicit:
+            # Only global level is explicitly set, apply to both
+            self.set_level(global_log_level)
+        else:
+            # No explicit levels, use defaults (shouldn't happen, but safe fallback)
+            self.set_printer_level(printer_level)
+            self.set_logger_level(file_logger_level)
 
         # Reinitialize logger with new rotation / retention / compression settings
+        # Preserve current level if logger was already initialized
+        current_logger_level = (
+            self._logger._level
+            if hasattr(self, "_logger") and self._logger
+            else file_logger_level
+        )
         try:
             if hasattr(self, "_logger") and self._logger:
                 self._logger.close()
@@ -430,23 +515,25 @@ class Ezpl:
             logger.error(f"Error while closing logger during reload_config: {e}")
         self._logger = EzLogger(
             log_file=self._log_file,
-            level=self._config_manager.get_file_logger_level(),
+            level=current_logger_level,
             rotation=self._config_manager.get_log_rotation(),
             retention=self._config_manager.get_log_retention(),
             compression=self._config_manager.get_log_compression(),
         )
 
         # Reinitialize printer with new indent settings
+        # Preserve current level if printer was already initialized
+        current_printer_level = (
+            self._printer._level
+            if hasattr(self, "_printer") and self._printer
+            else printer_level
+        )
         self._printer = EzPrinter(
-            level=self._config_manager.get_printer_level(),
+            level=current_printer_level,
             indent_step=self._config_manager.get_indent_step(),
             indent_symbol=self._config_manager.get_indent_symbol(),
             base_indent_symbol=self._config_manager.get_base_indent_symbol(),
         )
-
-        # Apply global log level
-        global_log_level = self._config_manager.get_log_level()
-        self.set_level(global_log_level)
 
     def configure(self, config_dict: dict[str, Any] = None, **kwargs) -> None:
         """
@@ -471,6 +558,14 @@ class Ezpl:
         # Merge config_dict and kwargs
         if config_dict:
             kwargs.update(config_dict)
+
+        # Special control flag (not stored in configuration):
+        # - force=True allows configure() even when configuration is locked
+        force = kwargs.pop("force", False)
+
+        # If configuration is locked and not forced, ignore configure() call
+        if self._config_locked and not force:
+            return
 
         # Normalize keys: convert underscores to hyphens for consistency
         normalized_config = {}
@@ -500,13 +595,30 @@ class Ezpl:
         if "log-file" in normalized_config:
             self.set_log_file(normalized_config["log-file"])
 
-        if "printer-level" in normalized_config:
+        # Handle log level changes with proper priority
+        # Priority: specific levels (printer-level, file-logger-level) > global level (log-level)
+        has_printer_level = "printer-level" in normalized_config
+        has_file_logger_level = "file-logger-level" in normalized_config
+        has_global_level = "log-level" in normalized_config
+
+        if has_printer_level and has_file_logger_level:
+            # Both specific levels are provided, use them
             self.set_printer_level(normalized_config["printer-level"])
-
-        if "file-logger-level" in normalized_config:
             self.set_logger_level(normalized_config["file-logger-level"])
-
-        if "log-level" in normalized_config:
+        elif has_printer_level:
+            # Only printer level is provided
+            self.set_printer_level(normalized_config["printer-level"])
+            # Apply global level to logger if provided, otherwise leave it unchanged
+            if has_global_level:
+                self.set_logger_level(normalized_config["log-level"])
+        elif has_file_logger_level:
+            # Only file logger level is provided
+            self.set_logger_level(normalized_config["file-logger-level"])
+            # Apply global level to printer if provided, otherwise leave it unchanged
+            if has_global_level:
+                self.set_printer_level(normalized_config["log-level"])
+        elif has_global_level:
+            # Only global level is provided, apply to both
             self.set_level(normalized_config["log-level"])
 
         # Reinitialize logger if rotation settings changed
@@ -515,6 +627,12 @@ class Ezpl:
             for key in ["log-rotation", "log-retention", "log-compression"]
         )
         if rotation_changed:
+            # Save current level before closing logger
+            current_logger_level = (
+                self._logger._level
+                if hasattr(self, "_logger") and self._logger
+                else self._config_manager.get_file_logger_level()
+            )
             # Close previous logger before creating a new one to avoid duplicate handlers
             try:
                 if hasattr(self, "_logger") and self._logger:
@@ -523,7 +641,8 @@ class Ezpl:
                 logger.error(f"Error while closing logger during configure(): {e}")
             self._logger = EzLogger(
                 log_file=self._log_file,
-                level=self._logger._level,
+                level=self._config_manager.get_file_logger_level()
+                or current_logger_level,
                 rotation=self._config_manager.get_log_rotation(),
                 retention=self._config_manager.get_log_retention(),
                 compression=self._config_manager.get_log_compression(),
@@ -535,8 +654,14 @@ class Ezpl:
             for key in ["indent-step", "indent-symbol", "base-indent-symbol"]
         )
         if indent_changed:
+            # Save current level before reinitializing printer
+            current_printer_level = (
+                self._printer._level
+                if hasattr(self, "_printer") and self._printer
+                else self._config_manager.get_printer_level()
+            )
             self._printer = EzPrinter(
-                level=self._printer._level,
+                level=self._config_manager.get_printer_level() or current_printer_level,
                 indent_step=self._config_manager.get_indent_step(),
                 indent_symbol=self._config_manager.get_indent_symbol(),
                 base_indent_symbol=self._config_manager.get_base_indent_symbol(),

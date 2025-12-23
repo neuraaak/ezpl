@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/OS-Independent-lightgray?style=for-the-badge)](https://pypi.org/project/ezpl/)
-[![Version](https://img.shields.io/badge/Version-1.1.4-orange?style=for-the-badge)](https://github.com/neuraaak/ezpl)
+[![Version](https://img.shields.io/badge/Version-1.2.0-orange?style=for-the-badge)](https://github.com/neuraaak/ezpl)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)](https://github.com/neuraaak/ezpl)
 [![Tests](https://img.shields.io/badge/Tests-200%2B%20passing-success?style=for-the-badge)](https://github.com/neuraaak/ezpl)
