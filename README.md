@@ -5,7 +5,7 @@
 [![Version](https://img.shields.io/badge/Version-1.2.1-orange?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)](https://github.com/neuraaak/ezplog)
-[![PyPI](https://img.shields.io/badge/PyPI-ezqt_app-green?style=for-the-badge&logo=pypi)](https://pypi.org/project/ezplog/)
+[![PyPI](https://img.shields.io/badge/PyPI-ezplog-green?style=for-the-badge&logo=pypi)](https://pypi.org/project/ezplog/)
 [![Tests](https://img.shields.io/badge/Tests-200%2B%20passing-success?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 
 **Ezpl** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
