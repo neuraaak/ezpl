@@ -2,10 +2,11 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/OS-Independent-lightgray?style=for-the-badge)](https://pypi.org/project/ezpl/)
-[![Version](https://img.shields.io/badge/Version-1.2.0-orange?style=for-the-badge)](https://github.com/neuraaak/ezpl)
+[![Version](https://img.shields.io/badge/Version-1.2.1-orange?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)](https://github.com/neuraaak/ezpl)
-[![Tests](https://img.shields.io/badge/Tests-200%2B%20passing-success?style=for-the-badge)](https://github.com/neuraaak/ezpl)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)](https://github.com/neuraaak/ezplog)
+[![PyPI](https://img.shields.io/badge/PyPI-ezqt_app-green?style=for-the-badge&logo=pypi)](https://pypi.org/project/ezplog/)
+[![Tests](https://img.shields.io/badge/Tests-200%2B%20passing-success?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 
 **Ezpl** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
 
@@ -18,7 +19,7 @@ pip install ezpl
 Or from source:
 
 ```bash
-git clone https://github.com/neuraaak/ezpl.git
+git clone https://github.com/neuraaak/ezplog.git
 cd ezpl && pip install .
 ```
 
@@ -169,8 +170,8 @@ MIT License – See [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
 
-- **Repository**: [https://github.com/neuraaak/ezpl](https://github.com/neuraaak/ezpl)
-- **Issues**: [GitHub Issues](https://github.com/neuraaak/ezpl/issues)
+- **Repository**: [https://github.com/neuraaak/ezplog](https://github.com/neuraaak/ezplog)
+- **Issues**: [GitHub Issues](https://github.com/neuraaak/ezplog/issues)
 - **Documentation**: [Complete API Docs](docs/api/API_DOCUMENTATION.md)
 
 ---

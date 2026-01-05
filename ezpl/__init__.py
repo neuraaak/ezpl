@@ -31,14 +31,14 @@ import sys
 # META INFORMATIONS
 # =============================================================================
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __license__ = "MIT"
 __description__ = "A module for easier logging"
 __keywords__ = ["logging", "rich", "loguru", "console", "file"]
-__url__ = "https://github.com/neuraaak/ezpl"
-__repository__ = "https://github.com/neuraaak/ezpl"
+__url__ = "https://github.com/neuraaak/ezplog"
+__repository__ = "https://github.com/neuraaak/ezplog"
 __python_requires__ = ">=3.10"
 
 # =============================================================================
