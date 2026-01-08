@@ -447,6 +447,228 @@ class Ezpl:
         """
         return self._config_manager
 
+    # ///////////////////////////////////////////////////////////////
+    # HANDLER OVERRIDE METHODS
+    # ///////////////////////////////////////////////////////////////
+
+    def set_printer_class(
+        self,
+        printer_class: type[EzPrinter] | EzPrinter,
+        **init_kwargs: Any,
+    ) -> None:
+        """
+        Replace the current printer with a custom printer class or instance.
+
+        Allows users to override the default printer with a custom class that
+        inherits from EzPrinter (or ConsolePrinter). The method preserves
+        current configuration values (level, indentation settings) unless
+        explicitly overridden in init_kwargs.
+
+        Args:
+            printer_class: Custom printer class inheriting from EzPrinter,
+                or an already instantiated EzPrinter instance
+            **init_kwargs: Optional initialization parameters for the printer
+                class. If not provided, current configuration values are used.
+
+        Raises:
+            TypeError: If printer_class is not a valid class or instance
+            ValidationError: If initialization parameters are invalid
+
+        Example:
+            >>> from ezpl import Ezpl, EzPrinter
+            >>>
+            >>> class CustomPrinter(EzPrinter):
+            ...     def info(self, message):
+            ...         super().info(f"[CUSTOM] {message}")
+            >>>
+            >>> ezpl = Ezpl()
+            >>> ezpl.set_printer_class(CustomPrinter, level="DEBUG")
+            >>> ezpl.get_printer().info("Test")
+            [CUSTOM] Test
+        """
+        from .core.exceptions import ValidationError
+
+        # If it's already an instance, use it directly
+        if isinstance(printer_class, EzPrinter):
+            new_printer = printer_class
+        # If it's a class, instantiate it
+        elif isinstance(printer_class, type):
+            # Validate that it's a subclass of EzPrinter
+            if not issubclass(printer_class, EzPrinter):
+                raise TypeError(
+                    f"printer_class must be a subclass of {EzPrinter.__name__}, "
+                    f"got {printer_class.__name__}"
+                )
+
+            # Preserve current configuration values if not provided
+            current_level = (
+                self._printer._level
+                if hasattr(self._printer, "_level")
+                else self._config_manager.get_printer_level()
+            )
+            current_indent_step = (
+                self._printer._indent_step
+                if hasattr(self._printer, "_indent_step")
+                else self._config_manager.get_indent_step()
+            )
+            current_indent_symbol = (
+                self._printer._indent_symbol
+                if hasattr(self._printer, "_indent_symbol")
+                else self._config_manager.get_indent_symbol()
+            )
+            current_base_indent_symbol = (
+                self._printer._base_indent_symbol
+                if hasattr(self._printer, "_base_indent_symbol")
+                else self._config_manager.get_base_indent_symbol()
+            )
+
+            # Merge kwargs with default values
+            init_params = {
+                "level": init_kwargs.pop("level", current_level),
+                "indent_step": init_kwargs.pop("indent_step", current_indent_step),
+                "indent_symbol": init_kwargs.pop(
+                    "indent_symbol", current_indent_symbol
+                ),
+                "base_indent_symbol": init_kwargs.pop(
+                    "base_indent_symbol", current_base_indent_symbol
+                ),
+            }
+            init_params.update(init_kwargs)
+
+            # Create new instance
+            try:
+                new_printer = printer_class(**init_params)
+            except Exception as e:
+                raise ValidationError(
+                    f"Failed to initialize printer class {printer_class.__name__}: {e}",
+                    "printer_class",
+                    printer_class,
+                ) from e
+        else:
+            raise TypeError(
+                f"printer_class must be a class or an instance of {EzPrinter.__name__}, "
+                f"got {type(printer_class).__name__}"
+            )
+
+        # Replace the instance
+        self._printer = new_printer
+
+    def set_logger_class(
+        self,
+        logger_class: type[EzLogger] | EzLogger,
+        **init_kwargs: Any,
+    ) -> None:
+        """
+        Replace the current logger with a custom logger class or instance.
+
+        Allows users to override the default logger with a custom class that
+        inherits from EzLogger (or FileLogger). The method preserves current
+        configuration values (level, rotation, retention, compression) unless
+        explicitly overridden in init_kwargs.
+
+        Args:
+            logger_class: Custom logger class inheriting from EzLogger,
+                or an already instantiated EzLogger instance
+            **init_kwargs: Optional initialization parameters for the logger
+                class. If not provided, current configuration values are used.
+
+        Raises:
+            TypeError: If logger_class is not a valid class or instance
+            ValidationError: If initialization parameters are invalid
+            FileOperationError: If file operations fail during logger creation
+                (may be raised by the logger class constructor)
+
+        Example:
+            >>> from ezpl import Ezpl, EzLogger
+            >>>
+            >>> class CustomLogger(EzLogger):
+            ...     def info(self, message):
+            ...         super().info(f"[CUSTOM LOG] {message}")
+            >>>
+            >>> ezpl = Ezpl()
+            >>> ezpl.set_logger_class(CustomLogger, log_file="custom.log")
+            >>> ezpl.get_logger().info("Test")
+        """
+        from .core.exceptions import ValidationError
+
+        # If it's already an instance, use it directly
+        if isinstance(logger_class, EzLogger):
+            new_logger = logger_class
+        # If it's a class, instantiate it
+        elif isinstance(logger_class, type):
+            # Validate that it's a subclass of EzLogger
+            if not issubclass(logger_class, EzLogger):
+                raise TypeError(
+                    f"logger_class must be a subclass of {EzLogger.__name__}, "
+                    f"got {logger_class.__name__}"
+                )
+
+            # Preserve current configuration values if not provided
+            current_level = (
+                self._logger._level
+                if hasattr(self._logger, "_level")
+                else self._config_manager.get_file_logger_level()
+            )
+            current_log_file = (
+                self._log_file
+                if hasattr(self, "_log_file")
+                else self._config_manager.get_log_file()
+            )
+            current_rotation = (
+                self._logger._rotation
+                if hasattr(self._logger, "_rotation")
+                else self._config_manager.get_log_rotation()
+            )
+            current_retention = (
+                self._logger._retention
+                if hasattr(self._logger, "_retention")
+                else self._config_manager.get_log_retention()
+            )
+            current_compression = (
+                self._logger._compression
+                if hasattr(self._logger, "_compression")
+                else self._config_manager.get_log_compression()
+            )
+
+            # Merge kwargs with default values
+            init_params = {
+                "log_file": init_kwargs.pop("log_file", current_log_file),
+                "level": init_kwargs.pop("level", current_level),
+                "rotation": init_kwargs.pop("rotation", current_rotation),
+                "retention": init_kwargs.pop("retention", current_retention),
+                "compression": init_kwargs.pop("compression", current_compression),
+            }
+            init_params.update(init_kwargs)
+
+            # Close previous logger before creating new one to avoid resource leaks
+            try:
+                if hasattr(self, "_logger") and self._logger:
+                    self._logger.close()
+            except Exception as e:
+                logger.error(f"Error while closing previous logger: {e}")
+
+            # Create new instance
+            try:
+                new_logger = logger_class(**init_params)
+            except Exception as e:
+                raise ValidationError(
+                    f"Failed to initialize logger class {logger_class.__name__}: {e}",
+                    "logger_class",
+                    logger_class,
+                ) from e
+        else:
+            raise TypeError(
+                f"logger_class must be a class or an instance of {EzLogger.__name__}, "
+                f"got {type(logger_class).__name__}"
+            )
+
+        # Replace the instance
+        self._logger = new_logger
+
+    # ///////////////////////////////////////////////////////////////
+    # CONFIGURATION METHODS
+    # ///////////////////////////////////////////////////////////////
+
     def reload_config(self) -> None:
         """
         Reload configuration from file and environment variables.
