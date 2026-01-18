@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests d'intégration Ezpl
 # Project: ezpl

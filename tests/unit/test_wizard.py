@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests unitaires RichWizard
 # Project: ezpl
@@ -277,7 +276,7 @@ class TestProgressBars:
         """Test step_progress() method."""
         steps = [("Init", "Initializing"), ("Install", "Installing")]
         with wizard.step_progress(steps) as (progress, task, steps_list):
-            for i in range(len(steps)):
+            for _i in range(len(steps)):
                 progress.advance(task)
         # Verify no exception raised
 
@@ -285,7 +284,7 @@ class TestProgressBars:
         """Test file_copy_progress() method."""
         files = ["file1.txt", "file2.txt", "file3.txt"]
         with wizard.file_copy_progress(files) as (progress, task, files_list):
-            for i in range(len(files)):
+            for _i in range(len(files)):
                 progress.advance(task)
         # Verify no exception raised
 
@@ -350,7 +349,7 @@ class TestProgressBars:
             {"name": "Layer2", "total": 50},
         ]
         with wizard.layered_progress(layers) as (progress, task_ids):
-            for layer_name, task_id in task_ids.items():
+            for _layer_name, task_id in task_ids.items():
                 progress.update(task_id, advance=50)
         # Verify no exception raised
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests unitaires Utils
 # Project: ezpl

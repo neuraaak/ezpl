@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests unitaires ConfigurationManager
 # Project: ezpl
@@ -71,7 +70,11 @@ class TestInitialization:
         assert config.get("log-level") == "DEBUG"
         assert config.get("printer-level") == "WARNING"
 
-    def test_init_loads_from_env(self, temp_config_file: Path, clean_env: None) -> None:
+    def test_init_loads_from_env(
+        self,
+        temp_config_file: Path,
+        clean_env: None,  # noqa: ARG002
+    ) -> None:
         """Test that initialization loads from environment variables."""
         os.environ["EZPL_LOG_LEVEL"] = "ERROR"
         os.environ["EZPL_PRINTER_LEVEL"] = "DEBUG"
@@ -209,7 +212,9 @@ class TestFileOperations:
         config = ConfigurationManager(config_file=temp_config_file)
         config.set("test-key", "test-value")
 
-        with patch("builtins.open", side_effect=PermissionError("Permission denied")):
+        with patch(  # noqa: SIM117
+            "builtins.open", side_effect=PermissionError("Permission denied")
+        ):
             with pytest.raises(FileOperationError):
                 config.save()
 
@@ -242,7 +247,11 @@ class TestFileOperations:
 class TestPriorityOrder:
     """Tests for configuration priority order."""
 
-    def test_env_overrides_file(self, temp_config_file: Path, clean_env: None) -> None:
+    def test_env_overrides_file(
+        self,
+        temp_config_file: Path,
+        clean_env: None,  # noqa: ARG002
+    ) -> None:
         """Test that environment variables override config file."""
         # Set config file
         config_data = {"log-level": "INFO"}
@@ -301,7 +310,9 @@ class TestExport:
         config = ConfigurationManager()
         invalid_path = temp_dir / "invalid" / "path" / "script.sh"
 
-        with patch("builtins.open", side_effect=IOError("Permission denied")):
+        with patch(  # noqa: SIM117
+            "builtins.open", side_effect=OSError("Permission denied")
+        ):
             with pytest.raises(FileOperationError):
                 config.export_to_script(invalid_path)
 

@@ -2,8 +2,6 @@
 # Pre-commit hook for Ezpl project
 # Automatically formats code before allowing commits
 
-set -e  # Exit on any error
-
 # Get project root (parent of .hooks directory)
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
@@ -16,58 +14,88 @@ if ! command -v python &> /dev/null; then
     exit 1
 fi
 
-# Function to check if a tool is available
-check_tool() {
-    local tool="$1"
-    local command="$2"
-    if ! command -v "$command" &> /dev/null; then
-        echo "⚠️  Warning: $tool not found, skipping..."
-        return 1
-    fi
-    return 0
-}
-
-# Function to run a formatting tool
-run_formatter() {
-    local tool="$1"
-    local command="$2"
-    echo "🔧 Running $tool..."
-    if eval "$command"; then
-        echo "✅ $tool completed"
-        return 0
-    else
-        echo "❌ $tool failed"
-        return 1
-    fi
-}
-
 # Track overall success
 overall_success=true
 
-# Run Black (code formatting) - format automatically
-if check_tool "Black" "black"; then
-    if ! run_formatter "Black" "black ."; then
+# Use the lint.py script for formatting (fixes issues automatically)
+if [ -f ".scripts/dev/lint.py" ]; then
+    echo "🔧 Running code quality checks and fixes..."
+    if python .scripts/dev/lint.py; then
+        echo "✅ Code formatting completed"
+    else
+        echo "❌ Code formatting failed"
+        overall_success=false
+    fi
+else
+    echo "⚠️  Warning: .scripts/dev/lint.py not found, using fallback tools..."
+    
+    # Fallback to direct tool calls if lint.py is not available
+    # Function to check if a tool is available
+    check_tool() {
+        local tool="$1"
+        local command="$2"
+        if ! command -v "$command" &> /dev/null; then
+            echo "⚠️  Warning: $tool not found, skipping..."
+            return 1
+        fi
+        return 0
+    }
+    
+    # Function to run a formatting tool
+    run_formatter() {
+        local tool="$1"
+        local command="$2"
+        echo "🔧 Running $tool..."
+        if eval "$command"; then
+            echo "✅ $tool completed"
+            return 0
+        else
+            echo "❌ $tool failed"
+            return 1
+        fi
+    }
+    
+    # Track overall success
+    overall_success=true
+    
+    # Run Black (code formatting) - format automatically
+    if check_tool "Black" "black"; then
+        if ! run_formatter "Black" "black ."; then
+            overall_success=false
+        fi
+    fi
+    
+    # Run isort (import sorting) - format automatically
+    if check_tool "isort" "isort"; then
+        if ! run_formatter "isort" "isort ."; then
+            overall_success=false
+        fi
+    fi
+    
+    # Run Ruff format (code formatting) - format automatically
+    if check_tool "Ruff" "ruff"; then
+        if ! run_formatter "Ruff format" "ruff format ."; then
+            overall_success=false
+        fi
+    fi
+    
+    if [ "$overall_success" != true ]; then
+        echo "❌ Pre-commit formatting failed!"
         overall_success=false
     fi
 fi
 
-# Run isort (import sorting) - format automatically
-if check_tool "isort" "isort"; then
-    if ! run_formatter "isort" "isort ."; then
-        overall_success=false
+# Update README version badge from ezpl/__init__.py before staging
+if [ -f ".scripts/dev/update_version.py" ]; then
+    echo "🔄 Updating README version badge from ezpl/__init__.py..."
+    if python .scripts/dev/update_version.py; then
+        echo "✅ README badge updated"
+    else
+        echo "⚠️  Warning: Failed to update README badge (non-blocking)"
     fi
 fi
 
-# Run Ruff format (code formatting) - format automatically
-if check_tool "Ruff" "ruff"; then
-    if ! run_formatter "Ruff format" "ruff format ."; then
-        overall_success=false
-    fi
-fi
-
-# Note: Ruff lint is intentionally skipped to avoid errors
-
-# Add all reformatted files to staging area
+# Add all reformatted files (and updated README) to staging area
 if [ "$overall_success" = true ]; then
     echo "📝 Adding reformatted files to staging area..."
     if git add .; then
@@ -86,11 +114,8 @@ if [ "$overall_success" = true ]; then
 else
     echo "❌ Pre-commit formatting failed!"
     echo ""
-    echo "💡 Some formatting tools failed. Please check the output above."
+    echo "💡 Please fix the issues above and try again."
     echo "💡 You can run formatting manually:"
-    echo "   black ."
-    echo "   isort ."
-    echo "   ruff format ."
-    echo "   git add ."
+    echo "   python .scripts/dev/lint.py"
     exit 1
 fi

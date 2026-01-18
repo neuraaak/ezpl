@@ -1,0 +1,189 @@
+[
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 71,
+      "row": 78
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\integration\\test_cli_integration.py",
+    "fix": null,
+    "location": {
+      "column": 62,
+      "row": 78
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 78,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 72,
+      "row": 150
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\integration\\test_cli_integration.py",
+    "fix": null,
+    "location": {
+      "column": 63,
+      "row": 150
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 150,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 52,
+      "row": 49
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\integration\\test_config_integration.py",
+    "fix": null,
+    "location": {
+      "column": 36,
+      "row": 49
+    },
+    "message": "Unused method argument: `temp_config_file`",
+    "noqa_row": 49,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 69,
+      "row": 65
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\integration\\test_config_integration.py",
+    "fix": null,
+    "location": {
+      "column": 60,
+      "row": 65
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 65,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 52,
+      "row": 86
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\integration\\test_config_integration.py",
+    "fix": null,
+    "location": {
+      "column": 39,
+      "row": 86
+    },
+    "message": "Unused method argument: `temp_log_file`",
+    "noqa_row": 86,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 73,
+      "row": 73
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\unit\\test_config.py",
+    "fix": null,
+    "location": {
+      "column": 64,
+      "row": 73
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 73,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 72,
+      "row": 244
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\unit\\test_config.py",
+    "fix": null,
+    "location": {
+      "column": 63,
+      "row": 244
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 244,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 48,
+      "row": 103
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\unit\\test_ezpl.py",
+    "fix": null,
+    "location": {
+      "column": 39,
+      "row": 103
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 103,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 72,
+      "row": 119
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\unit\\test_ezpl.py",
+    "fix": null,
+    "location": {
+      "column": 63,
+      "row": 119
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 119,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 56,
+      "row": 266
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\unit\\test_ezpl.py",
+    "fix": null,
+    "location": {
+      "column": 40,
+      "row": 266
+    },
+    "message": "Unused method argument: `temp_config_file`",
+    "noqa_row": 266,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  },
+  {
+    "cell": null,
+    "code": "ARG002",
+    "end_location": {
+      "column": 67,
+      "row": 297
+    },
+    "filename": "C:\\Dev\\__Outils\\__PY\\.lib\\ezplog\\tests\\unit\\test_ezpl.py",
+    "fix": null,
+    "location": {
+      "column": 58,
+      "row": 297
+    },
+    "message": "Unused method argument: `clean_env`",
+    "noqa_row": 297,
+    "url": "https://docs.astral.sh/ruff/rules/unused-method-argument"
+  }
+]

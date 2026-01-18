@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests unitaires Ezpl
 # Project: ezpl
@@ -16,7 +15,11 @@ Tests cover:
 - Indentation
 - Configuration management
 - Error handling
+
+Note: Some tests intentionally use try-except-pass for robustness testing.
 """
+
+# ruff: noqa: S110, SIM105
 
 import json
 import os
@@ -101,7 +104,9 @@ class TestConfigurationPriority:
     """Tests for configuration priority order (arg > env > file > default)."""
 
     def test_arg_overrides_env_and_file(
-        self, temp_config_file: Path, clean_env: None
+        self,
+        temp_config_file: Path,
+        clean_env: None,  # noqa: ARG002
     ) -> None:
         """Test that argument has highest priority."""
         # Set environment variable
@@ -117,7 +122,11 @@ class TestConfigurationPriority:
         assert ezpl._printer._level == "DEBUG"
         assert ezpl._logger._level == "DEBUG"
 
-    def test_env_overrides_file(self, temp_config_file: Path, clean_env: None) -> None:
+    def test_env_overrides_file(
+        self,
+        temp_config_file: Path,
+        clean_env: None,  # noqa: ARG002
+    ) -> None:
         """Test that environment variable overrides config file."""
         # Set config file
         config_data = {"log-level": "ERROR"}
@@ -264,7 +273,7 @@ class TestConfiguration:
         assert hasattr(config, "get")
         assert hasattr(config, "set")
 
-    def test_configure_with_dict(self, temp_config_file: Path) -> None:
+    def test_configure_with_dict(self, temp_config_file: Path) -> None:  # noqa: ARG002
         """Test configure() with dictionary."""
         ezpl = Ezpl()
         ezpl.configure({"level": "DEBUG", "log-rotation": "10 MB"})
@@ -295,7 +304,11 @@ class TestConfiguration:
         assert config.get("printer-level") == "DEBUG"
         assert config.get("log-rotation") == "10 MB"
 
-    def test_reload_config(self, temp_config_file: Path, clean_env: None) -> None:
+    def test_reload_config(
+        self,
+        temp_config_file: Path,
+        clean_env: None,  # noqa: ARG002
+    ) -> None:
         """Test reload_config() reloads from file and env."""
         # Create initial config
         config_data = {"log-level": "INFO"}

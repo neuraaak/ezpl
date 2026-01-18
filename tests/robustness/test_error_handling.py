@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests de robustesse - Gestion d'erreurs
 # Project: ezpl
@@ -14,7 +13,11 @@ Tests cover:
 - Network errors (if applicable)
 - Timeouts
 - Memory errors (if applicable)
+
+Note: This file intentionally uses try-except-pass for robustness testing.
 """
+
+# ruff: noqa: S110, SIM105
 
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////

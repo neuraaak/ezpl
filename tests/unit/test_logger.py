@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests unitaires FileLogger
 # Project: ezpl
@@ -17,7 +16,11 @@ Tests cover:
 - Special character handling
 - Error handling
 - Directory creation
+
+Note: Some tests intentionally use try-except-pass for robustness testing.
 """
+
+# ruff: noqa: S110, SIM105
 
 import time
 from pathlib import Path

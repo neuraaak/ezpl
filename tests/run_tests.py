@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 """
 Script de lancement des tests unitaires pour Ezpl.
@@ -16,7 +15,7 @@ def run_command(cmd, description) -> bool:
     print(f"🚀 {description}")
     print(f"{'=' * 60}")
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S602
             cmd, shell=True, check=False, capture_output=True, text=True
         )
         print(result.stdout)

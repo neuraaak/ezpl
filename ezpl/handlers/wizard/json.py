@@ -65,20 +65,17 @@ class JsonMixin:
                 # Try to parse and re-format for consistency
                 try:
                     parsed = json.loads(data)
-                    json_str = json.dumps(
-                        parsed, indent=indent or 2, ensure_ascii=False
-                    )
+                    json_str = json.dumps(parsed, ensure_ascii=False)
                 except json.JSONDecodeError:
                     # If invalid JSON, use as-is
                     json_str = data
             else:
                 # Convert dict/list to JSON string
-                json_str = json.dumps(data, indent=indent or 2, ensure_ascii=False)
+                json_str = json.dumps(data, ensure_ascii=False)
 
-            # Create Rich JSON object
-            rich_json = JSON(
-                json_str, indent_guides=indent is not None, highlight=highlight
-            )
+            # Create Rich JSON object with proper parameters
+            # Note: Rich's JSON class handles indentation internally via its indent parameter
+            rich_json = JSON(json_str, indent=indent or 2, highlight=highlight)
 
             # Display with optional title
             if title:

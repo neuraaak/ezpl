@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests d'intégration CLI
 # Project: ezpl
@@ -76,7 +75,11 @@ class TestCLIWithEzpl:
         # Should display config value or error
         assert result.exit_code in [0, 1, 2]
 
-    def test_config_set_command(self, cli_runner: CliRunner, clean_env: None) -> None:
+    def test_config_set_command(
+        self,
+        cli_runner: CliRunner,
+        clean_env: None,  # noqa: ARG002
+    ) -> None:
         """Test config set command."""
         result = cli_runner.invoke(cli, ["config", "set", "log-level", "DEBUG"])
         # Should set config or show error
@@ -148,7 +151,11 @@ class TestCLIConfigManagement:
         # Should display all config or error
         assert result.exit_code in [0, 1, 2]
 
-    def test_config_set_multiple(self, cli_runner: CliRunner, clean_env: None) -> None:
+    def test_config_set_multiple(
+        self,
+        cli_runner: CliRunner,
+        clean_env: None,  # noqa: ARG002
+    ) -> None:
         """Test config set with multiple values."""
         result = cli_runner.invoke(
             cli, ["config", "set", "log-level", "DEBUG", "printer-level", "INFO"]

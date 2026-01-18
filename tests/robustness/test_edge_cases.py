@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests de robustesse - Cas limites
 # Project: ezpl
@@ -15,7 +14,11 @@ Tests cover:
 - Invalid file paths
 - Invalid log levels
 - Excessive indentation
+
+Note: This file intentionally uses try-except-pass for robustness testing.
 """
+
+# ruff: noqa: S110, SIM105
 
 # IMPORT BASE
 # ///////////////////////////////////////////////////////////////
@@ -52,7 +55,7 @@ class TestSingletonEdgeCases:
             thread.join()
 
         # All instances should be the same
-        assert len(set(id(inst) for inst in instances)) == 1
+        assert len({id(inst) for inst in instances}) == 1
 
     def test_reset_during_use(self) -> None:
         """Test reset() while instance is in use."""
@@ -202,7 +205,6 @@ class TestInvalidLogLevels:
             _ = Ezpl()
             # set_level expects string, None would cause error
             # This tests the validation
-            pass
         except (TypeError, ValidationError, Exception):
             # Expected behavior
             pass
@@ -212,7 +214,6 @@ class TestInvalidLogLevels:
         try:
             _ = Ezpl()
             # Should accept string, not int
-            pass
         except (TypeError, ValidationError, Exception):
             # Expected behavior
             pass

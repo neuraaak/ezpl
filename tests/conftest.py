@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Pytest Configuration and Fixtures
 # Project: ezpl
@@ -17,8 +16,8 @@ This module provides fixtures for:
 
 import os
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 from unittest.mock import Mock
 
 # IMPORT BASE
@@ -212,7 +211,7 @@ def sample_log_data() -> list[dict]:
 # ///////////////////////////////////////////////////////////////
 
 
-def pytest_runtest_teardown(item, nextitem) -> None:
+def pytest_runtest_teardown(item, nextitem) -> None:  # noqa: ARG001
     """
     Hook to handle teardown errors on Windows.
 
@@ -230,7 +229,7 @@ def pytest_runtest_teardown(item, nextitem) -> None:
 
 
 @pytest.hookimpl(tryfirst=True)
-def pytest_runtest_makereport(item, call):
+def pytest_runtest_makereport(item, call):  # noqa: ARG001
     """
     Suppress NotADirectoryError and PermissionError during teardown on Windows.
 

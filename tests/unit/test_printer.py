@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests unitaires Printer
 # Project: ezpl
@@ -413,7 +412,7 @@ class TestTypeConversion:
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         try:
-            1 / 0
+            _ = 1 / 0  # noqa: B018
         except Exception as exc:
             printer.error(exc)
             printer.error(f"Exception: {exc}")

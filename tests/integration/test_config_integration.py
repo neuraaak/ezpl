@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ///////////////////////////////////////////////////////////////
 # EZPL - Tests d'intégration Configuration
 # Project: ezpl
@@ -47,7 +46,9 @@ class TestConfigManagerEzplIntegration:
         assert config is not None
 
     def test_config_changes_reflect_in_ezpl(
-        self, temp_log_file: Path, temp_config_file: Path
+        self,
+        temp_log_file: Path,
+        temp_config_file: Path,  # noqa: ARG002
     ) -> None:
         """Test that config changes reflect in Ezpl."""
         ezpl = Ezpl(log_file=temp_log_file)
@@ -63,7 +64,10 @@ class TestConfigManagerEzplIntegration:
         assert ezpl._logger._level is not None
 
     def test_env_and_file_config_integration(
-        self, temp_config_file: Path, temp_log_file: Path, clean_env: None
+        self,
+        temp_config_file: Path,
+        temp_log_file: Path,
+        clean_env: None,  # noqa: ARG002
     ) -> None:
         """Test integration of environment variables and config file."""
         # Set config file
@@ -84,7 +88,9 @@ class TestConfigManagerEzplIntegration:
             # Note: This tests the integration, actual priority is tested in unit tests
 
     def test_config_save_and_reload(
-        self, temp_config_file: Path, temp_log_file: Path
+        self,
+        temp_config_file: Path,
+        temp_log_file: Path,  # noqa: ARG002
     ) -> None:
         """Test saving and reloading configuration."""
         # Create a new ConfigurationManager with the temp config file

@@ -31,7 +31,7 @@ import sys
 # META INFORMATIONS
 # =============================================================================
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __license__ = "MIT"
