@@ -91,14 +91,18 @@ if [ -n "$version" ]; then
         echo "✅ [AUTO-TAG] Tags created/updated locally: $latest_tag_name"
     fi
     
-    # Push tags with force (local tags always have priority over remote)
-    if git push origin --tags --force >/dev/null 2>&1; then
-        echo "✅ [AUTO-TAG] Tags pushed to remote with force: $tag_name"
-        if [ -n "$latest_tag_name" ]; then
-            echo "✅ [AUTO-TAG] Tags pushed to remote with force: $latest_tag_name"
-        fi
+    # Push only tags that point to HEAD (avoid pushing all tags)
+    if git push origin --force "$tag_name" >/dev/null 2>&1; then
+        echo "✅ [AUTO-TAG] Tag pushed to remote with force: $tag_name"
     else
-        echo "⚠️  [AUTO-TAG] Failed to push tags to remote (may not be connected or no remote configured)"
+        echo "⚠️  [AUTO-TAG] Failed to push tag to remote: $tag_name"
+    fi
+    if [ -n "$latest_tag_name" ]; then
+        if git push origin --force "$latest_tag_name" >/dev/null 2>&1; then
+            echo "✅ [AUTO-TAG] Tag pushed to remote with force: $latest_tag_name"
+        else
+            echo "⚠️  [AUTO-TAG] Failed to push tag to remote: $latest_tag_name"
+        fi
     fi
 else
     echo "→ [AUTO-TAG] No version found"

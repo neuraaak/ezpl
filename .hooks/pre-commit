@@ -6,11 +6,21 @@
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+# Prefer project venv if present
+PYTHON_BIN=""
+if [ -x "$PROJECT_ROOT/.venv/Scripts/python.exe" ]; then
+    PYTHON_BIN="$PROJECT_ROOT/.venv/Scripts/python.exe"
+elif [ -x "$PROJECT_ROOT/.venv/bin/python" ]; then
+    PYTHON_BIN="$PROJECT_ROOT/.venv/bin/python"
+else
+    PYTHON_BIN="python"
+fi
+
 echo "🔍 Running pre-commit formatting..."
 
 # Check if Python is available
-if ! command -v python &> /dev/null; then
-    echo "❌ Error: Python not found in PATH"
+if ! command -v "$PYTHON_BIN" &> /dev/null; then
+    echo "❌ Error: Python not found (venv or PATH)"
     exit 1
 fi
 
@@ -20,7 +30,7 @@ overall_success=true
 # Use the lint.py script for formatting (fixes issues automatically)
 if [ -f ".scripts/dev/lint.py" ]; then
     echo "🔧 Running code quality checks and fixes..."
-    if python .scripts/dev/lint.py; then
+    if "$PYTHON_BIN" .scripts/dev/lint.py; then
         echo "✅ Code formatting completed"
     else
         echo "❌ Code formatting failed"
@@ -88,7 +98,7 @@ fi
 # Update README version badge from ezpl/__init__.py before staging
 if [ -f ".scripts/dev/update_version.py" ]; then
     echo "🔄 Updating README version badge from ezpl/__init__.py..."
-    if python .scripts/dev/update_version.py; then
+    if "$PYTHON_BIN" .scripts/dev/update_version.py; then
         echo "✅ README badge updated"
     else
         echo "⚠️  Warning: Failed to update README badge (non-blocking)"

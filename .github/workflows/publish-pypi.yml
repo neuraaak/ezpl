@@ -53,8 +53,8 @@ jobs:
         id: extract_version
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            # En mode manuel, utiliser le dernier tag ou la version du pyproject.toml
-            TAG_NAME=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            # En mode manuel, utiliser le dernier tag semver (v*.*.*) ou la version du pyproject.toml
+            TAG_NAME=$(git tag -l "v*.*.*" --sort=-version:refname | head -n 1)
             if [ -n "$TAG_NAME" ]; then
               TAG_VERSION=$(echo "$TAG_NAME" | sed 's/^v//')
             else

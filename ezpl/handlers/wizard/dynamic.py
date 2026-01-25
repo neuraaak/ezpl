@@ -98,9 +98,9 @@ class DynamicLayeredProgress:
         self.task_ids: dict[str, TaskID] = {}
         self.active_layers: list[TaskID] = []
         self.completed_layers: list[TaskID] = []
-        self.layer_metadata: dict[
-            TaskID, dict[str, Any]
-        ] = {}  # Store additional layer info
+        self.layer_metadata: dict[TaskID, dict[str, Any]] = (
+            {}
+        )  # Store additional layer info
         self._emergency_stopped = False
         self._emergency_message: str | None = None
 
