@@ -207,7 +207,7 @@ jobs:
       - name: Verify package installation
         run: |
           echo "🧪 Verifying package can be installed..."
-          pip install dist/*.whl --force-reinstall --no-deps
+          pip install dist/*.whl --force-reinstall
           python -c "import ezpl; print(f'✅ Package installed successfully: ezpl {ezpl.__version__}')"
           pip uninstall -y ezplog
 
