@@ -40,7 +40,7 @@ import sys
 # META INFORMATIONS
 # ///////////////////////////////////////////////////////////////
 
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __description__ = "A module for easier logging"
