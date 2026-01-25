@@ -9,20 +9,25 @@ Panel methods mixin for Rich Wizard.
 This module provides all panel-related methods for the RichWizard class.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
-from typing import Any, Optional
+# Standard library imports
+from typing import Any
 
-# External libraries
+# Third-party imports
 from rich.align import Align
+from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-# Internal modules
+# Local imports
 from ..utils import safe_str_convert
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -35,6 +40,9 @@ class PanelMixin:
     warning panels, and installation panels.
     """
 
+    # Type hints for attributes provided by RichWizard
+    _console: Console
+
     # ///////////////////////////////////////////////////////////////
     # PANEL METHODS
     # ///////////////////////////////////////////////////////////////
@@ -42,9 +50,9 @@ class PanelMixin:
     def panel(
         self,
         content: Any,
-        title: Optional[str] = None,
+        title: str | None = None,
         border_style: str = "blue",
-        width: Optional[int] = None,
+        width: int | None = None,
         **kwargs,
     ) -> None:
         """
@@ -77,7 +85,7 @@ class PanelMixin:
         content: str,
         style: str = "cyan",
         border_style: str = "cyan",
-        width: Optional[int] = None,
+        width: int | None = None,
         **kwargs,
     ) -> None:
         """
@@ -112,7 +120,7 @@ class PanelMixin:
         title: str,
         content: str,
         border_style: str = "green",
-        width: Optional[int] = None,
+        width: int | None = None,
         **kwargs,
     ) -> None:
         """
@@ -148,7 +156,7 @@ class PanelMixin:
         title: str,
         content: str,
         border_style: str = "red",
-        width: Optional[int] = None,
+        width: int | None = None,
         **kwargs,
     ) -> None:
         """
@@ -182,7 +190,7 @@ class PanelMixin:
         title: str,
         content: str,
         border_style: str = "yellow",
-        width: Optional[int] = None,
+        width: int | None = None,
         **kwargs,
     ) -> None:
         """
@@ -219,7 +227,7 @@ class PanelMixin:
         description: str,
         status: str = "pending",
         border_style: str = "blue",
-        width: Optional[int] = None,
+        width: int | None = None,
         **kwargs,
     ) -> None:
         """

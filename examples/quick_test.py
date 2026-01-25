@@ -10,13 +10,25 @@ Usage:
     python examples/quick_test.py
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
 import sys
+import time
 from pathlib import Path
 
 # Ajouter le répertoire parent au path pour importer ezpl
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Local imports
 from ezpl import Ezpl
+
+# ///////////////////////////////////////////////////////////////
+# FUNCTIONS
+# ///////////////////////////////////////////////////////////////
 
 
 def main():
@@ -127,8 +139,6 @@ def test_json(wizard):
 def test_progress_bars(wizard):
     """Tester les progress bars."""
     print("\n--- Test des progress bars ---")
-    import time
-
     with wizard.progress("Traitement...", total=50) as (progress, task):
         for _i in range(50):
             progress.update(task, advance=1)

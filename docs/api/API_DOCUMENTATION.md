@@ -315,7 +315,7 @@ logger_handler = FileLogger(
     compression="zip"      # Compress old logs
 )
 
-logger = logger_handler.get_logger()
+logger = logger_handler.get_loguru()
 logger.info("This will be rotated when file reaches 10 MB")
 ```
 
@@ -942,7 +942,7 @@ logger_handler = FileLogger(
     compression="zip"      # Compress old logs
 )
 
-logger = logger_handler.get_logger()
+logger = logger_handler.get_loguru()
 logger.info("This will be rotated when file reaches 10 MB")
 
 # Get file size

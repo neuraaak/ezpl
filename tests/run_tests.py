@@ -1,13 +1,33 @@
 #!/usr/bin/env python
 # ///////////////////////////////////////////////////////////////
+# EZPL - Test Runner Script
+# Project: ezpl
+# ///////////////////////////////////////////////////////////////
+
 """
-Script de lancement des tests unitaires pour Ezpl.
+Test runner script for Ezpl logging framework.
+
+This script provides a convenient way to run tests with various options:
+- Unit, integration, or robustness tests
+- Coverage reports
+- Parallel execution
+- Custom markers
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
 import argparse
 import subprocess
 import sys
 from pathlib import Path
+
+# ///////////////////////////////////////////////////////////////
+# FUNCTIONS
+# ///////////////////////////////////////////////////////////////
 
 
 def run_command(cmd, description) -> bool:
@@ -15,13 +35,13 @@ def run_command(cmd, description) -> bool:
     print(f"🚀 {description}")
     print(f"{'=' * 60}")
     try:
-        result = subprocess.run(  # noqa: S602
-            cmd, shell=True, check=False, capture_output=True, text=True
-        )
-        print(result.stdout)
-        if result.stderr:
-            print(f"⚠️  Avertissements/Erreurs: {result.stderr}")
+        # Use subprocess.run without capture_output to stream output in real-time
+        # This prevents blocking when output is large (e.g., with --coverage)
+        result = subprocess.run(cmd, shell=True, check=False)  # noqa: S602
         return result.returncode == 0
+    except KeyboardInterrupt:
+        print("\n⚠️  Interruption utilisateur (Ctrl+C)")
+        return False
     except Exception as e:
         print(f"❌ Erreur lors de l'exécution: {e}")
         return False

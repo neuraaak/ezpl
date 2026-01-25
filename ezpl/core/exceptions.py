@@ -6,10 +6,20 @@
 """
 Core exceptions for Ezpl logging framework.
 
-This module defines all custom exceptions used throughout the application.
+This module defines all custom exceptions used throughout the application
+with detailed error codes for better error tracking and diagnosis.
 """
 
-## ==> CLASSES
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
+# (No standard library imports needed for this module)
+
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -17,20 +27,26 @@ class EzplError(Exception):
     """
     Base exception class for all Ezpl-related errors.
 
-    This is the base class for all exceptions raised by the Ezpl framework.
+    All custom exceptions in the Ezpl framework inherit from this base class,
+    enabling centralized exception handling and consistent error reporting.
+    Each exception includes a message and optional error code for categorization.
     """
 
     # ///////////////////////////////////////////////////////////////
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, error_code: str = None) -> None:
+    def __init__(self, message: str, error_code: str | None = None) -> None:
         """
         Initialize the Ezpl error.
 
         Args:
-            message: Error message
-            error_code: Optional error code for categorization
+            message: Human-readable error message
+            error_code: Optional error code for categorization and debugging
+
+        Note:
+            Error codes follow the pattern: COMPONENT_ERROR or OPERATION_ERROR
+            (e.g., "CONFIG_ERROR", "FILE_ERROR") for consistent error tracking.
         """
         super().__init__(message)
         self.message = message
@@ -51,20 +67,21 @@ class ConfigurationError(EzplError):
     """
     Exception raised for configuration-related errors.
 
-    This exception is raised when there are issues with configuration
-    loading, validation, or processing.
+    This exception is raised when configuration loading, validation, or processing
+    encounters issues. The optional config_key attribute helps identify which
+    configuration parameter caused the problem.
     """
 
     # ///////////////////////////////////////////////////////////////
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, config_key: str = None) -> None:
+    def __init__(self, message: str, config_key: str | None = None) -> None:
         """
         Initialize the configuration error.
 
         Args:
-            message: Error message
+            message: Human-readable error message
             config_key: Optional configuration key that caused the error
         """
         super().__init__(message, "CONFIG_ERROR")
@@ -75,21 +92,22 @@ class LoggingError(EzplError):
     """
     Exception raised for logging-related errors.
 
-    This exception is raised when there are issues with logging operations,
-    such as file writing, formatting, or handler initialization.
+    This exception covers issues with logging operations such as file writing,
+    format processing, or handler initialization. The optional handler_type
+    attribute identifies which handler (console, file) caused the error.
     """
 
     # ///////////////////////////////////////////////////////////////
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, handler_type: str = None) -> None:
+    def __init__(self, message: str, handler_type: str | None = None) -> None:
         """
         Initialize the logging error.
 
         Args:
-            message: Error message
-            handler_type: Optional handler type that caused the error
+            message: Human-readable error message
+            handler_type: Optional handler type that caused the error (e.g., "file", "console")
         """
         super().__init__(message, "LOGGING_ERROR")
         self.handler_type = handler_type
@@ -99,20 +117,23 @@ class ValidationError(EzplError):
     """
     Exception raised for validation errors.
 
-    This exception is raised when input validation fails,
-    such as invalid log levels or malformed configuration values.
+    This exception is raised when input validation fails (e.g., invalid log levels,
+    malformed configuration values). The optional field_name and value attributes
+    help identify what was being validated when the error occurred.
     """
 
     # ///////////////////////////////////////////////////////////////
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, field_name: str = None, value: str = None) -> None:
+    def __init__(
+        self, message: str, field_name: str | None = None, value: str | None = None
+    ) -> None:
         """
         Initialize the validation error.
 
         Args:
-            message: Error message
+            message: Human-readable error message
             field_name: Optional field name that failed validation
             value: Optional value that failed validation
         """
@@ -125,20 +146,21 @@ class InitializationError(EzplError):
     """
     Exception raised for initialization errors.
 
-    This exception is raised when there are issues during the
-    initialization of Ezpl components.
+    This exception is raised when Ezpl components fail to initialize properly.
+    The optional component attribute identifies which component (printer, logger, config)
+    encountered the initialization issue.
     """
 
     # ///////////////////////////////////////////////////////////////
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, component: str = None) -> None:
+    def __init__(self, message: str, component: str | None = None) -> None:
         """
         Initialize the initialization error.
 
         Args:
-            message: Error message
+            message: Human-readable error message
             component: Optional component that failed to initialize
         """
         super().__init__(message, "INIT_ERROR")
@@ -149,8 +171,9 @@ class FileOperationError(EzplError):
     """
     Exception raised for file operation errors.
 
-    This exception is raised when there are issues with file operations,
-    such as reading, writing, or creating files.
+    This exception covers issues with file operations (reading, writing, creating files).
+    The optional file_path and operation attributes help identify which file and
+    operation (read, write, create) failed.
     """
 
     # ///////////////////////////////////////////////////////////////
@@ -158,15 +181,15 @@ class FileOperationError(EzplError):
     # ///////////////////////////////////////////////////////////////
 
     def __init__(
-        self, message: str, file_path: str = None, operation: str = None
+        self, message: str, file_path: str | None = None, operation: str | None = None
     ) -> None:
         """
         Initialize the file operation error.
 
         Args:
-            message: Error message
+            message: Human-readable error message
             file_path: Optional file path that caused the error
-            operation: Optional operation that failed
+            operation: Optional operation that failed (e.g., "read", "write", "create")
         """
         super().__init__(message, "FILE_ERROR")
         self.file_path = file_path
@@ -177,20 +200,21 @@ class HandlerError(EzplError):
     """
     Exception raised for handler-related errors.
 
-    This exception is raised when there are issues with logging handlers,
-    such as initialization, configuration, or operation failures.
+    This exception covers issues with logging handlers (initialization, configuration,
+    operation failures). The optional handler_name attribute identifies which handler
+    (ConsolePrinter, FileLogger) caused the problem.
     """
 
     # ///////////////////////////////////////////////////////////////
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, message: str, handler_name: str = None) -> None:
+    def __init__(self, message: str, handler_name: str | None = None) -> None:
         """
         Initialize the handler error.
 
         Args:
-            message: Error message
+            message: Human-readable error message
             handler_name: Optional handler name that caused the error
         """
         super().__init__(message, "HANDLER_ERROR")

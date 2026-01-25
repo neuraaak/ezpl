@@ -1,38 +1,42 @@
+# ///////////////////////////////////////////////////////////////
+# EZPL - Types Module
+# Project: ezpl
+# ///////////////////////////////////////////////////////////////
+
 """
 Types module for Ezpl logging framework.
 
-This module contains type definitions and enumerations.
+This module contains type definitions, enumerations, and protocols.
 """
 
-# =============================================================================
-# IMPORTS
-# =============================================================================
+from __future__ import annotations
 
-# ------------------------------------------------
-# TYPE & ENUM DEFINITIONS
-# ------------------------------------------------
-from .log_level import LogLevel
-from .patterns import (
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Local imports
+from .enums import (
     PATTERN_COLORS,
+    LogLevel,
     Pattern,
     get_pattern_color,
     get_pattern_color_by_name,
 )
+from .protocols import LoggerProtocol, PrinterProtocol
 
-# =============================================================================
-# MODULE EXPORTS
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
 
 __all__ = [
-    # ------------------------------------------------
-    # LOG LEVEL EXPORTS
-    # ------------------------------------------------
+    # Log level exports
     "LogLevel",
-    # ------------------------------------------------
-    # PATTERN EXPORTS
-    # ------------------------------------------------
+    # Pattern exports
     "Pattern",
     "PATTERN_COLORS",
     "get_pattern_color",
     "get_pattern_color_by_name",
+    # Protocol exports
+    "PrinterProtocol",
+    "LoggerProtocol",
 ]

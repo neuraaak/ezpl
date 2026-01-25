@@ -10,36 +10,40 @@ This module provides commands for viewing, searching, analyzing,
 and managing log files.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import json
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
 
 import click
 
-# External libraries
+# Third-party imports
 from rich.console import Console
 from rich.table import Table
 
-# Internal modules
+# Local imports
 from ...config import ConfigurationManager
 from ..utils.log_parser import LogParser
 from ..utils.log_stats import LogStatistics
 
-## ==> GLOBALS
+# ///////////////////////////////////////////////////////////////
+# GLOBALS
 # ///////////////////////////////////////////////////////////////
 
 console = Console()
 
-## ==> HELPER FUNCTIONS
+# ///////////////////////////////////////////////////////////////
+# HELPER FUNCTIONS
 # ///////////////////////////////////////////////////////////////
 
 
-def _get_log_file(file: Optional[Path]) -> Path:
+def _get_log_file(file: Path | None) -> Path:
     """
     Get log file path from parameter or configuration.
 
@@ -64,7 +68,7 @@ def _get_log_file(file: Optional[Path]) -> Path:
     return log_file
 
 
-def _get_log_dir(dir: Optional[Path]) -> Path:
+def _get_log_dir(dir: Path | None) -> Path:
     """
     Get log directory from parameter or configuration.
 
@@ -112,7 +116,8 @@ def _parse_size(size_str: str) -> int:
         raise click.ClickException(f"Invalid size format: {size_str}") from e
 
 
-## ==> COMMAND GROUP
+# ///////////////////////////////////////////////////////////////
+# COMMAND GROUP
 # ///////////////////////////////////////////////////////////////
 
 
@@ -125,7 +130,8 @@ def logs_group() -> None:
     """
 
 
-## ==> COMMANDS
+# ///////////////////////////////////////////////////////////////
+# COMMANDS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -150,7 +156,7 @@ def logs_group() -> None:
     help="Follow log file (like tail -f)",
 )
 def view_command(
-    file: Optional[Path], lines: int, level: Optional[str], follow: bool
+    file: Path | None, lines: int, level: str | None, follow: bool
 ) -> None:
     """
     View log file contents.
@@ -228,9 +234,9 @@ def view_command(
     help="Case-sensitive search",
 )
 def search_command(
-    file: Optional[Path],
+    file: Path | None,
     pattern: str,
-    level: Optional[str],
+    level: str | None,
     case_sensitive: bool,
 ) -> None:
     """
@@ -278,7 +284,7 @@ def search_command(
     default="table",
     help="Output format",
 )
-def stats_command(file: Optional[Path], format: str) -> None:
+def stats_command(file: Path | None, format: str) -> None:
     """
     Display statistics about log files.
 
@@ -366,7 +372,7 @@ def stats_command(file: Optional[Path], format: str) -> None:
     is_flag=True,
     help="Follow log file (like tail -f)",
 )
-def tail_command(file: Optional[Path], lines: int, follow: bool) -> None:
+def tail_command(file: Path | None, lines: int, follow: bool) -> None:
     """
     Display the last lines of a log file.
 
@@ -402,7 +408,7 @@ def tail_command(file: Optional[Path], lines: int, follow: bool) -> None:
     type=click.Path(exists=True, path_type=Path),
     help="Directory to search (default: from config)",
 )
-def list_command(dir: Optional[Path]) -> None:
+def list_command(dir: Path | None) -> None:
     """
     List available log files.
 
@@ -477,7 +483,7 @@ def list_command(dir: Optional[Path]) -> None:
     help="Skip confirmation prompt",
 )
 def clean_command(
-    file: Optional[Path], days: Optional[int], size: Optional[str], confirm: bool
+    file: Path | None, days: int | None, size: str | None, confirm: bool
 ) -> None:
     """
     Clean old or large log files.
@@ -579,7 +585,7 @@ def clean_command(
     type=click.Path(path_type=Path),
     help="Output file path (default: stdout)",
 )
-def export_command(file: Optional[Path], format: str, output: Optional[Path]) -> None:
+def export_command(file: Path | None, format: str, output: Path | None) -> None:
     """
     Export log file to different formats.
 

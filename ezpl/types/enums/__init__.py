@@ -1,13 +1,12 @@
 # ///////////////////////////////////////////////////////////////
-# EZPL - Utils Module
+# EZPL - Enums Module
 # Project: ezpl
 # ///////////////////////////////////////////////////////////////
 
 """
-Utils module for Ezpl logging framework.
+Enums module for Ezpl logging framework.
 
-This module contains utility functions and helpers used throughout the framework.
-Currently no public utilities are exposed at package level.
+This module contains all enumeration types used in Ezpl.
 """
 
 from __future__ import annotations
@@ -15,10 +14,25 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# (Currently no public utilities exposed at package level.)
+# Local imports
+from .log_level import LogLevel
+from .patterns import (
+    PATTERN_COLORS,
+    Pattern,
+    get_pattern_color,
+    get_pattern_color_by_name,
+)
 
 # ///////////////////////////////////////////////////////////////
 # PUBLIC API
 # ///////////////////////////////////////////////////////////////
 
-__all__: list[str] = []
+__all__ = [
+    # Log level exports
+    "LogLevel",
+    # Pattern exports
+    "Pattern",
+    "PATTERN_COLORS",
+    "get_pattern_color",
+    "get_pattern_color_by_name",
+]

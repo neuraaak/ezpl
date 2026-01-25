@@ -16,18 +16,17 @@ Tests cover:
 - Error handling
 """
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
+from __future__ import annotations
 
-# IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
-
-# IMPORT / GUI AND MODULES AND WIDGETS
+# IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Local imports
 from ezpl import Ezpl
 from ezpl.types import Pattern
 
-## ==> TESTS
+# ///////////////////////////////////////////////////////////////
+# TESTS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -66,7 +65,7 @@ class TestLogLevels:
         """Test warn() alias for warning()."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
-        printer.warn("Warn message")
+        printer.warning("Warn message")
         # Verify no exception raised
 
     def test_error_level(self) -> None:

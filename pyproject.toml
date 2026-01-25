@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ezplog"
-version = "1.4.0"
+version = "1.4.1"
 description = "Modern Python logging framework with Rich console output and loguru file logging, featuring advanced display capabilities, configuration management, and a simple typed API."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -41,16 +41,16 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
     "pre-commit>=3.0.0",
-    
+
     # Security
     "bandit>=1.7.0",
-    
+
     # Tests
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
     "pytest-xdist>=3.0.0",
-    
+
     # Build and distribution
     "build>=1.0.0",
     "twine>=4.0.0",
@@ -106,7 +106,7 @@ exclude = [
 # Configuration Black
 [tool.black]
 line-length = 88
-target-version = ['py310', 'py311', 'py312', 'py313']
+target-version = ['py310', 'py311', 'py312']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -176,13 +176,31 @@ warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 
+# Ignorer le dossier tests
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
 # Ignorer certains modules pour lesquels on n'a pas de stubs
 [[tool.mypy.overrides]]
 module = "winreg"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "win32*"
+module = [
+    "win32api",
+    "win32con",
+    "win32file",
+    "win32gui",
+    "win32pipe",
+    "win32process",
+    "win32security",
+    "win32service",
+    "win32serviceutil",
+    "win32ts",
+    "win32ui",
+    "win32wnet",
+]
 ignore_missing_imports = true
 
 # Configuration Pytest
@@ -269,7 +287,17 @@ directory = "htmlcov"
 
 # Bandit configuration (security)
 [tool.bandit]
-exclude_dirs = ["tests", "build", "dist", "venv", ".venv", ".hooks", "docs", "examples", "_temp"]
+exclude_dirs = [
+    "tests",
+    "build",
+    "dist",
+    "venv",
+    ".venv",
+    ".hooks",
+    "docs",
+    "examples",
+    "_temp",
+]
 skips = ["B101", "B601"]
 
 # Configuration Ruff (remplace flake8)

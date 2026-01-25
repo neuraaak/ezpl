@@ -10,14 +10,15 @@ This module provides the main RichWizard class that combines all mixins
 for panels, tables, JSON, and progress functionality.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
-
-# External libraries
+# Third-party imports
 from rich.console import Console
 
-# Internal modules
+# Local imports
 from ...types import Pattern, get_pattern_color
 from .dynamic import DynamicProgressMixin
 from .json import JsonMixin
@@ -25,7 +26,8 @@ from .panels import PanelMixin
 from .progress import ProgressMixin
 from .tables import TableMixin
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 

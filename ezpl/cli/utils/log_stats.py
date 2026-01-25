@@ -9,19 +9,21 @@ Log statistics utility for CLI operations.
 This module provides functionality to calculate statistics from log files.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
-# Internal modules
-from ezpl.cli.utils.log_parser import LogEntry
+# Local imports
+from .log_parser import LogEntry, LogParser
 
-from .log_parser import LogParser
-
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -43,7 +45,7 @@ class LogStatistics:
         """
         self.log_file = Path(log_file)
         self.parser = LogParser(self.log_file)
-        self._entries: Optional[list[LogEntry]] = None
+        self._entries: list[LogEntry] | None = None
 
     # ------------------------------------------------
     # PRIVATE HELPER METHODS

@@ -1,41 +1,41 @@
+# ///////////////////////////////////////////////////////////////
+# EZPL - Handlers Module
+# Project: ezpl
+# ///////////////////////////////////////////////////////////////
+
 """
 Handlers module for Ezpl logging framework.
 
 This module contains concrete implementations of logging handlers.
 """
 
-# =============================================================================
-# IMPORTS
-# =============================================================================
+from __future__ import annotations
 
-# ------------------------------------------------
-# HANDLER IMPLEMENTATIONS
-# ------------------------------------------------
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Local imports
 from .console import ConsolePrinter, ConsolePrinterWrapper
 from .file import FileLogger
 from .wizard import RichWizard
 
-# ------------------------------------------------
-# BACKWARD COMPATIBILITY ALIASES
-# ------------------------------------------------
+# Public API aliases
+# EzPrinter is the actual printer class (ConsolePrinter)
+# ConsolePrinterWrapper is returned by ConsolePrinter.get_printer()
 EzPrinter = ConsolePrinter
 EzLogger = FileLogger
 
-# =============================================================================
-# MODULE EXPORTS
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
 
 __all__ = [
-    # ------------------------------------------------
-    # HANDLER CLASS EXPORTS
-    # ------------------------------------------------
+    # Handler class exports
     "ConsolePrinter",
     "ConsolePrinterWrapper",
     "FileLogger",
     "RichWizard",
-    # ------------------------------------------------
-    # BACKWARD COMPATIBILITY EXPORTS
-    # ------------------------------------------------
+    # Public API exports
     "EzPrinter",
     "EzLogger",
 ]

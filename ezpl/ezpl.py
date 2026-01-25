@@ -5,33 +5,32 @@
 
 from __future__ import annotations
 
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import sys
 import threading
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
-# External libraries
+# Third-party imports
 from loguru import logger
-from loguru._logger import Logger
 
-# Internal modules
+# Local imports
 from .config import ConfigurationManager
-from .handlers import EzLogger, EzPrinter
-from .handlers.console import ConsolePrinterWrapper
+from .handlers import ConsolePrinterWrapper, EzLogger, EzPrinter
 
-## ==> GLOBALS
 # ///////////////////////////////////////////////////////////////
+# GLOBALS
+# ///////////////////////////////////////////////////////////////
+
 APP_PATH = Path(sys.argv[0]).parent
 
-## ==> VARIABLES
 # ///////////////////////////////////////////////////////////////
-
-## ==> CLASSES
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -63,16 +62,16 @@ class Ezpl:
 
     def __new__(
         cls: type[T],
-        log_file: Path | str = None,
-        log_level: str = None,
-        printer_level: str = None,
-        file_logger_level: str = None,
-        log_rotation: str = None,
-        log_retention: str = None,
-        log_compression: str = None,
-        indent_step: int = None,
-        indent_symbol: str = None,
-        base_indent_symbol: str = None,
+        log_file: Path | str | None = None,
+        log_level: str | None = None,
+        printer_level: str | None = None,
+        file_logger_level: str | None = None,
+        log_rotation: str | None = None,
+        log_retention: str | None = None,
+        log_compression: str | None = None,
+        indent_step: int | None = None,
+        indent_symbol: str | None = None,
+        base_indent_symbol: str | None = None,
     ) -> T:
         """
         Creates and returns a new instance of Ezpl if none exists.
@@ -242,7 +241,9 @@ class Ezpl:
                             # Only apply to logger if file_logger_level was not specified
                             cls._instance.set_logger_level(final_log_level)
 
-        return cls._instance
+        # Type narrowing: _instance is guaranteed to be set at this point
+        assert cls._instance is not None
+        return cast(T, cls._instance)
 
     # ///////////////////////////////////////////////////////////////
     # GETTER
@@ -255,6 +256,7 @@ class Ezpl:
         **Returns:**
 
             * ConsolePrinterWrapper: Wrapper providing info(), debug(), success(), etc.
+                Implements PrinterProtocol for type safety.
 
         **Raises:**
 
@@ -264,19 +266,22 @@ class Ezpl:
 
     # ///////////////////////////////////////////////////////////////
 
-    def get_logger(self) -> Logger:
+    def get_logger(self) -> EzLogger:
         """
-        Returns the FileLogger instance (loguru Logger).
+        Returns the FileLogger instance that implements LoggerProtocol.
 
         **Returns:**
 
-            * loguru.Logger: The loguru logger instance for file logging.
+            * EzLogger (FileLogger): The file logger instance for file logging.
+                Use logger.info(), logger.debug(), etc. directly.
+                For advanced loguru features, use logger.get_loguru()
+                Implements LoggerProtocol for type safety.
 
         **Raises:**
 
             * `None`.
         """
-        return self._logger.get_logger()
+        return self._logger
 
     # ///////////////////////////////////////////////////////////////
     # UTILS METHODS
@@ -542,7 +547,7 @@ class Ezpl:
                 raise ValidationError(
                     f"Failed to initialize printer class {printer_class.__name__}: {e}",
                     "printer_class",
-                    printer_class,
+                    str(printer_class),
                 ) from e
         else:
             raise TypeError(
@@ -654,7 +659,7 @@ class Ezpl:
                 raise ValidationError(
                     f"Failed to initialize logger class {logger_class.__name__}: {e}",
                     "logger_class",
-                    logger_class,
+                    str(logger_class),
                 ) from e
         else:
             raise TypeError(
@@ -757,7 +762,7 @@ class Ezpl:
             base_indent_symbol=self._config_manager.get_base_indent_symbol(),
         )
 
-    def configure(self, config_dict: dict[str, Any] = None, **kwargs) -> None:
+    def configure(self, config_dict: dict[str, Any] | None = None, **kwargs) -> None:
         """
         Configure Ezpl dynamically.
 

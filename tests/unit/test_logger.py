@@ -22,25 +22,26 @@ Note: Some tests intentionally use try-except-pass for robustness testing.
 
 # ruff: noqa: S110, SIM105
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
 import time
 from pathlib import Path
 from unittest.mock import patch
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
+# Third-party imports
 import pytest
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Local imports
 from ezpl import Ezpl
 from ezpl.core.exceptions import FileOperationError, ValidationError
 from ezpl.handlers import FileLogger
 
-# IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
-
-
-## ==> HELPER FUNCTIONS
+# HELPER FUNCTIONS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -53,7 +54,8 @@ def wait_for_file(path: Path, timeout: float = 2.0) -> None:
         time.sleep(0.05)
 
 
-## ==> TESTS
+# ///////////////////////////////////////////////////////////////
+# TESTS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -63,7 +65,7 @@ class TestLogLevels:
     def test_debug_level(self, temp_log_file: Path) -> None:
         """Test debug() level."""
         logger_handler = FileLogger(temp_log_file, level="DEBUG")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.debug("Debug message")
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
@@ -71,7 +73,7 @@ class TestLogLevels:
     def test_info_level(self, temp_log_file: Path) -> None:
         """Test info() level."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info("Info message")
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
@@ -79,7 +81,7 @@ class TestLogLevels:
     def test_warning_level(self, temp_log_file: Path) -> None:
         """Test warning() level."""
         logger_handler = FileLogger(temp_log_file, level="WARNING")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.warning("Warning message")
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
@@ -87,7 +89,7 @@ class TestLogLevels:
     def test_error_level(self, temp_log_file: Path) -> None:
         """Test error() level."""
         logger_handler = FileLogger(temp_log_file, level="ERROR")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.error("Error message")
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
@@ -95,7 +97,7 @@ class TestLogLevels:
     def test_critical_level(self, temp_log_file: Path) -> None:
         """Test critical() level."""
         logger_handler = FileLogger(temp_log_file, level="CRITICAL")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.critical("Critical message")
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
@@ -121,7 +123,7 @@ class TestFileRotation:
         logger_handler = FileLogger(
             log_file, level="INFO", rotation="1 KB", retention="1 day"
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
 
         # Write enough data to trigger rotation
         for i in range(100):
@@ -136,7 +138,7 @@ class TestFileRotation:
         logger_handler = FileLogger(
             log_file, level="INFO", rotation="1 second", retention="1 day"
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
 
         logger.info("Message 1")
         time.sleep(1.1)  # Wait for rotation time
@@ -151,7 +153,7 @@ class TestFileRotation:
         logger_handler = FileLogger(
             log_file, level="INFO", rotation="1 day", retention="7 days"
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info("Test message")
         # Verify file exists
         assert log_file.exists()
@@ -162,7 +164,7 @@ class TestFileRotation:
         logger_handler = FileLogger(
             log_file, level="INFO", rotation="12:00", retention="7 days"
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info("Test message")
         # Verify file exists
         assert log_file.exists()
@@ -175,7 +177,7 @@ class TestRetention:
         """Test retention by duration."""
         log_file = temp_dir / "retention_duration.log"
         logger_handler = FileLogger(log_file, level="INFO", retention="1 day")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info("Test message")
         # Verify file exists
         assert log_file.exists()
@@ -186,7 +188,7 @@ class TestRetention:
         logger_handler = FileLogger(
             log_file, level="INFO", rotation="1 KB", retention="1 day"
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
 
         # Write enough to create multiple files
         for i in range(50):
@@ -209,7 +211,7 @@ class TestCompression:
             retention="1 day",
             compression="zip",
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
 
         # Write enough to trigger rotation
         for i in range(50):
@@ -230,7 +232,7 @@ class TestCompression:
             retention="1 day",
             compression="gz",
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
 
         # Write enough to trigger rotation
         for i in range(50):
@@ -249,7 +251,7 @@ class TestCompression:
             retention="1 day",
             compression="tar.gz",
         )
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
 
         # Write enough to trigger rotation
         for i in range(50):
@@ -268,7 +270,7 @@ class TestSeparators:
         """Test add_separator() method."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
         logger_handler.add_separator()
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info("Test message")
         wait_for_file(temp_log_file)
         content = temp_log_file.read_text(encoding="utf-8")
@@ -295,7 +297,7 @@ class TestFileOperations:
     def test_get_file_size(self, temp_log_file: Path) -> None:
         """Test get_file_size() method."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info("Test message 1")
         logger.info("Test message 2")
         wait_for_file(temp_log_file)
@@ -315,7 +317,7 @@ class TestSpecialCharacters:
     def test_unicode_characters(self, temp_log_file: Path) -> None:
         """Test logger with Unicode characters."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         strange_message = "Test spécial: éèàçô 漢字 🚀"
         logger.info(strange_message)
         wait_for_file(temp_log_file)
@@ -327,7 +329,7 @@ class TestSpecialCharacters:
     def test_control_characters(self, temp_log_file: Path) -> None:
         """Test logger with control characters."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         message_with_control = "Test\x00\x1b[31m"
         logger.info(message_with_control)
         wait_for_file(temp_log_file)
@@ -337,7 +339,7 @@ class TestSpecialCharacters:
     def test_html_tags(self, temp_log_file: Path) -> None:
         """Test logger with HTML tags."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info("Message with <tags> and </tags>")
         wait_for_file(temp_log_file)
         content = temp_log_file.read_text(encoding="utf-8")
@@ -351,7 +353,7 @@ class TestTypeConversion:
     def test_exception_object(self, temp_log_file: Path) -> None:
         """Test logger with exception object."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         try:
             {}[0]
         except Exception as exc:
@@ -364,7 +366,7 @@ class TestTypeConversion:
     def test_dict_message(self, temp_log_file: Path) -> None:
         """Test logger with dictionary message."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info({"key": "value"})
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
@@ -372,7 +374,7 @@ class TestTypeConversion:
     def test_list_message(self, temp_log_file: Path) -> None:
         """Test logger with list message."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
         logger.info(["list", "items"])
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
@@ -397,7 +399,7 @@ class TestErrorHandling:
     def test_file_write_error_handling(self, temp_log_file: Path) -> None:
         """Test handling of file write errors."""
         logger_handler = FileLogger(temp_log_file, level="INFO")
-        logger = logger_handler.get_logger()
+        logger = logger_handler.get_loguru()
 
         # Try to write with mocked error
         with patch("builtins.open", side_effect=OSError("Write error")):

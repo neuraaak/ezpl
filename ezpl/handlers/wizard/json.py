@@ -9,20 +9,24 @@ JSON methods mixin for Rich Wizard.
 This module provides JSON display functionality for the RichWizard class.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import json
-from typing import Optional, Union
 
-# External libraries
+# Third-party imports
+from rich.console import Console
 from rich.json import JSON
 from rich.panel import Panel
 
-# Internal modules
+# Local imports
 from ..utils import safe_str_convert
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -34,15 +38,18 @@ class JsonMixin:
     and optional panel wrapping.
     """
 
+    # Type hints for attributes provided by RichWizard
+    _console: Console
+
     # ///////////////////////////////////////////////////////////////
     # JSON METHODS
     # ///////////////////////////////////////////////////////////////
 
     def json(
         self,
-        data: Union[str, dict, list],
-        title: Optional[str] = None,
-        indent: Optional[int] = None,
+        data: str | dict | list,
+        title: str | None = None,
+        indent: int | None = None,
         highlight: bool = True,
     ) -> None:
         """

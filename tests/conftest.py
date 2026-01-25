@@ -14,27 +14,31 @@ This module provides fixtures for:
 - Custom pytest markers
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
+import gc
 import os
+import sys
 import tempfile
+import time
 from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import Mock
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
+# Third-party imports
 import pytest
 from rich.console import Console
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Local imports
 from ezpl import Ezpl
 from ezpl.config import ConfigurationManager
 
-# IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
-
-
-## ==> FIXTURES
+# FIXTURES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -51,12 +55,7 @@ def reset_ezpl() -> Generator[None, None, None]:
     # Reset after test
     Ezpl.reset()
     # Force cleanup on Windows to release file handles
-    import sys
-
     if sys.platform == "win32":
-        import gc
-        import time
-
         gc.collect()  # Force garbage collection
         time.sleep(0.15)  # Allow time for Windows to release file locks
 
@@ -69,15 +68,10 @@ def temp_dir() -> Generator[Path, None, None]:
     Yields:
         Path to temporary directory
     """
-    import sys
-
     with tempfile.TemporaryDirectory() as tmpdir:
         yield Path(tmpdir)
         # On Windows, give time for file handles to be released
         if sys.platform == "win32":
-            import gc
-            import time
-
             gc.collect()
             time.sleep(0.1)
 
@@ -207,7 +201,8 @@ def sample_log_data() -> list[dict]:
     ]
 
 
-## ==> PYTEST HOOKS
+# ///////////////////////////////////////////////////////////////
+# PYTEST HOOKS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -218,12 +213,7 @@ def pytest_runtest_teardown(item, nextitem) -> None:  # noqa: ARG001
     On Windows, loguru can keep file handles open, causing PermissionError
     during teardown. These errors are non-critical and don't affect test results.
     """
-    import sys
-
     if sys.platform == "win32":
-        import gc
-        import time
-
         gc.collect()  # Force garbage collection to release file handles
         time.sleep(0.15)  # Allow time for Windows to release file locks
 
@@ -236,8 +226,6 @@ def pytest_runtest_makereport(item, call):  # noqa: ARG001
     These errors occur when pytest tries to clean up temporary directories
     but loguru still has file handles open. They don't affect test results.
     """
-    import sys
-
     if sys.platform == "win32" and call.when == "teardown" and call.excinfo:
         exc_type = call.excinfo.type
         if exc_type in (NotADirectoryError, PermissionError, OSError):
@@ -291,7 +279,8 @@ def pytest_runtest_logreport(report):
             report.sections = []
 
 
-## ==> MARKERS
+# ///////////////////////////////////////////////////////////////
+# MARKERS
 # ///////////////////////////////////////////////////////////////
 
 # Markers are registered in pytest.ini

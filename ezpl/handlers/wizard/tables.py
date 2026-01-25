@@ -9,17 +9,20 @@ Table methods mixin for Rich Wizard.
 This module provides all table-related methods for the RichWizard class.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
-from typing import Any, Optional
+# Standard library imports
+from typing import Any
 
-# External libraries
+# Third-party imports
+from rich.console import Console
 from rich.table import Table
 
-# Internal modules
-
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -31,6 +34,9 @@ class TableMixin:
     generic tables, status tables, dependency tables, and command tables.
     """
 
+    # Type hints for attributes provided by RichWizard
+    _console: Console
+
     # ///////////////////////////////////////////////////////////////
     # TABLE METHODS
     # ///////////////////////////////////////////////////////////////
@@ -38,7 +44,7 @@ class TableMixin:
     def table(
         self,
         data: list[dict[str, Any]],
-        title: Optional[str] = None,
+        title: str | None = None,
         show_header: bool = True,
         **kwargs,
     ) -> None:

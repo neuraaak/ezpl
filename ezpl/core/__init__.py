@@ -1,16 +1,21 @@
+# ///////////////////////////////////////////////////////////////
+# EZPL - Core Module
+# Project: ezpl
+# ///////////////////////////////////////////////////////////////
+
 """
 Core module for Ezpl logging framework.
 
-This module contains the core business logic and interfaces.
+This module exports core interfaces (protocols and abstract base classes)
+and custom exception types used throughout the Ezpl framework.
 """
 
-# =============================================================================
-# IMPORTS
-# =============================================================================
+from __future__ import annotations
 
-# ------------------------------------------------
-# CORE EXCEPTIONS
-# ------------------------------------------------
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Local imports
 from .exceptions import (
     ConfigurationError,
     EzplError,
@@ -20,10 +25,6 @@ from .exceptions import (
     LoggingError,
     ValidationError,
 )
-
-# ------------------------------------------------
-# CORE INTERFACES
-# ------------------------------------------------
 from .interfaces import (
     ConfigurationManager,
     EzplCore,
@@ -31,21 +32,18 @@ from .interfaces import (
     LoggingHandler,
 )
 
-# =============================================================================
-# MODULE EXPORTS
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
 
 __all__ = [
-    # ------------------------------------------------
-    # INTERFACE EXPORTS
-    # ------------------------------------------------
+    # Protocols (structural typing interfaces)
     "LoggingHandler",
     "IndentationManager",
     "ConfigurationManager",
+    # Abstract base classes
     "EzplCore",
-    # ------------------------------------------------
-    # EXCEPTION EXPORTS
-    # ------------------------------------------------
+    # Custom exceptions
     "EzplError",
     "ConfigurationError",
     "LoggingError",

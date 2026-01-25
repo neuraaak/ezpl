@@ -1,13 +1,12 @@
 # ///////////////////////////////////////////////////////////////
-# EZPL - Utils Module
+# EZPL - Protocols Module
 # Project: ezpl
 # ///////////////////////////////////////////////////////////////
 
 """
-Utils module for Ezpl logging framework.
+Protocols module for Ezpl logging framework.
 
-This module contains utility functions and helpers used throughout the framework.
-Currently no public utilities are exposed at package level.
+This module contains Protocol definitions for type checking and interface contracts.
 """
 
 from __future__ import annotations
@@ -15,10 +14,16 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# (Currently no public utilities exposed at package level.)
+# Local imports
+from .logger_protocol import LoggerProtocol
+from .printer_protocol import PrinterProtocol
 
 # ///////////////////////////////////////////////////////////////
 # PUBLIC API
 # ///////////////////////////////////////////////////////////////
 
-__all__: list[str] = []
+__all__ = [
+    # Protocol exports
+    "PrinterProtocol",
+    "LoggerProtocol",
+]

@@ -20,21 +20,21 @@ Note: This file intentionally uses try-except-pass for robustness testing.
 
 # ruff: noqa: S110, SIM105
 
-# IMPORT BASE
+from __future__ import annotations
+
 # ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
 import threading
 from pathlib import Path
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Local imports
 from ezpl import Ezpl
 from ezpl.core.exceptions import FileOperationError, ValidationError
 
-# IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
-
-
-## ==> TESTS
+# TESTS
 # ///////////////////////////////////////////////////////////////
 
 

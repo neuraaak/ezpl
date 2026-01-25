@@ -10,33 +10,32 @@ This module provides the command-line interface for managing Ezpl
 configuration, viewing logs, and performing various operations.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import click
 
-# External libraries
+# Third-party imports
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-# Internal modules
-try:
-    import ezpl
-
-    EZPL_AVAILABLE = True
-except ImportError:
-    EZPL_AVAILABLE = False
-    ezpl = None
+# Local imports
+import ezpl
 
 from .commands import config, info, logs, version
 
-## ==> GLOBALS
+# ///////////////////////////////////////////////////////////////
+# GLOBALS
 # ///////////////////////////////////////////////////////////////
 
 console = Console()
 
-## ==> CLI GROUP
+# ///////////////////////////////////////////////////////////////
+# CLI GROUP
 # ///////////////////////////////////////////////////////////////
 
 
@@ -46,7 +45,7 @@ console = Console()
     context_settings={"help_option_names": ["-h", "--help"]},
 )
 @click.version_option(
-    version=ezpl.__version__ if EZPL_AVAILABLE else "1.0.0",
+    version=ezpl.__version__,
     prog_name="Ezpl CLI",
     message="%(prog)s version %(version)s",
 )
@@ -86,7 +85,8 @@ def _display_welcome() -> None:
         click.echo("🚀 Ezpl CLI - Modern Python Logging Framework")
 
 
-## ==> COMMAND GROUPS
+# ///////////////////////////////////////////////////////////////
+# COMMAND GROUPS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -103,7 +103,9 @@ cli.add_command(version.version_command)
 cli.add_command(info.info_command)
 
 
-## ==> MAIN ENTRY POINT
+# ///////////////////////////////////////////////////////////////
+# MAIN ENTRY POINT
+# ///////////////////////////////////////////////////////////////
 # ///////////////////////////////////////////////////////////////
 
 

@@ -10,26 +10,30 @@ This module provides a console-based logging handler with advanced formatting,
 indentation management, and color support using Rich.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Optional, Union
+from typing import Any
 
-# External libraries
+# Third-party imports
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 
-# Internal modules
+# Local imports
 from ..core.exceptions import ValidationError
 from ..core.interfaces import IndentationManager, LoggingHandler
-from ..types import LogLevel, Pattern, get_pattern_color
+from ..types.enums import LogLevel, Pattern, get_pattern_color
 from .utils import safe_str_convert, sanitize_for_console
 from .wizard import RichWizard
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -44,7 +48,7 @@ class ConsolePrinterWrapper:
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, console_printer: "ConsolePrinter") -> None:
+    def __init__(self, console_printer: ConsolePrinter) -> None:
         self._console_printer = console_printer
 
     # ///////////////////////////////////////////////////////////////
@@ -68,7 +72,7 @@ class ConsolePrinterWrapper:
         self._console_printer.print_pattern(Pattern.WARN, message, "WARNING")
 
     def warn(self, message: Any) -> None:
-        """Log a warning message with pattern format (alias for warning)."""
+        """Alias for warning(). Log a warning message with pattern format."""
         self.warning(message)
 
     def error(self, message: Any) -> None:
@@ -112,16 +116,16 @@ class ConsolePrinterWrapper:
     # ------------------------------------------------
 
     def print_pattern(
-        self, pattern: Union[str, Pattern], message: Any, level: str = "INFO"
+        self, pattern: str | Pattern, message: Any, level: str = "INFO"
     ) -> None:
         """Display a message with pattern format: • PATTERN :: message"""
         self._console_printer.print_pattern(pattern, message, level)
 
     def print_json(
         self,
-        data: Union[str, dict, list],
-        title: Optional[str] = None,
-        indent: Optional[int] = None,
+        data: str | dict | list,
+        title: str | None = None,
+        indent: int | None = None,
         highlight: bool = True,
     ) -> None:
         """Display JSON data in a formatted and syntax-highlighted way."""
@@ -132,7 +136,7 @@ class ConsolePrinterWrapper:
     # ------------------------------------------------
 
     @property
-    def wizard(self) -> "RichWizard":
+    def wizard(self) -> RichWizard:
         """
         Get the Rich Wizard instance for advanced display features.
 
@@ -319,7 +323,7 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
         self.print_pattern(Pattern.WARN, message, "WARNING")
 
     def warn(self, message: Any) -> None:
-        """Log a warning message with pattern format (alias for warning)."""
+        """Alias for warning(). Log a warning message with pattern format."""
         self.warning(message)
 
     def error(self, message: Any) -> None:
@@ -359,7 +363,7 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
         self.print_pattern(Pattern.DEPS, message, "INFO")
 
     def print_pattern(
-        self, pattern: Union[str, Pattern], message: Any, level: str = "INFO"
+        self, pattern: str | Pattern, message: Any, level: str = "INFO"
     ) -> None:
         """
         Display a message with pattern format: • PATTERN :: message
@@ -452,7 +456,7 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
         self._indent = 0
 
     @contextmanager
-    def manage_indent(self) -> Generator[None, None, None]:
+    def manage_indent(self) -> Generator[None, None, None]:  # type: ignore[override]
         """
         Context manager for temporary indentation.
 
@@ -469,9 +473,7 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
     # ENHANCED METHODS (Rich features)
     # ///////////////////////////////////////////////////////////////
 
-    def print_table(
-        self, data: list[dict[str, Any]], title: Optional[str] = None
-    ) -> None:
+    def print_table(self, data: list[dict[str, Any]], title: str | None = None) -> None:
         """
         Display a table using Rich (delegates to RichWizard).
 
@@ -482,7 +484,7 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
         self._wizard.table(data, title=title)
 
     def print_panel(
-        self, content: str, title: Optional[str] = None, style: str = "blue"
+        self, content: str, title: str | None = None, style: str = "blue"
     ) -> None:
         """
         Display a panel using Rich (delegates to RichWizard).
@@ -518,9 +520,9 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
 
     def print_json(
         self,
-        data: Union[str, dict, list],
-        title: Optional[str] = None,
-        indent: Optional[int] = None,
+        data: str | dict | list,
+        title: str | None = None,
+        indent: int | None = None,
         highlight: bool = True,
     ) -> None:
         """

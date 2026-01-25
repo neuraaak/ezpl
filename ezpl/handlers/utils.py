@@ -9,13 +9,17 @@ Utility functions for message handling in handlers.
 This module provides robust message conversion and sanitization functions.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import re
-from typing import Any
+from typing import Any, cast
 
-## ==> FUNCTIONS
+# ///////////////////////////////////////////////////////////////
+# FUNCTIONS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -38,28 +42,33 @@ def safe_str_convert(obj: Any) -> str:
     # Try str() first (most common case)
     try:
         return str(obj)
-    except Exception as e:
-        raise ValueError(f"Failed to convert object to string: {obj}") from e
+    except (  # noqa: S110
+        Exception
+    ):  # noqa: S110 - Intentional fallback, exception handling is the purpose
+        pass
 
     # Fallback to repr() if str() fails
     try:
         return repr(obj)
-    except Exception as e:
-        raise ValueError(f"Failed to convert object to string: {obj}") from e
+    except (  # noqa: S110
+        Exception
+    ):  # noqa: S110 - Intentional fallback, exception handling is the purpose
+        pass
 
     # Last resort: type name
     try:
         return f"<{type(obj).__name__} object>"
-    except Exception as e:
-        raise ValueError(f"Failed to convert object to string: {obj}") from e
+    except Exception:
+        # Ultimate fallback - should never happen
+        return "<unknown object>"
 
 
-def sanitize_for_file(message: str) -> str:
+def sanitize_for_file(message: Any) -> str:
     """
     Sanitize a message for file output by removing problematic characters.
 
     Args:
-        message: Message to sanitize
+        message: Message to sanitize (can be any type, will be converted to str)
 
     Returns:
         Sanitized message safe for file output
@@ -85,15 +94,15 @@ def sanitize_for_file(message: str) -> str:
         # Replace problematic Unicode characters
         message = message.encode("utf-8", errors="replace").decode("utf-8")
 
-    return message
+    return cast(str, message)
 
 
-def sanitize_for_console(message: str) -> str:
+def sanitize_for_console(message: Any) -> str:
     """
     Sanitize a message for console output (less aggressive, Rich handles most cases).
 
     Args:
-        message: Message to sanitize
+        message: Message to sanitize (can be any type, will be converted to str)
 
     Returns:
         Sanitized message safe for console output
@@ -107,4 +116,4 @@ def sanitize_for_console(message: str) -> str:
     # Remove other control characters that might break terminal
     message = re.sub(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]", "", message)
 
-    return message
+    return cast(str, message)

@@ -15,8 +15,12 @@ Ce script montre comment utiliser :
 - La configuration
 """
 
-# IMPORT BASE
+from __future__ import annotations
+
 # ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
 import sys
 import time
 from pathlib import Path
@@ -24,9 +28,11 @@ from pathlib import Path
 # Ajouter le répertoire parent au path pour importer ezpl
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Local imports
 from ezpl import Ezpl
 
-## ==> INITIALISATION
+# ///////////////////////////////////////////////////////////////
+# INITIALISATION
 # ///////////////////////////////////////////////////////////////
 
 # Créer un fichier de log temporaire pour la démo
@@ -37,7 +43,8 @@ ezpl = Ezpl(log_file=log_file, log_level="DEBUG")
 printer = ezpl.get_printer()
 logger = ezpl.get_logger()
 
-## ==> SECTION 1: NIVEAUX DE LOG
+# ///////////////////////////////////////////////////////////////
+# SECTION 1: NIVEAUX DE LOG
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -57,7 +64,8 @@ logger.info("Info dans le fichier")
 logger.warning("Warning dans le fichier")
 logger.error("Error dans le fichier")
 
-## ==> SECTION 2: MÉTHODES DE PATTERN
+# ///////////////////////////////////////////////////////////////
+# SECTION 2: MÉTHODES DE PATTERN
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -71,7 +79,8 @@ printer.detect("Détection de Python 3.11.3")
 printer.config("Configuration chargée depuis ~/.ezpl/config.json")
 printer.deps("Vérification des dépendances: rich, loguru, click")
 
-## ==> SECTION 3: RICH FEATURES - PANELS
+# ///////////////////////////////////////////////////////////////
+# SECTION 3: RICH FEATURES - PANELS
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -94,7 +103,8 @@ wizard.installation_panel(
     "Installation", "Installation de ezpl en cours...", status="in_progress"
 )
 
-## ==> SECTION 4: RICH FEATURES - TABLES
+# ///////////////////////////////////////////////////////////////
+# SECTION 4: RICH FEATURES - TABLES
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -133,7 +143,8 @@ commands = [
 ]
 wizard.command_table(commands)
 
-## ==> SECTION 5: RICH FEATURES - JSON
+# ///////////////////////////////////////////////////////////////
+# SECTION 5: RICH FEATURES - JSON
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -161,7 +172,8 @@ data_list = [
 ]
 wizard.json(data_list, title="Liste d'éléments")
 
-## ==> SECTION 6: PROGRESS BARS
+# ///////////////////////////////////////////////////////////////
+# SECTION 6: PROGRESS BARS
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -218,7 +230,8 @@ with wizard.step_progress(steps) as (progress, task, steps_list):
         progress.advance(task)
         time.sleep(0.2)
 
-## ==> SECTION 7: INDENTATION
+# ///////////////////////////////////////////////////////////////
+# SECTION 7: INDENTATION
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -235,7 +248,8 @@ with ezpl.manage_indent():
     printer.info("Retour au niveau 1")
 printer.info("Retour au niveau 0")
 
-## ==> SECTION 8: CONFIGURATION
+# ///////////////////////////////////////////////////////////////
+# SECTION 8: CONFIGURATION
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -257,7 +271,8 @@ printer.warning("Message d'avertissement - devrait apparaître")
 ezpl.configure(printer_level="INFO")
 printer.info("Retour au niveau INFO")
 
-## ==> SECTION 9: LOGGING DANS LE FICHIER
+# ///////////////////////////////////////////////////////////////
+# SECTION 9: LOGGING DANS LE FICHIER
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -277,7 +292,8 @@ logger.info("Message après le séparateur")
 # Afficher le chemin du fichier de log
 printer.info(f"Fichier de log: {ezpl.get_log_file()}")
 
-## ==> SECTION 10: DYNAMIC LAYERED PROGRESS
+# ///////////////////////////////////////////////////////////////
+# SECTION 10: DYNAMIC LAYERED PROGRESS
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)
@@ -319,7 +335,8 @@ with wizard.dynamic_layered_progress(stages, show_time=True) as progress:
     progress.complete_layer("process")
     progress.complete_layer("main")
 
-## ==> FIN
+# ///////////////////////////////////////////////////////////////
+# FIN
 # ///////////////////////////////////////////////////////////////
 
 print("\n" + "=" * 80)

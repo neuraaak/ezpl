@@ -10,19 +10,18 @@ This module provides functionality to manage user environment variables
 for Ezpl configuration.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
-# External libraries
-
-# Internal modules
-
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -169,7 +168,7 @@ class UserEnvManager:
         except Exception:
             return False
 
-    def get_user_env(self, config_key: str) -> Optional[str]:
+    def get_user_env(self, config_key: str) -> str | None:
         """
         Get a user environment variable value from a config key.
 

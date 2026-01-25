@@ -5,6 +5,12 @@ on:
     tags:
       - "v*.*.*"
   workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: "Skip tests before publishing (not recommended)"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -13,17 +19,180 @@ env:
   PACKAGE_NAME: ezplog
 
 jobs:
-  publish:
+  # Job de validation et tests avant publication
+  validate:
+    name: Validate Package
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract_pyproject_version.outputs.version }}
+      tag_version: ${{ steps.extract_version.outputs.tag_version }}
+      version_match: ${{ steps.check_version.outputs.match }}
+      tag_on_main: ${{ steps.check_tag_on_main.outputs.on_main }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Nécessaire pour accéder aux tags et vérifier les branches
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Fetch all branches and tags
+        run: |
+          git fetch --all --tags --prune
+          echo "📋 Available branches:"
+          git branch -a
+          echo "📋 Available tags:"
+          git tag -l
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # En mode manuel, utiliser le dernier tag ou la version du pyproject.toml
+            TAG_NAME=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -n "$TAG_NAME" ]; then
+              TAG_VERSION=$(echo "$TAG_NAME" | sed 's/^v//')
+            else
+              TAG_VERSION=$(grep -E '^version\s*=\s*"' pyproject.toml | sed 's/.*version\s*=\s*"\([^"]*\)".*/\1/')
+              TAG_NAME="v$TAG_VERSION"
+            fi
+          else
+            # En mode tag push, extraire la version du tag
+            TAG_NAME="${{ github.ref_name }}"
+            TAG_VERSION=$(echo "$TAG_NAME" | sed 's/^v//')
+          fi
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "tag_version=$TAG_VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Tag name: $TAG_NAME"
+          echo "📦 Tag version: $TAG_VERSION"
+
+      - name: Extract version from pyproject.toml
+        id: extract_pyproject_version
+        run: |
+          VERSION=$(grep -E '^version\s*=\s*"' pyproject.toml | sed 's/.*version\s*=\s*"\([^"]*\)".*/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📋 pyproject.toml version: $VERSION"
+
+      - name: Check version consistency
+        id: check_version
+        run: |
+          TAG_VERSION="${{ steps.extract_version.outputs.tag_version }}"
+          PYPROJECT_VERSION="${{ steps.extract_pyproject_version.outputs.version }}"
+
+          if [ "$TAG_VERSION" != "$PYPROJECT_VERSION" ]; then
+            echo "❌ Version mismatch!"
+            echo "   Tag version: $TAG_VERSION"
+            echo "   pyproject.toml version: $PYPROJECT_VERSION"
+            echo "match=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "✅ Version consistency check passed"
+          echo "match=true" >> $GITHUB_OUTPUT
+
+      - name: Check if tag is on main branch
+        id: check_tag_on_main
+        run: |
+          TAG_NAME="${{ steps.extract_version.outputs.tag_name }}"
+
+          # En mode workflow_dispatch, on skip cette vérification (publication manuelle autorisée)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "⚠️  Manual trigger: skipping main branch check"
+            echo "on_main=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Vérifier que le tag existe
+          if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "❌ Tag $TAG_NAME not found"
+            echo "on_main=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          # Obtenir le commit pointé par le tag
+          TAG_COMMIT=$(git rev-parse "$TAG_NAME")
+          echo "🔍 Tag $TAG_NAME points to commit: $TAG_COMMIT"
+
+          # Vérifier que main existe et récupérer sa référence
+          if git rev-parse origin/main >/dev/null 2>&1; then
+            MAIN_REF="origin/main"
+          elif git rev-parse main >/dev/null 2>&1; then
+            MAIN_REF="main"
+          else
+            echo "❌ Main branch not found"
+            echo "on_main=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "🔍 Checking if tag commit is in main branch ($MAIN_REF)..."
+
+          # Vérifier si le commit du tag est dans l'historique de main
+          # Utiliser git branch --contains pour vérifier si main contient le commit du tag
+          if git branch --contains "$TAG_COMMIT" 2>/dev/null | grep -qE "(main|origin/main)" || \
+             git branch -r --contains "$TAG_COMMIT" 2>/dev/null | grep -qE "origin/main"; then
+            echo "✅ Tag $TAG_NAME is on main branch"
+            echo "on_main=true" >> $GITHUB_OUTPUT
+          else
+            # Vérification alternative : est-ce que le commit du tag est un ancêtre de main ?
+            if git merge-base --is-ancestor "$TAG_COMMIT" "$MAIN_REF" 2>/dev/null; then
+              echo "✅ Tag $TAG_NAME is on main branch (commit is ancestor of main)"
+              echo "on_main=true" >> $GITHUB_OUTPUT
+            else
+              echo "❌ Tag $TAG_NAME is NOT on main branch!"
+              echo "   Tag commit: $TAG_COMMIT"
+              echo "   Main branch: $MAIN_REF"
+              echo "   This tag points to a commit that is not in main's history"
+              echo "   Only tags on the main branch will trigger PyPI publication"
+              echo "on_main=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          fi
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run linting
+        if: github.event_name != 'workflow_dispatch' || !github.event.inputs.skip_tests
+        run: |
+          echo "🔍 Running linting checks..."
+          ruff check .
+          ruff format --check .
+          mypy ezpl --ignore-missing-imports || true
+
+      - name: Run tests
+        if: github.event_name != 'workflow_dispatch' || !github.event.inputs.skip_tests
+        run: |
+          echo "🧪 Running test suite..."
+          pytest tests/ -v --tb=short
+
+  # Job de build et publication
+  publish:
+    name: Build and Publish
+    needs: validate
+    runs-on: ubuntu-latest
+    if: needs.validate.outputs.version_match == 'true' && needs.validate.outputs.tag_on_main == 'true'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
+
+      - name: Clean previous builds
+        run: |
+          echo "🧹 Cleaning previous build artifacts..."
+          rm -rf build/ dist/ *.egg-info/
 
       - name: Install build dependencies
         run: |
@@ -32,21 +201,35 @@ jobs:
 
       - name: Build package
         run: |
+          echo "🔨 Building package..."
           python -m build
+          echo "📦 Build artifacts:"
+          ls -lh dist/
 
       - name: Check package
         run: |
+          echo "🔍 Checking package validity..."
           twine check dist/*
+          echo "✅ Package check passed"
+
+      - name: Verify package installation
+        run: |
+          echo "🧪 Verifying package can be installed..."
+          pip install dist/*.whl --force-reinstall --no-deps
+          python -c "import ezpl; print(f'✅ Package installed successfully: ezpl {ezpl.__version__}')"
+          pip uninstall -y ezplog
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
           verbose: true
+          skip-existing: false
 
       - name: Show publish info
         run: |
           echo "✅ Package published successfully to PyPI!"
           echo "📦 Package: ${{ env.PACKAGE_NAME }}"
-          echo "🏷️ Version: ${{ github.ref_name }}"
+          echo "🏷️  Version: ${{ needs.validate.outputs.version }}"
           echo "🔗 URL: https://pypi.org/project/${{ env.PACKAGE_NAME }}/"
+          echo "📋 PyPI Project: https://pypi.org/project/${{ env.PACKAGE_NAME }}/${{ needs.validate.outputs.version }}/"

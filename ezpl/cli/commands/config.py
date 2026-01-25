@@ -10,27 +10,30 @@ This module provides commands for getting, setting, and resetting
 Ezpl configuration with support for user environment variables.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
-from typing import Optional
-
+# Standard library imports
 import click
 
-# External libraries
+# Third-party imports
 from rich.console import Console
 from rich.table import Table
 
-# Internal modules
+# Local imports
 from ...config import ConfigurationManager
 from ..utils.env_manager import UserEnvManager
 
-## ==> GLOBALS
+# ///////////////////////////////////////////////////////////////
+# GLOBALS
 # ///////////////////////////////////////////////////////////////
 
 console = Console()
 
-## ==> COMMAND GROUP
+# ///////////////////////////////////////////////////////////////
+# COMMAND GROUP
 # ///////////////////////////////////////////////////////////////
 
 
@@ -44,7 +47,8 @@ def config_group() -> None:
     """
 
 
-## ==> COMMANDS
+# ///////////////////////////////////////////////////////////////
+# COMMANDS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -56,7 +60,7 @@ def config_group() -> None:
     is_flag=True,
     help="Show environment variable names for each key",
 )
-def get_command(key: Optional[str], show_env: bool) -> None:
+def get_command(key: str | None, show_env: bool) -> None:
     """
     Get configuration value(s).
 

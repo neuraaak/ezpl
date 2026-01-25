@@ -9,19 +9,23 @@ LogLevel enumeration for Ezpl logging framework.
 This module defines the logging levels with their associated colors and properties.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
-# External libraries
+# Third-party imports
 from loguru import logger
 
-# Internal modules
-from ..core.exceptions import ValidationError
+# Local imports
+from ...core.exceptions import ValidationError
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -146,7 +150,7 @@ class LogLevel(Enum):
         Returns:
             The label for the log level
         """
-        return cls.get_attribute(level, "label")
+        return cast(str, cls.get_attribute(level, "label"))
 
     @classmethod
     def get_no(cls, level: str) -> int:
@@ -159,7 +163,7 @@ class LogLevel(Enum):
         Returns:
             The numeric level
         """
-        return cls.get_attribute(level, "no")
+        return cast(int, cls.get_attribute(level, "no"))
 
     @classmethod
     def get_fgcolor(cls, level: str) -> str:
@@ -172,7 +176,7 @@ class LogLevel(Enum):
         Returns:
             The foreground color code
         """
-        return cls.get_attribute(level, "fg")
+        return cast(str, cls.get_attribute(level, "fg"))
 
     @classmethod
     def get_bgcolor(cls, level: str) -> str:
@@ -185,7 +189,7 @@ class LogLevel(Enum):
         Returns:
             The background color code
         """
-        return cls.get_attribute(level, "bg")
+        return cast(str, cls.get_attribute(level, "bg"))
 
     @classmethod
     def is_valid_level(cls, level: str) -> bool:

@@ -9,20 +9,25 @@ Progress methods mixin for Rich Wizard.
 This module provides all progress bar-related methods for the RichWizard class.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import time
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Any
 
-# External libraries
+# Third-party imports
+from rich.console import Console
 from rich.progress import (
     BarColumn,
     DownloadColumn,
     Progress,
     SpinnerColumn,
+    TaskID,
     TaskProgressColumn,
     TextColumn,
     TimeElapsedColumn,
@@ -30,9 +35,8 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 
-# Internal modules
-
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -45,6 +49,10 @@ class ProgressMixin:
     and layered progress bars.
     """
 
+    # Type hints for attributes provided by RichWizard
+    _console: Console
+    _progress_prefix: str
+
     # ///////////////////////////////////////////////////////////////
     # PROGRESS METHODS
     # ///////////////////////////////////////////////////////////////
@@ -53,7 +61,7 @@ class ProgressMixin:
     def progress(
         self,
         description: str = "Working...",
-        total: Optional[int] = None,
+        total: int | None = None,
         transient: bool = False,
     ) -> Generator[tuple[Progress, int], None, None]:
         """
@@ -627,7 +635,7 @@ class ProgressMixin:
 
         with progress:
             # Create tasks for each layer
-            task_ids = {}
+            task_ids: dict[str, TaskID] = {}
 
             for i, layer in enumerate(layers):
                 layer_name = layer.get("name", f"Layer_{i}")
@@ -639,7 +647,7 @@ class ProgressMixin:
                     # Handle step-based layer
                     steps = layer.get("steps", [])
                     layer_total = len(steps)
-                    task_id = progress.add_task(
+                    task_id: TaskID = progress.add_task(
                         f"[{layer_style}]{layer_desc}",
                         total=layer_total,
                         details="",

@@ -1,3 +1,8 @@
+# ///////////////////////////////////////////////////////////////
+# EZPL - Main Module
+# Project: ezpl
+# ///////////////////////////////////////////////////////////////
+
 """
 Ezpl - Modern Python logging framework.
 
@@ -25,25 +30,28 @@ suitable for professional and industrial applications.
 
 from __future__ import annotations
 
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
 import sys
 
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
 # META INFORMATIONS
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
-__license__ = "MIT"
 __description__ = "A module for easier logging"
+__python_requires__ = ">=3.10"
 __keywords__ = ["logging", "rich", "loguru", "console", "file"]
 __url__ = "https://github.com/neuraaak/ezplog"
 __repository__ = "https://github.com/neuraaak/ezplog"
-__python_requires__ = ">=3.10"
 
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
 # PYTHON VERSION CHECK
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
 
 if sys.version_info < (3, 10):
     raise RuntimeError(
@@ -51,13 +59,7 @@ if sys.version_info < (3, 10):
         f"Current version: {sys.version}"
     )
 
-# =============================================================================
-# IMPORTS
-# =============================================================================
-
-# ------------------------------------------------
-# CORE CONFIG & EXCEPTIONS
-# ------------------------------------------------
+# Local imports
 from .config import ConfigurationManager
 from .core.exceptions import (
     ConfigurationError,
@@ -68,35 +70,26 @@ from .core.exceptions import (
     LoggingError,
     ValidationError,
 )
-
-# ------------------------------------------------
-# MAIN CLASS & HANDLERS
-# ------------------------------------------------
 from .ezpl import Ezpl
 from .handlers import ConsolePrinter, EzLogger, EzPrinter, FileLogger, RichWizard
 from .handlers.console import ConsolePrinterWrapper
-
-# ------------------------------------------------
-# TYPES
-# ------------------------------------------------
 from .types import (
     PATTERN_COLORS,
+    LoggerProtocol,
     LogLevel,
     Pattern,
+    PrinterProtocol,
     get_pattern_color,
     get_pattern_color_by_name,
 )
 
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
 # TYPE ALIASES
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
 
 # Canonical type aliases for users.
 # They mirror the internal EzPrinter / EzLogger types.
 
-# ------------------------------------------------
-# PRINTER TYPE ALIAS
-# ------------------------------------------------
 Printer = EzPrinter
 """Type alias for EzPrinter (console printer handler).
 Use this type when you want to annotate a variable that represents a printer.
@@ -110,9 +103,6 @@ Example:
     >>> printer.print_json({"key": "value"})
 """
 
-# ------------------------------------------------
-# LOGGER TYPE ALIAS
-# ------------------------------------------------
 Logger = EzLogger
 """Type alias for EzLogger (file logger handler).
 Use this type when you want to annotate a variable that represents a logger.
@@ -124,18 +114,14 @@ Example:
     >>> logger.info("Logged to file")
 """
 
-# =============================================================================
-# MODULE EXPORTS
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
 
 __all__ = [
-    # ------------------------------------------------
-    # MAIN CLASS EXPORTS
-    # ------------------------------------------------
+    # Main class exports
     "Ezpl",
-    # ------------------------------------------------
-    # HANDLER CLASS EXPORTS
-    # ------------------------------------------------
+    # Handler class exports
     "EzPrinter",
     "EzLogger",
     "Logger",
@@ -143,25 +129,20 @@ __all__ = [
     "FileLogger",
     "ConsolePrinterWrapper",
     "RichWizard",
-    # ------------------------------------------------
-    # CONFIGURATION EXPORTS
-    # ------------------------------------------------
+    # Configuration exports
     "ConfigurationManager",
-    # ------------------------------------------------
-    # TYPE ALIASES EXPORTS
-    # ------------------------------------------------
+    # Type aliases exports
     "Printer",
-    # ------------------------------------------------
-    # TYPE & PATTERN EXPORTS
-    # ------------------------------------------------
+    # Type & pattern exports
     "LogLevel",
     "Pattern",
     "PATTERN_COLORS",
     "get_pattern_color",
     "get_pattern_color_by_name",
-    # ------------------------------------------------
-    # EXCEPTION EXPORTS
-    # ------------------------------------------------
+    # Protocol exports
+    "PrinterProtocol",
+    "LoggerProtocol",
+    # Exception exports
     "EzplError",
     "ConfigurationError",
     "LoggingError",
@@ -169,16 +150,13 @@ __all__ = [
     "InitializationError",
     "FileOperationError",
     "HandlerError",
-    # ------------------------------------------------
-    # METADATA EXPORTS
-    # ------------------------------------------------
+    # Metadata exports
     "__version__",
     "__author__",
     "__maintainer__",
-    "__license__",
     "__description__",
+    "__python_requires__",
     "__keywords__",
     "__url__",
     "__repository__",
-    "__python_requires__",
 ]

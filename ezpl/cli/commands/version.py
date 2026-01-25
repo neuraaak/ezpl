@@ -9,31 +9,30 @@ CLI command for displaying version information.
 This module provides the version command for Ezpl.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import click
 
-# External libraries
+# Third-party imports
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-# Internal modules
-try:
-    import ezpl
+# Local imports
+import ezpl
 
-    EZPL_AVAILABLE = True
-except ImportError:
-    EZPL_AVAILABLE = False
-    ezpl = None
-
-## ==> GLOBALS
+# ///////////////////////////////////////////////////////////////
+# GLOBALS
 # ///////////////////////////////////////////////////////////////
 
 console = Console()
 
-## ==> COMMANDS
+# ///////////////////////////////////////////////////////////////
+# COMMANDS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -52,10 +51,6 @@ def version_command(full: bool) -> None:
     Use --full for detailed version information.
     """
     try:
-        if not EZPL_AVAILABLE:
-            console.print("[red]Ezpl not available[/red]")
-            return
-
         version = getattr(ezpl, "__version__", "unknown")
         author = getattr(ezpl, "__author__", "unknown")
         license_type = getattr(ezpl, "__license__", "unknown")

@@ -10,19 +10,23 @@ This module provides centralized configuration management with support for
 file-based configuration, environment variables, and runtime configuration.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 import json
 import os
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, cast
 
-# Internal modules
+# Local imports
 from ..core.exceptions import FileOperationError
 from .defaults import DefaultConfiguration
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -38,7 +42,7 @@ class ConfigurationManager:
     # INIT
     # ///////////////////////////////////////////////////////////////
 
-    def __init__(self, config_file: Optional[Path] = None):
+    def __init__(self, config_file: Path | None = None):
         """
         Initialize the configuration manager.
 
@@ -151,7 +155,7 @@ class ConfigurationManager:
 
     def get_log_level(self) -> str:
         """Get the current log level."""
-        return self.get("log-level", DefaultConfiguration.LOG_LEVEL)
+        return cast(str, self.get("log-level", DefaultConfiguration.LOG_LEVEL))
 
     def get_log_file(self) -> Path:
         """Get the current log file path."""
@@ -169,39 +173,50 @@ class ConfigurationManager:
 
     def get_printer_level(self) -> str:
         """Get the current printer level."""
-        return self.get("printer-level", DefaultConfiguration.PRINTER_LEVEL)
+        return cast(str, self.get("printer-level", DefaultConfiguration.PRINTER_LEVEL))
 
     def get_file_logger_level(self) -> str:
         """Get the current file logger level."""
-        return self.get("file-logger-level", DefaultConfiguration.FILE_LOGGER_LEVEL)
+        return cast(
+            str, self.get("file-logger-level", DefaultConfiguration.FILE_LOGGER_LEVEL)
+        )
 
     def get_indent_step(self) -> int:
         """Get the current indent step."""
-        return self.get("indent-step", DefaultConfiguration.INDENT_STEP)
+        return cast(int, self.get("indent-step", DefaultConfiguration.INDENT_STEP))
 
     def get_indent_symbol(self) -> str:
         """Get the current indent symbol."""
-        return self.get("indent-symbol", DefaultConfiguration.INDENT_SYMBOL)
+        return cast(str, self.get("indent-symbol", DefaultConfiguration.INDENT_SYMBOL))
 
     def get_base_indent_symbol(self) -> str:
         """Get the current base indent symbol."""
-        return self.get("base-indent-symbol", DefaultConfiguration.BASE_INDENT_SYMBOL)
+        return cast(
+            str, self.get("base-indent-symbol", DefaultConfiguration.BASE_INDENT_SYMBOL)
+        )
 
     def get_log_format(self) -> str:
         """Get the current log format."""
-        return self.get("log-format", DefaultConfiguration.LOG_FORMAT)
+        return cast(str, self.get("log-format", DefaultConfiguration.LOG_FORMAT))
 
-    def get_log_rotation(self) -> Optional[str]:
+    def get_log_rotation(self) -> str | None:
         """Get the current log rotation setting."""
-        return self.get("log-rotation", DefaultConfiguration.LOG_ROTATION)
+        return cast(
+            str | None, self.get("log-rotation", DefaultConfiguration.LOG_ROTATION)
+        )
 
-    def get_log_retention(self) -> Optional[str]:
+    def get_log_retention(self) -> str | None:
         """Get the current log retention setting."""
-        return self.get("log-retention", DefaultConfiguration.LOG_RETENTION)
+        return cast(
+            str | None, self.get("log-retention", DefaultConfiguration.LOG_RETENTION)
+        )
 
-    def get_log_compression(self) -> Optional[str]:
+    def get_log_compression(self) -> str | None:
         """Get the current log compression setting."""
-        return self.get("log-compression", DefaultConfiguration.LOG_COMPRESSION)
+        return cast(
+            str | None,
+            self.get("log-compression", DefaultConfiguration.LOG_COMPRESSION),
+        )
 
     def get_all(self) -> dict[str, Any]:
         """
@@ -274,7 +289,7 @@ class ConfigurationManager:
         self._load_configuration()
 
     def export_to_script(
-        self, output_file: Union[str, Path], platform: str = None
+        self, output_file: str | Path, platform: str | None = None
     ) -> None:
         """
         Export configuration as environment variables script.

@@ -6,18 +6,25 @@
 """
 Core interfaces for Ezpl logging framework.
 
-This module defines the core interfaces and protocols used throughout the application.
+This module defines the core protocols and abstract base classes used
+throughout the application. Protocols provide structural typing for flexible,
+duck-typed implementations, while abstract base classes define strict interfaces
+with runtime enforcement.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 from pathlib import Path
 from typing import Any, Protocol
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# PROTOCOLS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -25,7 +32,10 @@ class LoggingHandler(Protocol):
     """
     Protocol for logging handlers.
 
-    This protocol defines the interface that all logging handlers must implement.
+    This structural typing protocol defines the interface that all logging
+    handlers must implement. Using a Protocol (rather than ABC) allows
+    duck-typed implementations without requiring explicit inheritance,
+    enabling more flexible handler implementations.
     """
 
     def log(self, level: str, message: str) -> None:
@@ -41,7 +51,9 @@ class IndentationManager(Protocol):
     """
     Protocol for indentation management.
 
-    This protocol defines the interface for managing indentation levels.
+    This structural typing protocol defines the interface for managing
+    indentation levels in output. Implementations can handle indentation
+    independently, enabling pluggable indentation strategies.
     """
 
     def get_indent(self) -> str:
@@ -69,7 +81,9 @@ class ConfigurationManager(Protocol):
     """
     Protocol for configuration management.
 
-    This protocol defines the interface for configuration managers.
+    This structural typing protocol defines the interface for configuration
+    managers. Implementations can support different configuration sources
+    (files, environment, in-memory) without coupling to a specific backend.
     """
 
     def get(self, key: str, default: Any = None) -> Any:
@@ -101,11 +115,17 @@ class ConfigurationManager(Protocol):
         ...
 
 
+# ///////////////////////////////////////////////////////////////
+# ABSTRACT BASE CLASSES
+# ///////////////////////////////////////////////////////////////
+
+
 class EzplCore(ABC):
     """
     Abstract base class for the core Ezpl functionality.
 
-    This abstract class defines the interface for the main Ezpl class.
+    This abstract class defines the interface for the main Ezpl class,
+    enforcing implementation of core logging and configuration methods.
     """
 
     # ///////////////////////////////////////////////////////////////

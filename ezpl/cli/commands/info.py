@@ -9,36 +9,35 @@ CLI command for displaying package information.
 This module provides the info command for Ezpl.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 from pathlib import Path
 
 import click
 
-# External libraries
+# Third-party imports
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-# Internal modules
-try:
-    import ezpl
-
-    EZPL_AVAILABLE = True
-except ImportError:
-    EZPL_AVAILABLE = False
-    ezpl = None
+# Local imports
+import ezpl
 
 from ...config import ConfigurationManager
 
-## ==> GLOBALS
+# ///////////////////////////////////////////////////////////////
+# GLOBALS
 # ///////////////////////////////////////////////////////////////
 
 console = Console()
 
-## ==> COMMANDS
+# ///////////////////////////////////////////////////////////////
+# COMMANDS
 # ///////////////////////////////////////////////////////////////
 
 
@@ -51,10 +50,6 @@ def info_command() -> None:
     version, location, configuration, and dependencies.
     """
     try:
-        if not EZPL_AVAILABLE:
-            console.print("[red]Ezpl not available[/red]")
-            return
-
         # Package info
         version = getattr(ezpl, "__version__", "unknown")
         author = getattr(ezpl, "__author__", "unknown")

@@ -14,14 +14,16 @@ Tests cover:
 - Edge cases
 """
 
-# IMPORT BASE
+from __future__ import annotations
+
 # ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Third-party imports
 import pytest
 
+# Local imports
 from ezpl.core.exceptions import ValidationError
-
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
 from ezpl.types import (
     PATTERN_COLORS,
     LogLevel,
@@ -30,11 +32,8 @@ from ezpl.types import (
     get_pattern_color_by_name,
 )
 
-# IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
-
-
-## ==> TESTS
+# TESTS
 # ///////////////////////////////////////////////////////////////
 
 

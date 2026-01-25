@@ -1,3 +1,8 @@
+# ///////////////////////////////////////////////////////////////
+# EZPL - CLI Utils Module
+# Project: ezpl
+# ///////////////////////////////////////////////////////////////
+
 """
 CLI utilities module for Ezpl logging framework.
 
@@ -7,34 +12,25 @@ This module contains utility functions and classes for CLI operations:
 - User environment variable management
 """
 
-# =============================================================================
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
-# =============================================================================
-
-# ------------------------------------------------
-# ENVIRONMENT MANAGEMENT UTILITIES
-# ------------------------------------------------
+# ///////////////////////////////////////////////////////////////
+# Local imports
 from .env_manager import UserEnvManager
-
-# ------------------------------------------------
-# LOG PARSING & STATISTICS UTILITIES
-# ------------------------------------------------
 from .log_parser import LogEntry, LogParser
 from .log_stats import LogStatistics
 
-# =============================================================================
-# MODULE EXPORTS
-# =============================================================================
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
 
 __all__ = [
-    # ------------------------------------------------
-    # LOG UTILITIES EXPORTS
-    # ------------------------------------------------
+    # Log utilities exports
     "LogParser",
     "LogEntry",
     "LogStatistics",
-    # ------------------------------------------------
-    # ENVIRONMENT UTILITIES EXPORTS
-    # ------------------------------------------------
+    # Environment utilities exports
     "UserEnvManager",
 ]

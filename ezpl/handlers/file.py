@@ -10,24 +10,28 @@ This module provides a file-based logging handler with advanced formatting,
 session separation, and structured output.
 """
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Base imports
+# Standard library imports
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
-# External libraries
+# Third-party imports
 from loguru import logger
-from loguru._logger import Logger
+from loguru._logger import Logger as LoguruLogger
 
-# Internal modules
+# Local imports
 from ..core.exceptions import FileOperationError, LoggingError, ValidationError
 from ..core.interfaces import LoggingHandler
-from ..types import LogLevel
+from ..types.enums import LogLevel
 from .utils import safe_str_convert, sanitize_for_file
 
-## ==> CLASSES
+# ///////////////////////////////////////////////////////////////
+# CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
@@ -50,9 +54,9 @@ class FileLogger(LoggingHandler):
         self,
         log_file: Path | str,
         level: str = "INFO",
-        rotation: Optional[str] = None,
-        retention: Optional[str] = None,
-        compression: Optional[str] = None,
+        rotation: str | None = None,
+        retention: str | None = None,
+        compression: str | None = None,
     ) -> None:
         """
         Initialize the file logger handler.
@@ -74,7 +78,7 @@ class FileLogger(LoggingHandler):
         self._level = level.upper()
         self._log_file = Path(log_file)
         self._logger = logger.bind(task="logger")
-        self._logger_id = None
+        self._logger_id: int | None = None
         self._rotation = rotation
         self._retention = retention
         self._compression = compression
@@ -115,31 +119,23 @@ class FileLogger(LoggingHandler):
             LoggingError: If logger initialization fails
         """
         try:
-            if self._logger_id is not None:
-                self._logger.remove(self._logger_id)
+            # Remove existing handler if any
+            logger_id: int | None = self._logger_id
+            if logger_id is not None:
+                self._logger.remove(logger_id)
 
-            # Préparer les paramètres pour loguru.add()
-            add_kwargs = {
-                "sink": self._log_file,
-                "level": self._level,
-                "format": self._custom_formatter,
-                "filter": lambda record: record["extra"]["task"] == "logger",
-                "encoding": "utf-8",
-            }
-
-            # Ajouter rotation si spécifiée
-            if self._rotation:
-                add_kwargs["rotation"] = self._rotation
-
-            # Ajouter retention si spécifiée
-            if self._retention:
-                add_kwargs["retention"] = self._retention
-
-            # Ajouter compression si spécifiée
-            if self._compression:
-                add_kwargs["compression"] = self._compression
-
-            self._logger_id = self._logger.add(**add_kwargs)
+            # Call loguru.add() with keyword arguments directly
+            # Note: loguru.add() accepts keyword arguments, not a dict
+            self._logger_id = self._logger.add(
+                sink=self._log_file,
+                level=self._level,
+                format=self._custom_formatter,  # type: ignore[arg-type]
+                filter=lambda record: record["extra"]["task"] == "logger",
+                encoding="utf-8",
+                rotation=self._rotation if self._rotation else None,
+                retention=self._retention if self._retention else None,
+                compression=self._compression if self._compression else None,
+            )
         except Exception as e:
             raise LoggingError(f"Failed to initialize file logger: {e}", "file") from e
 
@@ -192,22 +188,88 @@ class FileLogger(LoggingHandler):
             raise LoggingError(f"Failed to log message: {e}", "file") from e
 
     # ///////////////////////////////////////////////////////////////
-    # GETTER
+    # LOGGING METHODS (API primaire - delegates to loguru)
     # ///////////////////////////////////////////////////////////////
 
-    def get_logger(self) -> Logger:
+    def trace(self, message: Any, *args, **kwargs) -> None:
+        """Log a trace message."""
+        message = safe_str_convert(message)
+        self._logger.trace(message, *args, **kwargs)
+
+    def debug(self, message: Any, *args, **kwargs) -> None:
+        """Log a debug message."""
+        message = safe_str_convert(message)
+        self._logger.debug(message, *args, **kwargs)
+
+    def info(self, message: Any, *args, **kwargs) -> None:
+        """Log an info message."""
+        message = safe_str_convert(message)
+        self._logger.info(message, *args, **kwargs)
+
+    def success(self, message: Any, *args, **kwargs) -> None:
+        """Log a success message."""
+        message = safe_str_convert(message)
+        self._logger.success(message, *args, **kwargs)
+
+    def warning(self, message: Any, *args, **kwargs) -> None:
+        """Log a warning message."""
+        message = safe_str_convert(message)
+        self._logger.warning(message, *args, **kwargs)
+
+    def warn(self, message: Any, *args, **kwargs) -> None:
+        """Alias for warning(). Log a warning message."""
+        self.warning(message, *args, **kwargs)
+
+    def error(self, message: Any, *args, **kwargs) -> None:
+        """Log an error message."""
+        message = safe_str_convert(message)
+        self._logger.error(message, *args, **kwargs)
+
+    def critical(self, message: Any, *args, **kwargs) -> None:
+        """Log a critical message."""
+        message = safe_str_convert(message)
+        self._logger.critical(message, *args, **kwargs)
+
+    def exception(self, message: Any, *args, **kwargs) -> None:
+        """Log an exception with traceback."""
+        message = safe_str_convert(message)
+        self._logger.exception(message, *args, **kwargs)
+
+    # ///////////////////////////////////////////////////////////////
+    # LOGURU-SPECIFIC METHODS (delegation)
+    # ///////////////////////////////////////////////////////////////
+
+    def bind(self, **kwargs: Any) -> LoguruLogger:
+        """Bind context variables to the logger."""
+        return self._logger.bind(**kwargs)  # type: ignore[return-value]
+
+    def opt(self, **kwargs: Any) -> LoguruLogger:
+        """Configure logger options."""
+        return self._logger.opt(**kwargs)  # type: ignore[return-value]
+
+    def patch(self, patcher: Any) -> LoguruLogger:
+        """Patch log records."""
+        return self._logger.patch(patcher)  # type: ignore[return-value]
+
+    # ///////////////////////////////////////////////////////////////
+    # GETTER - Returns the underlying loguru logger for advanced usage
+    # ///////////////////////////////////////////////////////////////
+
+    def get_loguru(self) -> LoguruLogger:
         """
-        Get the underlying Loguru logger instance.
+        Get the underlying Loguru logger instance for advanced usage.
 
-        Returns:
-            The Loguru logger instance
+        **Returns:**
 
-        Raises:
-            LoggingError: If the logger is not initialized
+            * loguru.Logger: The loguru logger instance
+
+        **Raises:**
+
+            * LoggingError: If the logger is not initialized
         """
         if not self._logger:
             raise LoggingError("File logger not initialized", "file")
-        return self._logger
+        return self._logger  # type: ignore[return-value]
 
     def get_log_file(self) -> Path:
         """
@@ -240,9 +302,11 @@ class FileLogger(LoggingHandler):
         which is especially important on Windows where files can remain locked.
         """
         try:
-            if self._logger_id is not None:
+            # Remove existing handler if any
+            logger_id: int | None = self._logger_id
+            if logger_id is not None:
                 # Remove the specific handler
-                self._logger.remove(self._logger_id)
+                self._logger.remove(logger_id)
                 self._logger_id = None
 
                 # Force flush and close on Windows
@@ -325,9 +389,15 @@ class FileLogger(LoggingHandler):
         try:
             # Sécuriser le formatage du timestamp
             try:
-                time_obj = record.get("time")
-                if hasattr(time_obj, "strftime"):
-                    timestamp = time_obj.strftime("%Y-%m-%d %H:%M:%S")
+                time_obj: Any = record.get("time")
+                # Check if time_obj is a datetime-like object with strftime
+                if time_obj is not None:
+                    strftime_method = getattr(time_obj, "strftime", None)
+                    if strftime_method is not None and callable(strftime_method):
+                        # Safe to call strftime - time_obj is datetime-like
+                        timestamp = strftime_method("%Y-%m-%d %H:%M:%S")
+                    else:
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 else:
                     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             except Exception:

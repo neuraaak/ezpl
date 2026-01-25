@@ -9,3 +9,5 @@ Integration tests for Ezpl logging framework.
 This package contains integration tests that verify the interaction
 between multiple components of the Ezpl library.
 """
+
+from __future__ import annotations

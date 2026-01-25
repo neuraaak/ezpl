@@ -21,25 +21,26 @@ Note: Some tests intentionally use try-except-pass for robustness testing.
 
 # ruff: noqa: S110, SIM105
 
+from __future__ import annotations
+
+# ///////////////////////////////////////////////////////////////
+# IMPORTS
+# ///////////////////////////////////////////////////////////////
+# Standard library imports
 import json
 import os
 from pathlib import Path
 from unittest.mock import patch
 
-# IMPORT BASE
-# ///////////////////////////////////////////////////////////////
+# Third-party imports
 import pytest
 
-# IMPORT / GUI AND MODULES AND WIDGETS
-# ///////////////////////////////////////////////////////////////
+# Local imports
 from ezpl import Ezpl
 from ezpl.core.exceptions import FileOperationError, ValidationError
 
-# IMPORT SPECS
 # ///////////////////////////////////////////////////////////////
-
-
-## ==> TESTS
+# TESTS
 # ///////////////////////////////////////////////////////////////
 
 
