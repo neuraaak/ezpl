@@ -1,5 +1,6 @@
 # ///////////////////////////////////////////////////////////////
-# BUILD SYSTEM
+# 🔨 BUILD SYSTEM
+# Defines the build backend and requirements for packaging
 # ///////////////////////////////////////////////////////////////
 
 [build-system]
@@ -7,7 +8,8 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 # ///////////////////////////////////////////////////////////////
-# PROJECT METADATA
+# 📦 PROJECT METADATA
+# Package information, version, authors, and classifiers
 # ///////////////////////////////////////////////////////////////
 
 [project]
@@ -36,14 +38,20 @@ classifiers = [
 ]
 
 # ///////////////////////////////////////////////////////////////
-# DEPENDENCIES
+# 📚 DEPENDENCIES
+# Core production dependencies for runtime
 # ///////////////////////////////////////////////////////////////
 
 dependencies = [
-    "loguru>=0.7.2", # Pour FileLogger uniquement
-    "rich>=13.0.0",  # Pour ConsolePrinter et RichWizard (gère les couleurs, panels, tables, progress bars)
-    "click>=8.0.0",  # Pour CLI
+    "loguru>=0.7.2", # Advanced file logging with rotation, retention, compression
+    "rich>=13.0.0",  # Rich console rendering with colors, panels, tables, progress bars
+    "click>=8.0.0",  # CLI framework for user commands
 ]
+
+# ///////////////////////////////////////////////////////////////
+# 🛠️ OPTIONAL DEPENDENCIES
+# Development tools, testing, and build dependencies
+# ///////////////////////////////////////////////////////////////
 
 [project.optional-dependencies]
 dev = [
@@ -76,7 +84,8 @@ test = [
 ]
 
 # ///////////////////////////////////////////////////////////////
-# PROJECT URLS
+# 🔗 PROJECT URLS
+# Links to repository, documentation, and package index
 # ///////////////////////////////////////////////////////////////
 
 [project.urls]
@@ -85,14 +94,16 @@ Repository = "https://github.com/neuraaak/ezplog"
 PyPI = "https://pypi.org/project/ezplog/"
 
 # ///////////////////////////////////////////////////////////////
-# CLI SCRIPTS
+# 🖥️ SCRIPTS
+# Entry points for command-line tools
 # ///////////////////////////////////////////////////////////////
 
 [project.scripts]
 ezpl = "ezpl.cli.main:cli"
 
 # ///////////////////////////////////////////////////////////////
-# SETUPTOOLS CONFIGURATION
+# 📦 SETUPTOOLS CONFIGURATION
+# Package discovery and inclusion/exclusion patterns
 # ///////////////////////////////////////////////////////////////
 
 [tool.setuptools.packages.find]
@@ -129,9 +140,11 @@ exclude = [
 ]
 
 # ///////////////////////////////////////////////////////////////
-# TOOL: BLACK (CODE FORMATTER)
+# 🎨 CODE FORMATTING & LINTING TOOLS
+# Auto-formatting, import sorting, and style checking
 # ///////////////////////////////////////////////////////////////
 
+# Black: Code formatter (88 char line length, Python 3.10+)
 [tool.black]
 line-length = 88
 target-version = ['py310', 'py311', 'py312']
@@ -161,10 +174,7 @@ extend-exclude = '''
 )/
 '''
 
-# ///////////////////////////////////////////////////////////////
-# TOOL: ISORT (IMPORT SORTER)
-# ///////////////////////////////////////////////////////////////
-
+# isort: Import sorting (Black-compatible profile)
 [tool.isort]
 profile = "black"
 line_length = 88
@@ -191,12 +201,56 @@ skip = [
     "examples",
 ]
 
+# Ruff: All-in-one linter with comprehensive rule sets
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "S",   # bandit security
+    "T20", # flake8-print
+    "ARG", # flake8-unused-arguments
+    "PIE", # flake8-pie
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+    "S101", # assert_used (for tests)
+    "S106", # hardcoded_password_funcarg
+    "T201", # print statements (for init.py and scripts)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["S101", "S311", "E501"]
+"examples/**/*" = ["T201", "E501"]
+"ezpl/cli/**/*" = ["T201", "E501"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
 # ///////////////////////////////////////////////////////////////
-# TOOL: TY (TYPE CHECKER - ASTRAL)
+# ✅ TYPE CHECKING TOOLS
+# Static type analysis with minimal and comprehensive modes
 # ///////////////////////////////////////////////////////////////
 
+# ty: Type checking with minimal configuration
 [tool.ty.environment]
-# Python version target
+# Target Python version
 python-version = "3.10"
 
 # Project root paths (first-party modules)
@@ -225,15 +279,12 @@ respect-ignore-files = true
 # Output format (full or concise)
 output-format = "full"
 
-# Treat warnings as errors
+# Warnings are not treated as errors
 error-on-warning = false
 
-# ///////////////////////////////////////////////////////////////
-# TOOL: PYRIGHT (TYPE CHECKER - MICROSOFT)
-# ///////////////////////////////////////////////////////////////
-
+# Pyright: Comprehensive type checking with detailed reporting
 [tool.pyright]
-# Python version
+# Target Python version
 pythonVersion = "3.10"
 
 # Type checking mode (off, basic, standard, strict)
@@ -252,7 +303,7 @@ exclude = [
     "examples",
 ]
 
-# Reporting options
+# Reporting rules: flag missing imports and duplicates
 reportMissingImports = true
 reportMissingTypeStubs = false
 reportUnusedImport = true
@@ -260,16 +311,22 @@ reportUnusedClass = true
 reportUnusedFunction = true
 reportUnusedVariable = true
 reportDuplicateImport = true
+
+# Optional type checking (None safety)
 reportOptionalSubscript = true
 reportOptionalMemberAccess = true
 reportOptionalCall = true
 reportOptionalIterable = true
 reportOptionalContextManager = true
 reportOptionalOperand = true
+
+# Tolerance for decorators and complex types
 reportUntypedFunctionDecorator = false
 reportUntypedClassDecorator = false
 reportUntypedBaseClass = false
 reportUntypedNamedTuple = false
+
+# Override and consistency checks
 reportPrivateUsage = false
 reportConstantRedefinition = true
 reportIncompatibleMethodOverride = true
@@ -277,9 +334,11 @@ reportIncompatibleVariableOverride = true
 reportInconsistentConstructor = true
 
 # ///////////////////////////////////////////////////////////////
-# TOOL: PYTEST (TEST FRAMEWORK)
+# 🧪 TESTING & COVERAGE TOOLS
+# Test execution, coverage analysis, and test configuration
 # ///////////////////////////////////////////////////////////////
 
+# Pytest: Test runner with markers and coverage configuration
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = [
@@ -314,10 +373,7 @@ filterwarnings = [
     "ignore::PendingDeprecationWarning",
 ]
 
-# ///////////////////////////////////////////////////////////////
-# TOOL: COVERAGE (CODE COVERAGE)
-# ///////////////////////////////////////////////////////////////
-
+# Coverage: Code coverage measurement and reporting
 [tool.coverage.run]
 source = ["ezpl"]
 branch = true
@@ -345,6 +401,7 @@ omit = [
 ]
 
 [tool.coverage.report]
+# Lines to exclude: comments, abstractions, unreachable code
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -365,9 +422,11 @@ precision = 2
 directory = "htmlcov"
 
 # ///////////////////////////////////////////////////////////////
-# TOOL: BANDIT (SECURITY LINTER)
+# 🔒 SECURITY TOOLS
+# Code security scanning and vulnerability detection
 # ///////////////////////////////////////////////////////////////
 
+# Bandit: Security linter for identifying common security issues
 [tool.bandit]
 exclude_dirs = [
     "tests",
@@ -381,48 +440,3 @@ exclude_dirs = [
     "_temp",
 ]
 skips = ["B101", "B601"]
-
-# ///////////////////////////////////////////////////////////////
-# TOOL: RUFF (LINTER & FORMATTER)
-# ///////////////////////////////////////////////////////////////
-
-[tool.ruff]
-target-version = "py39"
-line-length = 88
-
-[tool.ruff.lint]
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "B",   # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "UP",  # pyupgrade
-    "S",   # bandit security
-    "T20", # flake8-print
-    "ARG", # flake8-unused-arguments
-    "PIE", # flake8-pie
-    "SIM", # flake8-simplify
-]
-ignore = [
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-    "S101", # assert_used (pour les tests)
-    "S106", # hardcoded_password_funcarg
-    "T201", # print statements (pour init.py et scripts)
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*" = ["S101", "S311", "E501"]
-"examples/**/*" = ["T201", "E501"]
-"ezpl/cli/**/*" = ["T201", "E501"]
-
-[tool.ruff.lint.mccabe]
-max-complexity = 10
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"

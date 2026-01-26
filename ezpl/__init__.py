@@ -77,7 +77,7 @@ __repository__ = "https://github.com/neuraaak/ezplog"
 # PYTHON VERSION CHECK
 # ///////////////////////////////////////////////////////////////
 
-if sys.version_info < (3, 10):
+if sys.version_info < (3, 10):  # noqa: UP036
     raise RuntimeError(
         f"ezpl {__version__} requires Python 3.10 or higher. "
         f"Current version: {sys.version}"

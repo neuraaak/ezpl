@@ -10,14 +10,20 @@
 # Bytecode Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.pyo
 *.pyd
+*.so
+.Python
 
 # Environnements virtuels
 .venv/
 env/
 venv/
 ENV/
+env.bak/
+venv.bak/
+.conda/
 
 # =============================================================================
 # BUILD ET DISTRIBUTION (COMMUNS)
@@ -25,10 +31,26 @@ ENV/
 # Artifacts de build
 build/
 !.scripts/build/
+!.scripts/build/**
 dist/
 *.egg-info/
 *.egg
 *.spec
+
+# Packaging
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+.installed.cfg
+MANIFEST
 
 # =============================================================================
 # CACHE ET FICHIERS TEMPORAIRES (COMMUNS)
@@ -38,6 +60,19 @@ dist/
 .ruff_cache/
 .mypy_cache/
 .black_cache/
+.bandit/
+.pre-commit-cache/
+.benchmarks/
+.tox/
+.cache
+.nox/
+.hypothesis/
+
+# Dependency manager cache
+.pip-cache/
+node_modules/
+.npm/
+.yarn/
 
 # =============================================================================
 # RAPPORTS ET ANALYSES DE QUALITÉ DE CODE (COMMUNS)
@@ -64,6 +99,9 @@ test-results/
 .pytest_cache/
 junit.xml
 test-report.xml
+nosetests.xml
+*.cover
+*.py,cover
 
 # Rapports de documentation
 doc8-report.txt
@@ -111,6 +149,7 @@ codacy-report.json
 .logs/
 *.log
 *.xlsx
+*.csv
 version_info.txt
 
 # =============================================================================
@@ -139,10 +178,22 @@ version_info.txt
 # =============================================================================
 # FICHIERS SYSTÈME (COMMUNS)
 # =============================================================================
-# Fichiers système
-.DS_Store
+# Windows
 Thumbs.db
-desktop.ini
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+
+# Linux
+.directory
+.Trash-*
 
 # =============================================================================
 # EXCLUSIONS GLOBALES (COMMUNES)
@@ -151,18 +202,53 @@ desktop.ini
 *.bak
 *.backup
 *.old
+*.orig
+*.rej
+
+# Fichiers temporaires
+*.pid
+*.tmp
+*.temp
+_temp/
+temp/
+tmp/
+tmpclaude-*
 
 # =============================================================================
 # EXCLUSIONS SPÉCIFIQUES AU PROJET RACINE
 # =============================================================================
-# Fichiers de configuration globaux
+# Fichiers de configuration globaux et sensibles
 .env
+.env.*
 .env.local
 .env.*.local
+.secret*
+*password*
+*secret*
+*.key
+*.pem
+*.crt
+credentials/
+keys/
 
-# Fichiers métier spécifiques à la racine
-/zz-Divers
-MouseMachine.exe
-No_Screen_Save.exe
-*FarefoxPortable*
-_temp/
+# =============================================================================
+# PATTERNS ADDITIONNELS
+# =============================================================================
+# Commit messages temporaires
+commit_message.txt
+
+# Fichiers de test temporaires
+test_output/
+temp_projects/
+
+# Configuration locale utilisateur
+local_config/
+user_settings/
+
+# Configuration IDE spécifique (optionnel)
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.github/instructions/
+.cursor/rules/
+.clinerules
