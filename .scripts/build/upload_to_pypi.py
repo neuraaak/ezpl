@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # ///////////////////////////////////////////////////////////////
 # UPLOAD_TO_PYPI - PyPI Package Uploader
-# Project: Ezpl
 # ///////////////////////////////////////////////////////////////
 
 """
-Upload script for Ezpl PyPI package.
+Upload script for PyPI package.
 
 This script uploads the built package to PyPI or Test PyPI.
 It assumes the package has already been built using build_package.py.
@@ -143,7 +142,7 @@ def upload_to_test_pypi() -> bool:
     )
     console.print(
         "[cyan]📦[/cyan] Package available at: "
-        "[link]https://test.pypi.org/project/ezpl/[/link]"
+        f"[link]https://test.pypi.org/project/{project_name}/[/link]"
     )
     return True
 
@@ -208,7 +207,7 @@ def upload_to_pypi() -> bool:
     )
     console.print(
         "[cyan]📦[/cyan] Package available at: "
-        "[link]https://pypi.org/project/ezpl/[/link]"
+        f"[link]https://pypi.org/project/{project_name}/[/link]"
     )
     return True
 

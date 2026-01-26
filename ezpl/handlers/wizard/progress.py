@@ -588,7 +588,7 @@ class ProgressMixin:
         self,
         layers: list[dict[str, Any]],
         show_time: bool = True,
-    ) -> Generator[tuple[Progress, dict[str, int]], None, None]:
+    ) -> Generator[tuple[Progress, dict[str, TaskID]], None, None]:
         """
         Create a multi-level progress bar with dynamic layers.
 

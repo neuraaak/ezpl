@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # ///////////////////////////////////////////////////////////////
 # UPDATE_README_VERSION - Sync README badge and pyproject.toml with __init__.py version
-# Project: Ezpl
 # ///////////////////////////////////////////////////////////////
 
-"""Update the version badge in README.md and pyproject.toml from ezpl/__init__.py.
+"""Update the version badge in README.md and pyproject.toml from your-project/__init__.py.
 
 This keeps the visible version in sync with the canonical __version__ value
-defined in ezpl/__init__.py, which is the single source of truth.
+defined in your-project/__init__.py, which is the single source of truth.
 """
 
 from __future__ import annotations

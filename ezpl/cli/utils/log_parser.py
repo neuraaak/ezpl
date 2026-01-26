@@ -187,7 +187,6 @@ class LogParser:
         except (OSError, UnicodeDecodeError):
             # Return empty iterator on error
             return
-            yield  # type: ignore
 
     def parse_lines(self, max_lines: int | None = None) -> list[LogEntry]:
         """

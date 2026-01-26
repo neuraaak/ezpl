@@ -1,10 +1,18 @@
+# ///////////////////////////////////////////////////////////////
+# BUILD SYSTEM
+# ///////////////////////////////////////////////////////////////
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+# ///////////////////////////////////////////////////////////////
+# PROJECT METADATA
+# ///////////////////////////////////////////////////////////////
+
 [project]
 name = "ezplog"
-version = "1.4.2"
+version = "1.4.3"
 description = "Modern Python logging framework with Rich console output and loguru file logging, featuring advanced display capabilities, configuration management, and a simple typed API."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,6 +35,10 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
+# ///////////////////////////////////////////////////////////////
+# DEPENDENCIES
+# ///////////////////////////////////////////////////////////////
+
 dependencies = [
     "loguru>=0.7.2", # Pour FileLogger uniquement
     "rich>=13.0.0",  # Pour ConsolePrinter et RichWizard (gère les couleurs, panels, tables, progress bars)
@@ -39,7 +51,8 @@ dev = [
     "black>=23.0.0",
     "isort>=5.12.0",
     "ruff>=0.1.0",
-    "mypy>=1.0.0",
+    "ty>=0.0.13",
+    "pyright>=1.1.0",
     "pre-commit>=3.0.0",
 
     # Security
@@ -62,13 +75,25 @@ test = [
     "pytest-xdist>=3.0.0",
 ]
 
+# ///////////////////////////////////////////////////////////////
+# PROJECT URLS
+# ///////////////////////////////////////////////////////////////
+
 [project.urls]
 Homepage = "https://github.com/neuraaak/ezplog"
 Repository = "https://github.com/neuraaak/ezplog"
 PyPI = "https://pypi.org/project/ezplog/"
 
+# ///////////////////////////////////////////////////////////////
+# CLI SCRIPTS
+# ///////////////////////////////////////////////////////////////
+
 [project.scripts]
 ezpl = "ezpl.cli.main:cli"
+
+# ///////////////////////////////////////////////////////////////
+# SETUPTOOLS CONFIGURATION
+# ///////////////////////////////////////////////////////////////
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -103,7 +128,10 @@ exclude = [
     ".hooks*",
 ]
 
-# Configuration Black
+# ///////////////////////////////////////////////////////////////
+# TOOL: BLACK (CODE FORMATTER)
+# ///////////////////////////////////////////////////////////////
+
 [tool.black]
 line-length = 88
 target-version = ['py310', 'py311', 'py312']
@@ -133,7 +161,10 @@ extend-exclude = '''
 )/
 '''
 
-# Configuration isort
+# ///////////////////////////////////////////////////////////////
+# TOOL: ISORT (IMPORT SORTER)
+# ///////////////////////////////////////////////////////////////
+
 [tool.isort]
 profile = "black"
 line_length = 88
@@ -160,50 +191,95 @@ skip = [
     "examples",
 ]
 
-# Configuration MyPy
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-check_untyped_defs = true
-disallow_untyped_decorators = false
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
+# ///////////////////////////////////////////////////////////////
+# TOOL: TY (TYPE CHECKER - ASTRAL)
+# ///////////////////////////////////////////////////////////////
 
-# Ignorer le dossier tests
-[[tool.mypy.overrides]]
-module = "tests.*"
-ignore_errors = true
+[tool.ty.environment]
+# Python version target
+python-version = "3.10"
 
-# Ignorer certains modules pour lesquels on n'a pas de stubs
-[[tool.mypy.overrides]]
-module = "winreg"
-ignore_missing_imports = true
+# Project root paths (first-party modules)
+root = [".", "./ezpl"]
 
-[[tool.mypy.overrides]]
-module = [
-    "win32api",
-    "win32con",
-    "win32file",
-    "win32gui",
-    "win32pipe",
-    "win32process",
-    "win32security",
-    "win32service",
-    "win32serviceutil",
-    "win32ts",
-    "win32ui",
-    "win32wnet",
+[tool.ty.src]
+# Files to check
+include = ["ezpl/**/*.py"]
+
+# Files/directories to exclude
+exclude = [
+    "**/__pycache__",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "tests",
+    "docs",
+    "examples",
 ]
-ignore_missing_imports = true
 
-# Configuration Pytest
+# Respect .gitignore
+respect-ignore-files = true
+
+[tool.ty.terminal]
+# Output format (full or concise)
+output-format = "full"
+
+# Treat warnings as errors
+error-on-warning = false
+
+# ///////////////////////////////////////////////////////////////
+# TOOL: PYRIGHT (TYPE CHECKER - MICROSOFT)
+# ///////////////////////////////////////////////////////////////
+
+[tool.pyright]
+# Python version
+pythonVersion = "3.10"
+
+# Type checking mode (off, basic, standard, strict)
+typeCheckingMode = "basic"
+
+# Include/exclude paths
+include = ["ezpl"]
+exclude = [
+    "**/__pycache__",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "tests",
+    "docs",
+    "examples",
+]
+
+# Reporting options
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportUnusedImport = true
+reportUnusedClass = true
+reportUnusedFunction = true
+reportUnusedVariable = true
+reportDuplicateImport = true
+reportOptionalSubscript = true
+reportOptionalMemberAccess = true
+reportOptionalCall = true
+reportOptionalIterable = true
+reportOptionalContextManager = true
+reportOptionalOperand = true
+reportUntypedFunctionDecorator = false
+reportUntypedClassDecorator = false
+reportUntypedBaseClass = false
+reportUntypedNamedTuple = false
+reportPrivateUsage = false
+reportConstantRedefinition = true
+reportIncompatibleMethodOverride = true
+reportIncompatibleVariableOverride = true
+reportInconsistentConstructor = true
+
+# ///////////////////////////////////////////////////////////////
+# TOOL: PYTEST (TEST FRAMEWORK)
+# ///////////////////////////////////////////////////////////////
+
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = [
@@ -238,7 +314,10 @@ filterwarnings = [
     "ignore::PendingDeprecationWarning",
 ]
 
-# Configuration Coverage
+# ///////////////////////////////////////////////////////////////
+# TOOL: COVERAGE (CODE COVERAGE)
+# ///////////////////////////////////////////////////////////////
+
 [tool.coverage.run]
 source = ["ezpl"]
 branch = true
@@ -285,7 +364,10 @@ precision = 2
 [tool.coverage.html]
 directory = "htmlcov"
 
-# Bandit configuration (security)
+# ///////////////////////////////////////////////////////////////
+# TOOL: BANDIT (SECURITY LINTER)
+# ///////////////////////////////////////////////////////////////
+
 [tool.bandit]
 exclude_dirs = [
     "tests",
@@ -300,7 +382,10 @@ exclude_dirs = [
 ]
 skips = ["B101", "B601"]
 
-# Configuration Ruff (remplace flake8)
+# ///////////////////////////////////////////////////////////////
+# TOOL: RUFF (LINTER & FORMATTER)
+# ///////////////////////////////////////////////////////////////
+
 [tool.ruff]
 target-version = "py39"
 line-length = 88

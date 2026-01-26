@@ -1,10 +1,10 @@
-## Git Hooks Usage
+# Git Hooks Usage
 
-This directory contains Git hooks used by the WOMM project.
+This directory contains Git hooks used by your project.
 
-### Available Hooks
+## Available Hooks
 
-#### `pre-commit`
+### `pre-commit`
 
 - **Purpose**: Code quality and formatting before each commit  
 - **Behavior**:
@@ -14,7 +14,7 @@ This directory contains Git hooks used by the WOMM project.
 
 > Note: This is a **native Git hook** in `.hooks/`, independent from the Python `pre-commit` tool configured by `make setup-hooks`.
 
-#### `post-commit`
+### `post-commit`
 
 - **Purpose**: Automated tagging and local build after a successful commit  
 - **Behavior**:
@@ -22,9 +22,11 @@ This directory contains Git hooks used by the WOMM project.
   - Creates or updates a lightweight tag `v<version>` on `HEAD`
   - Creates or updates a major “latest” tag `v<major>-latest`
   - Builds the local package with:
+
     ```bash
     python .scripts/build/build_package.py build
     ```
+
   - Pushes the tags to `origin` (forced update)
 
 ### Configuration
@@ -63,5 +65,3 @@ You can test a hook manually from the project root:
 - `commit-msg`: Validate commit messages (format, IDs, etc.)
 - `post-merge`: Actions after merges (e.g. migrations, regeneration)
 - `pre-rebase`: Checks before rebasing
-
-

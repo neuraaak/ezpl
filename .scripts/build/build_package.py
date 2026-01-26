@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # ///////////////////////////////////////////////////////////////
 # BUILD_PACKAGE - PyPI Package Builder
-# Project: Ezpl
 # ///////////////////////////////////////////////////////////////
 
 """
-Build script for Ezpl PyPI package.
+Build script for PyPI package.
 
 This script builds the package and optionally checks it.
 """
@@ -107,7 +106,7 @@ def build_package() -> bool:
     """
     console.print(
         Panel.fit(
-            Text("🔨 Building Ezpl package", style="bold cyan"),
+            Text("🔨 Building your package", style="bold cyan"),
             border_style="cyan",
         )
     )

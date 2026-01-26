@@ -36,29 +36,6 @@ from __future__ import annotations
 # Standard library imports
 import sys
 
-# ///////////////////////////////////////////////////////////////
-# META INFORMATIONS
-# ///////////////////////////////////////////////////////////////
-
-__version__ = "1.4.2"
-__author__ = "Neuraaak"
-__maintainer__ = "Neuraaak"
-__description__ = "A module for easier logging"
-__python_requires__ = ">=3.10"
-__keywords__ = ["logging", "rich", "loguru", "console", "file"]
-__url__ = "https://github.com/neuraaak/ezplog"
-__repository__ = "https://github.com/neuraaak/ezplog"
-
-# ///////////////////////////////////////////////////////////////
-# PYTHON VERSION CHECK
-# ///////////////////////////////////////////////////////////////
-
-if sys.version_info < (3, 10):
-    raise RuntimeError(
-        f"ezpl {__version__} requires Python 3.10 or higher. "
-        f"Current version: {sys.version}"
-    )
-
 # Local imports
 from .config import ConfigurationManager
 from .core.exceptions import (
@@ -82,6 +59,29 @@ from .types import (
     get_pattern_color,
     get_pattern_color_by_name,
 )
+
+# ///////////////////////////////////////////////////////////////
+# META INFORMATIONS
+# ///////////////////////////////////////////////////////////////
+
+__version__ = "1.4.3"
+__author__ = "Neuraaak"
+__maintainer__ = "Neuraaak"
+__description__ = "A module for easier logging"
+__python_requires__ = ">=3.10"
+__keywords__ = ["logging", "rich", "loguru", "console", "file"]
+__url__ = "https://github.com/neuraaak/ezplog"
+__repository__ = "https://github.com/neuraaak/ezplog"
+
+# ///////////////////////////////////////////////////////////////
+# PYTHON VERSION CHECK
+# ///////////////////////////////////////////////////////////////
+
+if sys.version_info < (3, 10):
+    raise RuntimeError(
+        f"ezpl {__version__} requires Python 3.10 or higher. "
+        f"Current version: {sys.version}"
+    )
 
 # ///////////////////////////////////////////////////////////////
 # TYPE ALIASES

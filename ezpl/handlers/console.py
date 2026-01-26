@@ -16,7 +16,6 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
-from collections.abc import Generator
 from contextlib import contextmanager
 from typing import Any
 
@@ -456,7 +455,7 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
         self._indent = 0
 
     @contextmanager
-    def manage_indent(self) -> Generator[None, None, None]:  # type: ignore[override]
+    def manage_indent(self):
         """
         Context manager for temporary indentation.
 

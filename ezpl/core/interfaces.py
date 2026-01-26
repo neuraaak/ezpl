@@ -19,7 +19,7 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
 from abc import ABC, abstractmethod
-from collections.abc import Generator
+from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -72,7 +72,7 @@ class IndentationManager(Protocol):
         """Reset the indentation level to zero."""
         ...
 
-    def manage_indent(self) -> Generator[None, None, None]:
+    def manage_indent(self) -> AbstractContextManager[None]:
         """Context manager for temporary indentation."""
         ...
 
@@ -163,6 +163,6 @@ class EzplCore(ABC):
         ...
 
     @abstractmethod
-    def manage_indent(self) -> Generator[None, None, None]:
+    def manage_indent(self) -> AbstractContextManager[None]:
         """Context manager for indentation management."""
         ...

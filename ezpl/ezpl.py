@@ -14,7 +14,7 @@ import threading
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import Any
 
 # Third-party imports
 from loguru import logger
@@ -32,9 +32,6 @@ APP_PATH = Path(sys.argv[0]).parent
 # ///////////////////////////////////////////////////////////////
 # CLASSES
 # ///////////////////////////////////////////////////////////////
-
-
-T = TypeVar("T", bound="Ezpl")
 
 
 class Ezpl:
@@ -61,7 +58,7 @@ class Ezpl:
         return cls._instance is not None
 
     def __new__(
-        cls: type[T],
+        cls,
         log_file: Path | str | None = None,
         log_level: str | None = None,
         printer_level: str | None = None,
@@ -72,7 +69,7 @@ class Ezpl:
         indent_step: int | None = None,
         indent_symbol: str | None = None,
         base_indent_symbol: str | None = None,
-    ) -> T:
+    ) -> Ezpl:
         """
         Creates and returns a new instance of Ezpl if none exists.
 
@@ -209,7 +206,9 @@ class Ezpl:
                         cls._config_manager.get_base_indent_symbol,
                     )
 
-                    cls._instance = super().__new__(cls)
+                    instance = object.__new__(cls)
+                    assert isinstance(instance, Ezpl)
+                    cls._instance = instance
 
                     # Initialize printer with resolved configuration
                     cls._printer = EzPrinter(
@@ -243,7 +242,7 @@ class Ezpl:
 
         # Type narrowing: _instance is guaranteed to be set at this point
         assert cls._instance is not None
-        return cast(T, cls._instance)
+        return cls._instance
 
     # ///////////////////////////////////////////////////////////////
     # GETTER

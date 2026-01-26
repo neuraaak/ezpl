@@ -208,8 +208,8 @@ jobs:
         run: |
           echo "🧪 Verifying package can be installed..."
           pip install dist/*.whl --force-reinstall
-          python -c "import ezpl; print(f'✅ Package installed successfully: ezpl {ezpl.__version__}')"
-          pip uninstall -y ezplog
+          python -c "import sys; import importlib; pkg = importlib.import_module('${{ env.PACKAGE_NAME }}'); print(f'✅ Package installed successfully: ${{ env.PACKAGE_NAME }} {getattr(pkg, \"__version__\", \"unknown\")}')"
+          pip uninstall -y ${{ env.PACKAGE_NAME }}
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pre-commit hook for Ezpl project
+# Pre-commit hook for automatic code formatting
 # Automatically formats code before allowing commits
 
 # Get project root (parent of .hooks directory)
@@ -95,9 +95,9 @@ else
     fi
 fi
 
-# Update README version badge from ezpl/__init__.py before staging
+# Update README version badge from your project's __init__.py before staging
 if [ -f ".scripts/dev/update_version.py" ]; then
-    echo "🔄 Updating README version badge from ezpl/__init__.py..."
+    echo "🔄 Updating README version badge..."
     if "$PYTHON_BIN" .scripts/dev/update_version.py; then
         echo "✅ README badge updated"
     else

@@ -16,7 +16,7 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
 import re
-from typing import Any, cast
+from typing import Any
 
 # ///////////////////////////////////////////////////////////////
 # FUNCTIONS
@@ -94,7 +94,7 @@ def sanitize_for_file(message: Any) -> str:
         # Replace problematic Unicode characters
         message = message.encode("utf-8", errors="replace").decode("utf-8")
 
-    return cast(str, message)
+    return message
 
 
 def sanitize_for_console(message: Any) -> str:
@@ -116,4 +116,4 @@ def sanitize_for_console(message: Any) -> str:
     # Remove other control characters that might break terminal
     message = re.sub(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]", "", message)
 
-    return cast(str, message)
+    return message

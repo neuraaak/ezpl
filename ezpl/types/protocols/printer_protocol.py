@@ -17,8 +17,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
-from collections.abc import Generator
-from contextlib import contextmanager
+from contextlib import AbstractContextManager
 from typing import Any, Protocol, runtime_checkable
 
 # Local imports
@@ -156,8 +155,7 @@ class PrinterProtocol(Protocol):
         """Reset indentation to zero."""
         ...
 
-    @contextmanager
-    def manage_indent(self) -> Generator[None, None, None]:
+    def manage_indent(self) -> AbstractContextManager[None]:
         """Context manager for temporary indentation."""
         ...
 

@@ -1,6 +1,5 @@
 #!/bin/sh
 # Post-commit bash hook for automatic tag creation
-# Project: Ezpl
 # Usage: Copy this file to .git/hooks/post-commit (without extension)
 
 # Function to get version from pyproject.toml
