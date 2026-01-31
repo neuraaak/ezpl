@@ -16,7 +16,7 @@ The Ezpl test suite is organized into three main categories:
 
 ### Directory Organization
 
-```
+```txt
 tests/
 ├── conftest.py          # Shared fixtures and pytest configuration
 ├── pytest.ini          # Pytest configuration and markers
@@ -106,7 +106,7 @@ tests/
 - `test_invalid_config_key` – Invalid config key
 - `test_invalid_file_path` – Invalid file path
 
-### `test_printer.py` – ConsolePrinter Tests
+### `test_printer.py` – EzPrinter Tests
 
 **Location:** `tests/unit/test_printer.py`
 
@@ -120,82 +120,82 @@ tests/
 
 - Pattern methods (tip, system, install, detect, config, deps, print_pattern)
 
-#### `TestIndentation`
+#### `TestIndentation` (Printer)
 
 - Indentation management (get_indent, add_indent, del_indent, reset_indent, manage_indent)
 - Maximum indent limit
 - Indentation with messages
 
-#### `TestRichFeatures`
+#### `TestRichFeatures` (Printer)
 
 - `print_table` – Table display
 - `print_panel` – Panel display
 - `print_json` – JSON display
 - `wizard` property – RichWizard access
 
-#### `TestSpecialCharacters`
+#### `TestSpecialCharacters` (Printer)
 
 - Windows paths
 - Braces and tags
 - Unicode characters
 - ANSI escape sequences
 
-#### `TestTypeConversion`
+#### `TestTypeConversion` (Printer)
 
 - Dict, int, list, exception, None, custom objects as messages
 
-### `test_logger.py` – FileLogger Tests
+### `test_logger.py` – EzLogger Tests
 
 **Location:** `tests/unit/test_logger.py`
 
 **Test Classes:**
 
-#### `TestLogLevels`
+#### `TestLogLevels` (Logger)
 
 - All log levels (debug, info, warning, error, critical, set_level)
 
-#### `TestFileRotation`
+#### `TestFileRotation` (Logger)
 
 - `rotation_by_size` – Size-based rotation
 - `rotation_by_time` – Time-based rotation
 - `rotation_by_date` – Date-based rotation
 - `rotation_at_time` – Time-of-day rotation
 
-#### `TestRetention`
+#### `TestRetention` (Logger)
 
 - `retention_by_duration` – Duration-based retention
 - `retention_by_count` – Count-based retention
 
-#### `TestCompression`
+#### `TestCompression` (Logger)
 
 - `compression_zip` – ZIP compression
 - `compression_gz` – GZ compression
 - `compression_tar_gz` – TAR.GZ compression
 
-#### `TestSeparators`
+#### `TestSeparators` (Logger)
 
 - `add_separator` – Add separator to log file
 - `separator_with_ezpl` – Separator with Ezpl integration
 
-#### `TestFileOperations`
+#### `TestFileOperations` (Logger)
 
 - `get_log_file` – Get log file path
 - `get_file_size` – Get file size
 - `get_file_size_empty_file` – Empty file size
 
-#### `TestSpecialCharacters`
+#### `TestSpecialCharacters` (Logger)
 
 - Unicode characters
 - Control characters
 - HTML tags
 
-#### `TestTypeConversion`
+#### `TestTypeConversion` (Logger)
 
 - Exception messages
 - Dict messages
 - List messages
 
-#### `TestErrorHandling`
+#### `TestErrorHandling` (Logger)
 
 - Invalid directory permissions
 - File write errors
@@ -261,7 +261,7 @@ tests/
 - Emergency stop
 - Without time display
 
-#### `TestErrorHandling`
+#### `TestErrorHandling` (Wizard)
 
 - Panel with invalid data
 - Table with invalid data
@@ -273,41 +273,41 @@ tests/
 
 **Test Classes:**
 
-#### `TestInitialization`
+#### `TestInitialization` (Config)
 
 - Default config file
 - Custom config file
 
-#### `TestGetSetUpdate`
+#### `TestGetSetUpdate` (Config)
 
 - `get` – Get configuration value
 - `set` – Set configuration value
 - `update` – Update multiple values
 - `get_all` – Get all configuration
 
-#### `TestSaveLoad`
+#### `TestSaveLoad` (Config)
 
 - `save` – Save to file
 - `load` – Load from file
 - `reload` – Reload configuration
 - `reset_to_defaults` – Reset to defaults
 
-#### `TestPriorityOrder`
+#### `TestPriorityOrder` (Config)
 
 - Argument priority
 - Environment variable priority
 - File priority
 - Default priority
 
-#### `TestGetters`
+#### `TestGetters` (Config)
 
 - All specific getter methods (get_log_level, get_printer_level, etc.)
 
-#### `TestExport`
+#### `TestExport` (Config)
 
 - `export_to_script` – Export to shell script (Unix and Windows)
 
-#### `TestErrorHandling`
+#### `TestErrorHandling` (Config)
 
 - File operation errors (permission, invalid JSON)
 
@@ -760,7 +760,7 @@ Tests handle Windows-specific file locking issues through pytest hooks in `conft
 
 On Windows, loguru can keep file handles open, causing `PermissionError` during test teardown. This is handled by:
 
-- Explicit `close()` method in `FileLogger`
+- Explicit `close()` method in `EzLogger`
 - Garbage collection and delays in fixtures
 - Pytest hooks to suppress non-critical teardown errors
 

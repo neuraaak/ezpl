@@ -4,7 +4,7 @@
 # ///////////////////////////////////////////////////////////////
 
 """
-Unit tests for ConsolePrinter and ConsolePrinterWrapper.
+Unit tests for EzPrinter.
 
 Tests cover:
 - All log levels

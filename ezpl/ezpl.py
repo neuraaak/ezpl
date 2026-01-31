@@ -11,6 +11,7 @@ from __future__ import annotations
 # Standard library imports
 import sys
 import threading
+import warnings
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
@@ -21,7 +22,7 @@ from loguru import logger
 
 # Local imports
 from .config import ConfigurationManager
-from .handlers import ConsolePrinterWrapper, EzLogger, EzPrinter
+from .handlers import EzLogger, EzPrinter
 
 # ///////////////////////////////////////////////////////////////
 # GLOBALS
@@ -227,58 +228,68 @@ class Ezpl:
                         compression=final_compression,
                     )
 
-                    # Apply global log level if specified, but only if specific levels were not set
-                    # Priority: printer_level/file_logger_level > log_level
-                    if final_log_level:
-                        # Only apply global level if specific levels were not provided
-                        if printer_level is None and file_logger_level is None:
-                            cls._instance.set_level(final_log_level)
-                        elif printer_level is None:
-                            # Only apply to printer if printer_level was not specified
-                            cls._instance.set_printer_level(final_log_level)
-                        elif file_logger_level is None:
-                            # Only apply to logger if file_logger_level was not specified
-                            cls._instance.set_logger_level(final_log_level)
+                    # Apply global log level with priority: specific > global
+                    cls._instance._apply_level_priority(
+                        printer_level=printer_level,
+                        file_logger_level=file_logger_level,
+                        global_level=final_log_level,
+                    )
 
         # Type narrowing: _instance is guaranteed to be set at this point
         assert cls._instance is not None
         return cls._instance
 
     # ///////////////////////////////////////////////////////////////
+    # PRIVATE HELPERS
+    # ///////////////////////////////////////////////////////////////
+
+    def _apply_level_priority(
+        self,
+        *,
+        printer_level: str | None = None,
+        file_logger_level: str | None = None,
+        global_level: str | None = None,
+    ) -> None:
+        """
+        Apply log levels with priority: specific level > global level.
+
+        Only sets levels when a non-None value can be resolved.
+        If a specific level is not provided, global_level is used as fallback.
+        """
+        effective_printer = printer_level or global_level
+        effective_logger = file_logger_level or global_level
+        if effective_printer:
+            self.set_printer_level(effective_printer)
+        if effective_logger:
+            self.set_logger_level(effective_logger)
+
+    # ///////////////////////////////////////////////////////////////
     # GETTER
     # ///////////////////////////////////////////////////////////////
 
-    def get_printer(self) -> ConsolePrinterWrapper:
+    def get_printer(self) -> EzPrinter:
         """
-        Returns the Printer wrapper instance (compatible with existing API).
+        Returns the EzPrinter instance.
 
         **Returns:**
 
-            * ConsolePrinterWrapper: Wrapper providing info(), debug(), success(), etc.
+            * EzPrinter: The console printer instance providing info(), debug(), success(), etc.
                 Implements PrinterProtocol for type safety.
-
-        **Raises:**
-
-            * `None`.
         """
-        return self._printer.get_printer()
+        return self._printer
 
     # ///////////////////////////////////////////////////////////////
 
     def get_logger(self) -> EzLogger:
         """
-        Returns the FileLogger instance that implements LoggerProtocol.
+        Returns the EzLogger instance.
 
         **Returns:**
 
-            * EzLogger (FileLogger): The file logger instance for file logging.
+            * EzLogger: The file logger instance for file logging.
                 Use logger.info(), logger.debug(), etc. directly.
                 For advanced loguru features, use logger.get_loguru()
                 Implements LoggerProtocol for type safety.
-
-        **Raises:**
-
-            * `None`.
         """
         return self._logger
 
@@ -464,7 +475,7 @@ class Ezpl:
         Replace the current printer with a custom printer class or instance.
 
         Allows users to override the default printer with a custom class that
-        inherits from EzPrinter (or ConsolePrinter). The method preserves
+        inherits from EzPrinter. The method preserves
         current configuration values (level, indentation settings) unless
         explicitly overridden in init_kwargs.
 
@@ -566,7 +577,7 @@ class Ezpl:
         Replace the current logger with a custom logger class or instance.
 
         Allows users to override the default logger with a custom class that
-        inherits from EzLogger (or FileLogger). The method preserves current
+        inherits from EzLogger. The method preserves current
         configuration values (level, rotation, retention, compression) unless
         explicitly overridden in init_kwargs.
 
@@ -699,32 +710,15 @@ class Ezpl:
         global_log_level_explicit = self._config_manager.has_key("log-level")
 
         # Reapply to handlers with priority logic
-        if printer_level_explicit and file_logger_level_explicit:
-            # Both specific levels are explicitly set, use them
+        self._apply_level_priority(
+            printer_level=printer_level if printer_level_explicit else None,
+            file_logger_level=file_logger_level if file_logger_level_explicit else None,
+            global_level=global_log_level if global_log_level_explicit else None,
+        )
+        # Fallback: apply config defaults if no explicit override resolved
+        if not printer_level_explicit and not global_log_level_explicit:
             self.set_printer_level(printer_level)
-            self.set_logger_level(file_logger_level)
-        elif printer_level_explicit:
-            # Only printer level is explicitly set
-            self.set_printer_level(printer_level)
-            # Apply global level to logger if it's explicitly set, otherwise use file_logger_level
-            if global_log_level_explicit:
-                self.set_logger_level(global_log_level)
-            else:
-                self.set_logger_level(file_logger_level)
-        elif file_logger_level_explicit:
-            # Only file logger level is explicitly set
-            self.set_logger_level(file_logger_level)
-            # Apply global level to printer if it's explicitly set, otherwise use printer_level
-            if global_log_level_explicit:
-                self.set_printer_level(global_log_level)
-            else:
-                self.set_printer_level(printer_level)
-        elif global_log_level_explicit:
-            # Only global level is explicitly set, apply to both
-            self.set_level(global_log_level)
-        else:
-            # No explicit levels, use defaults (shouldn't happen, but safe fallback)
-            self.set_printer_level(printer_level)
+        if not file_logger_level_explicit and not global_log_level_explicit:
             self.set_logger_level(file_logger_level)
 
         # Reinitialize logger with new rotation / retention / compression settings
@@ -761,7 +755,7 @@ class Ezpl:
             base_indent_symbol=self._config_manager.get_base_indent_symbol(),
         )
 
-    def configure(self, config_dict: dict[str, Any] | None = None, **kwargs) -> None:
+    def configure(self, config_dict: dict[str, Any] | None = None, **kwargs) -> bool:
         """
         Configure Ezpl dynamically.
 
@@ -779,6 +773,9 @@ class Ezpl:
                 - indent_symbol or indent-symbol: Symbol for indentation
                 - base_indent_symbol or base-indent-symbol: Base indentation symbol
 
+        Returns:
+            True if configuration was applied, False if it was blocked by lock.
+
         Note: Changes are persisted to the configuration file.
         """
         # Merge config_dict and kwargs
@@ -789,9 +786,15 @@ class Ezpl:
         # - force=True allows configure() even when configuration is locked
         force = kwargs.pop("force", False)
 
-        # If configuration is locked and not forced, ignore configure() call
+        # If configuration is locked and not forced, warn and return False
         if self._config_locked and not force:
-            return
+            warnings.warn(
+                "Ezpl configuration is locked. Call Ezpl.unlock_config() or "
+                "pass force=True to override.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return False
 
         # Normalize keys: convert underscores to hyphens for consistency
         normalized_config = {}
@@ -821,31 +824,12 @@ class Ezpl:
         if "log-file" in normalized_config:
             self.set_log_file(normalized_config["log-file"])
 
-        # Handle log level changes with proper priority
-        # Priority: specific levels (printer-level, file-logger-level) > global level (log-level)
-        has_printer_level = "printer-level" in normalized_config
-        has_file_logger_level = "file-logger-level" in normalized_config
-        has_global_level = "log-level" in normalized_config
-
-        if has_printer_level and has_file_logger_level:
-            # Both specific levels are provided, use them
-            self.set_printer_level(normalized_config["printer-level"])
-            self.set_logger_level(normalized_config["file-logger-level"])
-        elif has_printer_level:
-            # Only printer level is provided
-            self.set_printer_level(normalized_config["printer-level"])
-            # Apply global level to logger if provided, otherwise leave it unchanged
-            if has_global_level:
-                self.set_logger_level(normalized_config["log-level"])
-        elif has_file_logger_level:
-            # Only file logger level is provided
-            self.set_logger_level(normalized_config["file-logger-level"])
-            # Apply global level to printer if provided, otherwise leave it unchanged
-            if has_global_level:
-                self.set_printer_level(normalized_config["log-level"])
-        elif has_global_level:
-            # Only global level is provided, apply to both
-            self.set_level(normalized_config["log-level"])
+        # Handle log level changes with priority: specific > global
+        self._apply_level_priority(
+            printer_level=normalized_config.get("printer-level"),
+            file_logger_level=normalized_config.get("file-logger-level"),
+            global_level=normalized_config.get("log-level"),
+        )
 
         # Reinitialize logger if rotation settings changed
         rotation_changed = any(
@@ -892,3 +876,5 @@ class Ezpl:
                 indent_symbol=self._config_manager.get_indent_symbol(),
                 base_indent_symbol=self._config_manager.get_base_indent_symbol(),
             )
+
+        return True

@@ -51,8 +51,8 @@ python tests/run_tests.py --parallel
 **Unit Tests:**
 
 - `test_ezpl.py` – Ezpl singleton, initialization, configuration
-- `test_printer.py` – ConsolePrinter, log levels, patterns, Rich features
-- `test_logger.py` – FileLogger, rotation, retention, compression
+- `test_printer.py` – EzPrinter, log levels, patterns, Rich features
+- `test_logger.py` – EzLogger, rotation, retention, compression
 - `test_wizard.py` – RichWizard panels, tables, JSON, progress bars
 - `test_config.py` – ConfigurationManager operations
 - `test_types.py` – LogLevel and Pattern enumerations
@@ -169,7 +169,7 @@ pytest --cov=ezpl --cov-report=html:htmlcov tests/
 - Indentation management
 - Configuration reload
 
-**ConsolePrinter:**
+**EzPrinter:**
 
 - All log levels (DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL)
 - Pattern methods (TIP, SYSTEM, INSTALL, DETECT, CONFIG, DEPS)
@@ -178,7 +178,7 @@ pytest --cov=ezpl --cov-report=html:htmlcov tests/
 - Special character handling
 - Type conversion
 
-**FileLogger:**
+**EzLogger:**
 
 - All log levels
 - File rotation (by size, time, date, at time)

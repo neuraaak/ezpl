@@ -16,10 +16,11 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+import threading
 import time
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, TypedDict
 
 # Third-party imports
 from rich.console import Console
@@ -36,6 +37,42 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 from rich.text import Text
+
+# ///////////////////////////////////////////////////////////////
+# TYPES
+# ///////////////////////////////////////////////////////////////
+
+
+class _StageConfigRequired(TypedDict):
+    """Required fields for stage configuration."""
+
+    name: str
+    type: str  # "progress", "steps", "spinner", "download", "main"
+
+
+class StageConfig(_StageConfigRequired, total=False):
+    """Configuration for a DynamicLayeredProgress stage.
+
+    Required fields:
+        name: Layer name/identifier.
+        type: Layer type ("progress", "steps", "spinner", "download", "main").
+
+    Optional fields:
+        description: Display description for the layer.
+        style: Rich style string.
+        total: Total items (for "progress" or "download" type).
+        steps: List of step names (for "steps" or "main" type).
+        total_size: Total size in bytes (for "download" type).
+        filename: Filename (for "download" type).
+    """
+
+    description: str
+    style: str
+    total: int
+    steps: list[str]
+    total_size: int
+    filename: str
+
 
 # ///////////////////////////////////////////////////////////////
 # CLASSES
@@ -78,7 +115,7 @@ class DynamicLayeredProgress:
         self,
         console: Console,
         progress_prefix: str,
-        stages: list[dict[str, Any]],
+        stages: list[StageConfig],
         show_time: bool = True,
     ) -> None:
         """
@@ -103,11 +140,12 @@ class DynamicLayeredProgress:
         )  # Store additional layer info
         self._emergency_stopped = False
         self._emergency_message: str | None = None
+        self._lock = threading.Lock()
 
         # Hierarchy attributes (initialized in _setup_hierarchy)
         self.has_main_layer: bool = False
         self.main_layer_name: str | None = None
-        self.sub_layers: list[dict[str, Any]] = []
+        self.sub_layers: list[StageConfig] = []
 
         # Detect main layer and setup hierarchy
         self._setup_hierarchy()
@@ -171,7 +209,7 @@ class DynamicLayeredProgress:
 
         return Progress(*columns, console=self._console)
 
-    def _create_layer(self, layer_config: dict) -> int:
+    def _create_layer(self, layer_config: StageConfig) -> int:
         """Create a new layer in the progress bar.
 
         Args:
@@ -193,10 +231,8 @@ class DynamicLayeredProgress:
             # Sub-layer: add indentation and use softer colors
             layer_desc = f"  ├─ {layer_desc}"
 
-        # Assert that progress is initialized (should always be true when this is called)
-        assert (
-            self.progress is not None
-        ), "Progress must be initialized before creating layers"
+        if not self.progress:
+            return -1
 
         if layer_type == "steps":
             # Handle step-based layer
@@ -265,24 +301,44 @@ class DynamicLayeredProgress:
             progress: Progress value (0-100 or step index)
             details: Additional details to display
         """
+        with self._lock:
+            if not self.progress:
+                return
+
+            task_id = self.task_ids.get(layer_name)
+            if task_id is None:
+                return
+
+            metadata = self.layer_metadata.get(task_id)
+            if metadata is None:
+                return
+
+            self._update_layer_unsafe(task_id, metadata, progress, details)
+
+    def _update_layer_unsafe(
+        self,
+        task_id: TaskID,
+        metadata: dict[str, Any],
+        progress: int,
+        details: str,
+    ) -> None:
+        """Update layer without acquiring lock (caller must hold lock).
+
+        Args:
+            task_id: Task ID to update
+            metadata: Layer metadata
+            progress: Progress value
+            details: Additional details
+        """
         if not self.progress:
             return
-
-        task_id = self.task_ids.get(layer_name)
-        if task_id is None:
-            return
-
-        metadata = self.layer_metadata.get(task_id)
-        if metadata is None:
-            return
-
-        # Assert that progress is initialized
-        assert self.progress is not None, "Progress must be initialized"
 
         # Update the layer based on its type
         if metadata["type"] == "steps":
             # Handle step-based layer
-            task = self.progress._tasks[task_id]
+            task = self._get_task(task_id)
+            if task is None:
+                return
             steps = getattr(task, "fields", {}).get(
                 "steps", metadata["config"].get("steps", [])
             )
@@ -318,71 +374,99 @@ class DynamicLayeredProgress:
         Args:
             layer_name: Name of the layer to complete
         """
-        if not self.progress:
-            return
+        with self._lock:
+            if not self.progress:
+                return
 
-        task_id = self.task_ids.get(layer_name)
-        if task_id is None:
-            return
+            task_id = self.task_ids.get(layer_name)
+            if task_id is None:
+                return
 
-        # Mark as completed based on layer type
-        metadata = self.layer_metadata[task_id]
-        if metadata["type"] == "steps":
-            steps = metadata["config"].get("steps", [])
-            self.progress.update(task_id, completed=len(steps))
-        elif metadata["type"] == "spinner":
-            # For spinners, just mark as completed (no progress to update)
-            pass
-        else:
-            total = metadata["config"].get("total", 100)
-            self.progress.update(task_id, completed=total)
+            # Mark as completed based on layer type
+            metadata = self.layer_metadata.get(task_id)
+            if metadata is None:
+                return
 
-        # Don't remove main layer - it stays for reference
-        if metadata.get("is_main", False):
-            # Just mark as completed but keep it visible
+            if metadata["type"] == "steps":
+                steps = metadata["config"].get("steps", [])
+                self.progress.update(task_id, completed=len(steps))
+            elif metadata["type"] == "spinner":
+                # For spinners, just mark as completed (no progress to update)
+                pass
+            else:
+                total = metadata["config"].get("total", 100)
+                self.progress.update(task_id, completed=total)
+
+            # Don't remove main layer - it stays for reference
+            if metadata.get("is_main", False):
+                # Just mark as completed but keep it visible
+                self.completed_layers.append(task_id)
+                return
+
+            # Remove the layer (only for sub-layers)
             self.completed_layers.append(task_id)
-            return
+            metadata["state"] = "completed"
 
-        # Remove the layer (only for sub-layers)
-        self.completed_layers.append(task_id)
-        metadata["state"] = "completed"
+            # Animate success for this specific layer
+            self._animate_layer_success(task_id)
 
-        # Animate success for this specific layer
-        self._animate_layer_success(task_id, metadata)
+            # Update main layer progress if it exists
+            if self.has_main_layer:
+                self._update_main_layer_progress()
 
-        # Update main layer progress if it exists
-        if self.has_main_layer:
-            self._update_main_layer_progress()
+    @staticmethod
+    def _clean_description(description: str) -> str:
+        """Remove status icons from a task description.
 
-    def _animate_layer_success(
-        self,
-        task_id: TaskID,
-        metadata: dict[str, Any],  # noqa: ARG002
-    ) -> None:
+        Args:
+            description: The task description string
+
+        Returns:
+            Cleaned description without status icons
+        """
+        for icon in ("❌ ", "⚠️ ", "✅ "):
+            description = description.replace(icon, "")
+        return description
+
+    def _get_task(self, task_id: TaskID) -> Any | None:
+        """Safely get a task from the progress bar.
+
+        Args:
+            task_id: Task ID to retrieve
+
+        Returns:
+            The task object, or None if not found
+        """
+        if not self.progress:
+            return None
+        tasks = getattr(self.progress, "_tasks", {})
+        return tasks.get(task_id)
+
+    def _has_task(self, task_id: TaskID) -> bool:
+        """Check if a task exists in the progress bar.
+
+        Args:
+            task_id: Task ID to check
+
+        Returns:
+            True if the task exists
+        """
+        return self._get_task(task_id) is not None
+
+    def _animate_layer_success(self, task_id: TaskID) -> None:
         """Animate success for a specific layer and then remove it.
 
         Args:
             task_id: Task ID to animate
-            metadata: Layer metadata
         """
         if not self.progress:
             return
 
-        # Assert that progress is initialized
-        assert self.progress is not None
-
         # Flash green 2 times
         for flash in range(2):
-            if task_id in self.progress._tasks:
-                task = self.progress._tasks[task_id]
-
-                # Clean description (remove all icons)
-                clean_description = (
-                    str(task.description)
-                    .replace("❌ ", "")
-                    .replace("⚠️ ", "")
-                    .replace("✅ ", "")
-                )
+            task = self._get_task(task_id)
+            if task is not None:
+                clean_description = self._clean_description(str(task.description))
 
                 if flash % 2 == 0:  # Green flash
                     success_description = Text(
@@ -399,25 +483,18 @@ class DynamicLayeredProgress:
             time.sleep(0.1)  # Quick flash
 
         # Fade out by updating with dim style
-        if task_id in self.progress._tasks:
-            task = self.progress._tasks[task_id]
-            clean_description = (
-                str(task.description)
-                .replace("❌ ", "")
-                .replace("⚠️ ", "")
-                .replace("✅ ", "")
-            )
+        task = self._get_task(task_id)
+        if task is not None:
+            clean_description = self._clean_description(str(task.description))
             faded_description = Text(clean_description, style="dim")
             self.progress.update(task_id, description=faded_description)  # type: ignore[arg-type]
             time.sleep(0.3)  # Brief fade out
 
         # Remove the layer after animation
-        if task_id in self.progress._tasks:
+        if self._has_task(task_id):
             self.progress.remove_task(task_id)
             if task_id in self.active_layers:
                 self.active_layers.remove(task_id)
-            if task_id in self.layer_metadata:
-                del self.layer_metadata[task_id]
             # Remove from task_ids dict
             for name, tid in list(self.task_ids.items()):
                 if tid == task_id:
@@ -442,9 +519,12 @@ class DynamicLayeredProgress:
         if main_task_id is None:
             return
 
-        # Calculate progress based on completed sub-layers
-        # Note: completed_layers contains TaskIDs, not layer names
-        completed_sub_layers = len(self.completed_layers)
+        # Calculate progress based on completed sub-layers only (exclude main layer)
+        completed_sub_layers = sum(
+            1
+            for tid in self.completed_layers
+            if not self.layer_metadata.get(tid, {}).get("is_main", False)
+        )
 
         # Update main layer
         self.progress.update(main_task_id, completed=completed_sub_layers)
@@ -456,93 +536,19 @@ class DynamicLayeredProgress:
             layer_name: Name of the layer with error
             error: Error message to display
         """
-        if not self.progress:
-            return
+        with self._lock:
+            if not self.progress:
+                return
 
-        task_id = self.task_ids.get(layer_name)
-        if task_id is None:
-            return
+            task_id = self.task_ids.get(layer_name)
+            if task_id is None:
+                return
 
-        # Assert that progress is initialized
-        assert self.progress is not None
-
-        # Update with error styling using Rich Text objects
-        if task_id in self.progress._tasks:
-            task = self.progress._tasks[task_id]
-            error_description = Text(f"❌ {task.description}", style="red")
-            error_details = Text(f"Error: {error}", style="red")
-
-            self.progress.update(
-                task_id,
-                description=error_description,  # type: ignore[arg-type]
-                details=error_details,
-            )
-
-    def emergency_stop(self, error_message: str = "Critical error occurred") -> None:
-        """Emergency stop all layers with animated failure effects.
-
-        Args:
-            error_message: The error message to display
-        """
-        if not self.progress:
-            return
-
-        # Assert that progress is initialized
-        assert self.progress is not None
-
-        # Create failure animation sequence: flash red 3 times
-        for flash in range(3):
-            # Apply flash effect to all active layers
-            for task_id in list(self.active_layers):
-                # Check if task still exists before updating
-                if task_id in self.progress._tasks:
-                    task = self.progress._tasks[task_id]
-
-                    # Clean description (remove all icons)
-                    clean_description = (
-                        str(task.description)
-                        .replace("❌ ", "")
-                        .replace("⚠️ ", "")
-                        .replace("✅ ", "")
-                    )
-
-                    if flash % 2 == 0:  # Red flash
-                        error_description = Text(
-                            clean_description, style="bold red on red"
-                        )
-                        error_details = Text(
-                            f"Stopped: {error_message}", style="red on red"
-                        )
-                    else:  # Normal red
-                        error_description = Text(clean_description, style="bold red")
-                        error_details = Text(f"Stopped: {error_message}", style="red")
-
-                    self.progress.update(
-                        task_id,
-                        description=error_description,  # type: ignore[arg-type]
-                        details=error_details,
-                    )
-
-            # Brief pause for flash effect
-            time.sleep(0.15)
-
-        # Final state: settle on clean error display
-        # Assert that progress is initialized (already checked above)
-        assert self.progress is not None
-
-        for task_id in list(self.active_layers):
-            if task_id in self.progress._tasks:
-                task = self.progress._tasks[task_id]
-
-                # Final error state (clean, no symbols)
-                clean_description = (
-                    str(task.description)
-                    .replace("❌ ", "")
-                    .replace("⚠️ ", "")
-                    .replace("✅ ", "")
-                )
-                error_description = Text(f"{clean_description}", style="bold red")
-                error_details = Text(f"Stopped: {error_message}", style="red")
+            # Update with error styling using Rich Text objects
+            task = self._get_task(task_id)
+            if task is not None:
+                error_description = Text(f"❌ {task.description}", style="red")
+                error_details = Text(f"Error: {error}", style="red")
 
                 self.progress.update(
                     task_id,
@@ -550,12 +556,70 @@ class DynamicLayeredProgress:
                     details=error_details,
                 )
 
-        # Stop the progress bar to freeze the display
-        self.progress.stop()
+    def emergency_stop(self, error_message: str = "Critical error occurred") -> None:
+        """Emergency stop all layers with animated failure effects.
 
-        # Mark as emergency stopped
-        self._emergency_stopped = True
-        self._emergency_message = error_message
+        Args:
+            error_message: The error message to display
+        """
+        with self._lock:
+            if not self.progress:
+                return
+
+            # Create failure animation sequence: flash red 3 times
+            for flash in range(3):
+                # Apply flash effect to all active layers
+                for task_id in list(self.active_layers):
+                    task = self._get_task(task_id)
+                    if task is not None:
+                        clean_description = self._clean_description(
+                            str(task.description)
+                        )
+
+                        if flash % 2 == 0:  # Red flash
+                            error_description = Text(
+                                clean_description, style="bold red on red"
+                            )
+                            error_details = Text(
+                                f"Stopped: {error_message}", style="red on red"
+                            )
+                        else:  # Normal red
+                            error_description = Text(
+                                clean_description, style="bold red"
+                            )
+                            error_details = Text(
+                                f"Stopped: {error_message}", style="red"
+                            )
+
+                        self.progress.update(
+                            task_id,
+                            description=error_description,  # type: ignore[arg-type]
+                            details=error_details,
+                        )
+
+                # Brief pause for flash effect
+                time.sleep(0.15)
+
+            # Final state: settle on clean error display
+            for task_id in list(self.active_layers):
+                task = self._get_task(task_id)
+                if task is not None:
+                    clean_description = self._clean_description(str(task.description))
+                    error_description = Text(clean_description, style="bold red")
+                    error_details = Text(f"Stopped: {error_message}", style="red")
+
+                    self.progress.update(
+                        task_id,
+                        description=error_description,  # type: ignore[arg-type]
+                        details=error_details,
+                    )
+
+            # Stop the progress bar to freeze the display
+            self.progress.stop()
+
+            # Mark as emergency stopped
+            self._emergency_stopped = True
+            self._emergency_message = error_message
 
     def is_emergency_stopped(self) -> bool:
         """Check if the progress bar was emergency stopped.
@@ -612,15 +676,9 @@ class DynamicLayeredProgress:
         elif not success:
             # ERROR/WARNING CASE: Freeze current state
             for task_id in list(self.active_layers):
-                if task_id in self.progress._tasks:
-                    task = self.progress._tasks[task_id]
-                    # Clean description (remove all icons)
-                    clean_description = (
-                        str(task.description)
-                        .replace("❌ ", "")
-                        .replace("⚠️ ", "")
-                        .replace("✅ ", "")
-                    )
+                task = self._get_task(task_id)
+                if task is not None:
+                    clean_description = self._clean_description(str(task.description))
                     error_description = Text(clean_description, style="bold orange")
 
                     self.progress.update(
@@ -651,7 +709,7 @@ class DynamicProgressMixin:
     @contextmanager
     def dynamic_layered_progress(
         self,
-        stages: list[dict[str, Any]],
+        stages: list[StageConfig],
         show_time: bool = True,
     ) -> Generator[DynamicLayeredProgress, None, None]:
         """
@@ -695,15 +753,15 @@ class DynamicProgressMixin:
         try:
             progress_bar.start()
             yield progress_bar
-        finally:
-            # Check if emergency stopped before normal cleanup
+        except BaseException:
             if not progress_bar.is_emergency_stopped():
-                # Normal completion - assume success
-                is_success = True
-                progress_bar.stop(success=is_success, show_success_animation=is_success)
-            else:
-                # If emergency stopped, the progress bar is already stopped
-                # Just display the emergency message
+                progress_bar.stop(success=False, show_success_animation=False)
+            raise
+        else:
+            if not progress_bar.is_emergency_stopped():
+                progress_bar.stop(success=True, show_success_animation=True)
+        finally:
+            if progress_bar.is_emergency_stopped():
                 emergency_msg = progress_bar.get_emergency_message()
                 if emergency_msg:
                     self._console.print(
