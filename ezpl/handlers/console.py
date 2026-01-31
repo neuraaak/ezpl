@@ -36,140 +36,7 @@ from .wizard import RichWizard
 # ///////////////////////////////////////////////////////////////
 
 
-class ConsolePrinterWrapper:
-    """
-    Wrapper pour compatibilité avec l'API existante.
-
-    Permet d'utiliser printer.info(), printer.debug(), etc.
-    """
-
-    # ///////////////////////////////////////////////////////////////
-    # INIT
-    # ///////////////////////////////////////////////////////////////
-
-    def __init__(self, console_printer: ConsolePrinter) -> None:
-        self._console_printer = console_printer
-
-    # ///////////////////////////////////////////////////////////////
-    # LOGGING METHODS (API primaire)
-    # ///////////////////////////////////////////////////////////////
-
-    def info(self, message: Any) -> None:
-        """Log an info message with pattern format."""
-        self._console_printer.print_pattern(Pattern.INFO, message, "INFO")
-
-    def debug(self, message: Any) -> None:
-        """Log a debug message with pattern format."""
-        self._console_printer.print_pattern(Pattern.DEBUG, message, "DEBUG")
-
-    def success(self, message: Any) -> None:
-        """Log a success message with pattern format."""
-        self._console_printer.print_pattern(Pattern.SUCCESS, message, "INFO")
-
-    def warning(self, message: Any) -> None:
-        """Log a warning message with pattern format."""
-        self._console_printer.print_pattern(Pattern.WARN, message, "WARNING")
-
-    def warn(self, message: Any) -> None:
-        """Alias for warning(). Log a warning message with pattern format."""
-        self.warning(message)
-
-    def error(self, message: Any) -> None:
-        """Log an error message with pattern format."""
-        self._console_printer.print_pattern(Pattern.ERROR, message, "ERROR")
-
-    def critical(self, message: Any) -> None:
-        """Log a critical message with pattern format."""
-        self._console_printer.print_pattern(Pattern.ERROR, message, "CRITICAL")
-
-    # ------------------------------------------------
-    # ADDITIONAL PATTERN METHODS
-    # ------------------------------------------------
-
-    def tip(self, message: Any) -> None:
-        """Display a tip message with pattern format."""
-        self._console_printer.print_pattern(Pattern.TIP, message, "INFO")
-
-    def system(self, message: Any) -> None:
-        """Display a system message with pattern format."""
-        self._console_printer.print_pattern(Pattern.SYSTEM, message, "INFO")
-
-    def install(self, message: Any) -> None:
-        """Display an installation message with pattern format."""
-        self._console_printer.print_pattern(Pattern.INSTALL, message, "INFO")
-
-    def detect(self, message: Any) -> None:
-        """Display a detection message with pattern format."""
-        self._console_printer.print_pattern(Pattern.DETECT, message, "INFO")
-
-    def config(self, message: Any) -> None:
-        """Display a configuration message with pattern format."""
-        self._console_printer.print_pattern(Pattern.CONFIG, message, "INFO")
-
-    def deps(self, message: Any) -> None:
-        """Display a dependencies message with pattern format."""
-        self._console_printer.print_pattern(Pattern.DEPS, message, "INFO")
-
-    # ------------------------------------------------
-    # ENHANCED METHODS
-    # ------------------------------------------------
-
-    def print_pattern(
-        self, pattern: str | Pattern, message: Any, level: str = "INFO"
-    ) -> None:
-        """Display a message with pattern format: • PATTERN :: message"""
-        self._console_printer.print_pattern(pattern, message, level)
-
-    def print_json(
-        self,
-        data: str | dict | list,
-        title: str | None = None,
-        indent: int | None = None,
-        highlight: bool = True,
-    ) -> None:
-        """Display JSON data in a formatted and syntax-highlighted way."""
-        self._console_printer.print_json(data, title, indent, highlight)
-
-    # ------------------------------------------------
-    # WIZARD ACCESS
-    # ------------------------------------------------
-
-    @property
-    def wizard(self) -> RichWizard:
-        """
-        Get the Rich Wizard instance for advanced display features.
-
-        Returns:
-            RichWizard instance for panels, tables, JSON, etc.
-
-        Example:
-            >>> printer.wizard.success_panel("Success", "Operation completed")
-            >>> printer.wizard.status_table("Status", data)
-            >>> printer.wizard.dependency_table({"tool": "1.0.0"})
-        """
-        return self._console_printer._wizard
-
-    # ------------------------------------------------
-    # DELEGATION TO CONSOLE PRINTER
-    # ------------------------------------------------
-
-    def __getattr__(self, name: str) -> Any:
-        """
-        Delegate attribute access to the underlying ConsolePrinter.
-
-        This allows the wrapper to transparently expose indentation methods
-        and other attributes from ConsolePrinter.
-
-        Args:
-            name: Attribute name to access
-
-        Returns:
-            The requested attribute from ConsolePrinter
-        """
-        return getattr(self._console_printer, name)
-
-
-class ConsolePrinter(LoggingHandler, IndentationManager):
+class EzPrinter(LoggingHandler, IndentationManager):
     """
     Console printer handler with advanced formatting and indentation support using Rich.
 
@@ -178,6 +45,8 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
     - Indentation management
     - Robust character handling (Rich handles special characters automatically)
     - Context manager support
+    - Pattern-based logging (SUCCESS, ERROR, WARN, TIP, etc.)
+    - Access to RichWizard for advanced display features
     """
 
     MAX_INDENT = 10  # Limite maximale d'indentation
@@ -220,22 +89,6 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
 
         # Initialiser Rich Wizard pour fonctionnalités avancées
         self._wizard = RichWizard(self._console)
-
-        # Wrapper pour compatibilité API
-        self._wrapper = ConsolePrinterWrapper(self)
-
-    # ///////////////////////////////////////////////////////////////
-    # GETTER
-    # ///////////////////////////////////////////////////////////////
-
-    def get_printer(self) -> ConsolePrinterWrapper:
-        """
-        Get a wrapper object compatible with the existing API.
-
-        Returns:
-            ConsolePrinterWrapper instance that provides info(), debug(), etc.
-        """
-        return self._wrapper
 
     # ///////////////////////////////////////////////////////////////
     # UTILS METHODS
@@ -469,6 +322,25 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
             self.del_indent()
 
     # ///////////////////////////////////////////////////////////////
+    # WIZARD ACCESS
+    # ///////////////////////////////////////////////////////////////
+
+    @property
+    def wizard(self) -> RichWizard:
+        """
+        Get the Rich Wizard instance for advanced display features.
+
+        Returns:
+            RichWizard instance for panels, tables, JSON, etc.
+
+        Example:
+            >>> printer.wizard.success_panel("Success", "Operation completed")
+            >>> printer.wizard.status_table("Status", data)
+            >>> printer.wizard.dependency_table({"tool": "1.0.0"})
+        """
+        return self._wizard
+
+    # ///////////////////////////////////////////////////////////////
     # ENHANCED METHODS (Rich features)
     # ///////////////////////////////////////////////////////////////
 
@@ -546,8 +418,8 @@ class ConsolePrinter(LoggingHandler, IndentationManager):
 
     def __str__(self) -> str:
         """String representation of the console printer."""
-        return f"ConsolePrinter(level={self._level}, indent={self._indent})"
+        return f"EzPrinter(level={self._level}, indent={self._indent})"
 
     def __repr__(self) -> str:
         """Detailed string representation of the console printer."""
-        return f"ConsolePrinter(level={self._level}, indent={self._indent}, indent_step={self._indent_step})"
+        return f"EzPrinter(level={self._level}, indent={self._indent}, indent_step={self._indent_step})"

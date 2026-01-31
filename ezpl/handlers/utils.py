@@ -63,9 +63,32 @@ def safe_str_convert(obj: Any) -> str:
         return "<unknown object>"
 
 
+def _sanitize_base(message: Any) -> str:
+    """
+    Base sanitization: convert to string and remove control characters.
+
+    Removes null bytes and control characters (except newlines and tabs).
+    This is the shared logic for both file and console sanitization.
+
+    Args:
+        message: Message to sanitize (can be any type, will be converted to str)
+
+    Returns:
+        Message with control characters removed
+    """
+    if not isinstance(message, str):
+        message = safe_str_convert(message)
+
+    # Remove null bytes and other control characters (except newlines and tabs)
+    return re.sub(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]", "", message)
+
+
 def sanitize_for_file(message: Any) -> str:
     """
     Sanitize a message for file output by removing problematic characters.
+
+    Applies base sanitization, then removes ANSI sequences, HTML/loguru tags,
+    and ensures valid UTF-8 encoding.
 
     Args:
         message: Message to sanitize (can be any type, will be converted to str)
@@ -73,11 +96,7 @@ def sanitize_for_file(message: Any) -> str:
     Returns:
         Sanitized message safe for file output
     """
-    if not isinstance(message, str):
-        message = safe_str_convert(message)
-
-    # Remove null bytes and other control characters (except newlines and tabs)
-    message = re.sub(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]", "", message)
+    message = _sanitize_base(message)
 
     # Remove ANSI escape sequences
     message = re.sub(r"\x1B\[[0-9;]*[a-zA-Z]", "", message)
@@ -87,11 +106,9 @@ def sanitize_for_file(message: Any) -> str:
     message = re.sub(r"<[^>]+>", "", message)  # Remove any remaining tags
 
     # Replace problematic characters that might break file encoding
-    # Keep Unicode characters but ensure they're valid
     try:
         message.encode("utf-8", errors="strict")
     except UnicodeEncodeError:
-        # Replace problematic Unicode characters
         message = message.encode("utf-8", errors="replace").decode("utf-8")
 
     return message
@@ -107,13 +124,4 @@ def sanitize_for_console(message: Any) -> str:
     Returns:
         Sanitized message safe for console output
     """
-    if not isinstance(message, str):
-        message = safe_str_convert(message)
-
-    # Remove null bytes (Rich can handle most other characters)
-    message = message.replace("\x00", "")
-
-    # Remove other control characters that might break terminal
-    message = re.sub(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]", "", message)
-
-    return message
+    return _sanitize_base(message)

@@ -6,10 +6,10 @@
 """
 Core interfaces for Ezpl logging framework.
 
-This module defines the core protocols and abstract base classes used
-throughout the application. Protocols provide structural typing for flexible,
-duck-typed implementations, while abstract base classes define strict interfaces
-with runtime enforcement.
+This module defines the core abstract base classes and protocols used
+throughout the application. ABCs provide strict interfaces with runtime
+enforcement for handler implementations, while Protocols provide structural
+typing for flexible, duck-typed configuration management.
 """
 
 from __future__ import annotations
@@ -24,57 +24,66 @@ from pathlib import Path
 from typing import Any, Protocol
 
 # ///////////////////////////////////////////////////////////////
-# PROTOCOLS
+# ABSTRACT BASE CLASSES
 # ///////////////////////////////////////////////////////////////
 
 
-class LoggingHandler(Protocol):
+class LoggingHandler(ABC):
     """
-    Protocol for logging handlers.
+    Abstract base class for logging handlers.
 
-    This structural typing protocol defines the interface that all logging
-    handlers must implement. Using a Protocol (rather than ABC) allows
-    duck-typed implementations without requiring explicit inheritance,
-    enabling more flexible handler implementations.
+    All logging handlers (EzPrinter, EzLogger) must inherit from this class
+    and implement the required methods.
     """
 
+    @abstractmethod
     def log(self, level: str, message: str) -> None:
         """Log a message with the specified level."""
         ...
 
+    @abstractmethod
     def set_level(self, level: str) -> None:
         """Set the logging level."""
         ...
 
 
-class IndentationManager(Protocol):
+class IndentationManager(ABC):
     """
-    Protocol for indentation management.
+    Abstract base class for indentation management.
 
-    This structural typing protocol defines the interface for managing
-    indentation levels in output. Implementations can handle indentation
-    independently, enabling pluggable indentation strategies.
+    Handlers that support indentation (e.g., EzPrinter) must inherit from
+    this class and implement the required methods.
     """
 
+    @abstractmethod
     def get_indent(self) -> str:
         """Get the current indentation string."""
         ...
 
+    @abstractmethod
     def add_indent(self) -> None:
         """Increase the indentation level."""
         ...
 
+    @abstractmethod
     def del_indent(self) -> None:
         """Decrease the indentation level."""
         ...
 
+    @abstractmethod
     def reset_indent(self) -> None:
         """Reset the indentation level to zero."""
         ...
 
+    @abstractmethod
     def manage_indent(self) -> AbstractContextManager[None]:
         """Context manager for temporary indentation."""
         ...
+
+
+# ///////////////////////////////////////////////////////////////
+# PROTOCOLS
+# ///////////////////////////////////////////////////////////////
 
 
 class ConfigurationManager(Protocol):
@@ -112,57 +121,4 @@ class ConfigurationManager(Protocol):
 
     def save(self) -> None:
         """Save configuration to file."""
-        ...
-
-
-# ///////////////////////////////////////////////////////////////
-# ABSTRACT BASE CLASSES
-# ///////////////////////////////////////////////////////////////
-
-
-class EzplCore(ABC):
-    """
-    Abstract base class for the core Ezpl functionality.
-
-    This abstract class defines the interface for the main Ezpl class,
-    enforcing implementation of core logging and configuration methods.
-    """
-
-    # ///////////////////////////////////////////////////////////////
-    # ABSTRACT METHODS
-    # ///////////////////////////////////////////////////////////////
-
-    @abstractmethod
-    def get_printer(self) -> LoggingHandler:
-        """Get the printer handler."""
-        ...
-
-    @abstractmethod
-    def get_logger(self) -> LoggingHandler:
-        """Get the file logger handler."""
-        ...
-
-    @abstractmethod
-    def set_level(self, level: str) -> None:
-        """Set the logging level for both printer and logger."""
-        ...
-
-    @abstractmethod
-    def set_printer_level(self, level: str) -> None:
-        """Set the printer logging level."""
-        ...
-
-    @abstractmethod
-    def set_logger_level(self, level: str) -> None:
-        """Set the file logger level."""
-        ...
-
-    @abstractmethod
-    def add_separator(self) -> None:
-        """Add a separator to the log file."""
-        ...
-
-    @abstractmethod
-    def manage_indent(self) -> AbstractContextManager[None]:
-        """Context manager for indentation management."""
         ...

@@ -48,8 +48,7 @@ from .core.exceptions import (
     ValidationError,
 )
 from .ezpl import Ezpl
-from .handlers import ConsolePrinter, EzLogger, EzPrinter, FileLogger, RichWizard
-from .handlers.console import ConsolePrinterWrapper
+from .handlers import EzLogger, EzPrinter, RichWizard
 from .types import (
     PATTERN_COLORS,
     LoggerProtocol,
@@ -64,7 +63,7 @@ from .types import (
 # META INFORMATIONS
 # ///////////////////////////////////////////////////////////////
 
-__version__ = "1.4.3"
+__version__ = "1.5.0"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __description__ = "A module for easier logging"
@@ -86,9 +85,6 @@ if sys.version_info < (3, 10):  # noqa: UP036
 # ///////////////////////////////////////////////////////////////
 # TYPE ALIASES
 # ///////////////////////////////////////////////////////////////
-
-# Canonical type aliases for users.
-# They mirror the internal EzPrinter / EzLogger types.
 
 Printer = EzPrinter
 """Type alias for EzPrinter (console printer handler).
@@ -124,15 +120,12 @@ __all__ = [
     # Handler class exports
     "EzPrinter",
     "EzLogger",
-    "Logger",
-    "ConsolePrinter",
-    "FileLogger",
-    "ConsolePrinterWrapper",
     "RichWizard",
     # Configuration exports
     "ConfigurationManager",
     # Type aliases exports
     "Printer",
+    "Logger",
     # Type & pattern exports
     "LogLevel",
     "Pattern",

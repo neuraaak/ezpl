@@ -27,7 +27,6 @@ from .exceptions import (
 )
 from .interfaces import (
     ConfigurationManager,
-    EzplCore,
     IndentationManager,
     LoggingHandler,
 )
@@ -41,8 +40,6 @@ __all__ = [
     "LoggingHandler",
     "IndentationManager",
     "ConfigurationManager",
-    # Abstract base classes
-    "EzplCore",
     # Custom exceptions
     "EzplError",
     "ConfigurationError",
