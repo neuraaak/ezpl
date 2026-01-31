@@ -202,7 +202,7 @@ class HandlerError(EzplError):
 
     This exception covers issues with logging handlers (initialization, configuration,
     operation failures). The optional handler_name attribute identifies which handler
-    (ConsolePrinter, FileLogger) caused the problem.
+    (EzPrinter, EzLogger) caused the problem.
     """
 
     # ///////////////////////////////////////////////////////////////

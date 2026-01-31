@@ -35,7 +35,7 @@ from .utils import safe_str_convert, sanitize_for_file
 # ///////////////////////////////////////////////////////////////
 
 
-class FileLogger(LoggingHandler):
+class EzLogger(LoggingHandler):
     """
     File logger handler with advanced formatting and session management.
 
@@ -435,8 +435,8 @@ class FileLogger(LoggingHandler):
 
     def __str__(self) -> str:
         """String representation of the file logger."""
-        return f"FileLogger(file={self._log_file}, level={self._level})"
+        return f"EzLogger(file={self._log_file}, level={self._level})"
 
     def __repr__(self) -> str:
         """Detailed string representation of the file logger."""
-        return f"FileLogger(file={self._log_file}, level={self._level}, logger_id={self._logger_id})"
+        return f"EzLogger(file={self._log_file}, level={self._level}, logger_id={self._logger_id})"

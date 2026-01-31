@@ -18,9 +18,8 @@ This documentation presents all the components available in the **Ezpl** library
       - [Indentation](#indentation)
       - [Configuration](#configuration)
       - [Utilities](#utilities)
-    - [ConsolePrinterWrapper (Printer)](#consoleprinterwrapper-printer)
-    - [ConsolePrinter](#consoleprinter)
-    - [FileLogger](#filelogger)
+    - [EzPrinter (Printer)](#ezprinter-printer)
+    - [EzLogger (Logger)](#ezlogger-logger)
     - [RichWizard](#richwizard)
       - [Panels](#panels)
       - [Tables](#tables)
@@ -45,7 +44,7 @@ This documentation presents all the components available in the **Ezpl** library
     - [Console Output](#console-output)
     - [File Logging](#file-logging)
     - [Error Handling](#error-handling)
-    - [Configuration](#configuration-1)
+    - [Configuration Best Practices](#configuration-best-practices)
     - [Testing](#testing)
     - [Performance](#performance)
   - [📝 Type Reference](#-type-reference)
@@ -65,12 +64,11 @@ The main entry point of the library. Provides a singleton for centralized loggin
 **Type Hints:**
 
 ```python
-from ezpl import Ezpl, Printer
-from loguru import Logger
+from ezpl import Ezpl, Printer, Logger
 
 ezpl = Ezpl()
-printer: Printer = ezpl.get_printer()  # Type: ConsolePrinterWrapper
-logger: Logger = ezpl.get_logger()     # Type: loguru.Logger
+printer: Printer = ezpl.get_printer()  # Type: EzPrinter
+logger: Logger = ezpl.get_logger()     # Type: EzLogger
 ```
 
 **Main methods:**
@@ -119,8 +117,8 @@ logger: Logger = ezpl.get_logger()     # Type: loguru.Logger
 
 #### Getters
 
-- `get_printer() -> ConsolePrinterWrapper`: Returns the console printer wrapper instance
-- `get_logger() -> Logger`: Returns the loguru Logger instance for file logging
+- `get_printer() -> EzPrinter`: Returns the console printer wrapper instance
+- `get_logger() -> EzLogger`: Returns the loguru EzLogger instance for file logging
 - `get_config() -> ConfigurationManager`: Get the current configuration manager
 
 #### Level Management
@@ -140,7 +138,9 @@ logger: Logger = ezpl.get_logger()     # Type: loguru.Logger
 
 #### Configuration
 
-- `configure(config_dict: Dict[str, Any] = None, **kwargs) -> None`: Configure Ezpl dynamically
+- `configure(config_dict: Dict[str, Any] = None, **kwargs) -> bool`: Configure Ezpl dynamically
+  - Returns `True` if configuration was applied, `False` if blocked by lock
+  - Emits warning when locked (unless `force=True` is passed)
   - Supports: `log_file`, `printer_level`, `logger_level`, `level`, `log_rotation`, `log_retention`, `log_compression`, `indent_step`, `indent_symbol`, `base_indent_symbol`
   - Changes are persisted to the configuration file
   - Handlers are reinitialized with new settings
@@ -154,7 +154,7 @@ logger: Logger = ezpl.get_logger()     # Type: loguru.Logger
 
 ---
 
-### ConsolePrinterWrapper (Printer)
+### EzPrinter (Printer)
 
 **File:** `ezpl/handlers/console.py`
 
@@ -163,7 +163,7 @@ Wrapper class that provides the main API for console logging. Returned by `Ezpl.
 **Type Alias:**
 
 ```python
-from ezpl import Printer  # Alias for ConsolePrinterWrapper
+from ezpl import Printer  # Alias for EzPrinter
 ```
 
 **Pattern Format:**
@@ -231,33 +231,7 @@ printer.print_json({"key": "value", "nested": {"a": 1}}, title="Config")
 
 ---
 
-### ConsolePrinter
-
-**File:** `ezpl/handlers/console.py`
-
-Internal console printer handler. Use `ConsolePrinterWrapper` (via `Ezpl.get_printer()`) for most use cases.
-
-**Key Features:**
-
-- Uses Rich for console output
-- Pattern-based formatting: `• PATTERN :: message`
-- Automatic handling of special characters
-- Robust error handling (never crashes)
-- Unicode support
-- Maximum indentation limit (10 levels)
-- Context manager support
-
-**Indentation Management:**
-
-- `get_indent() -> str`: Get the current indentation string
-- `add_indent() -> None`: Increase indentation level
-- `del_indent() -> None`: Decrease indentation level
-- `reset_indent() -> None`: Reset indentation to zero
-- `manage_indent() -> Generator[None, None, None]`: Context manager for temporary indentation
-
----
-
-### FileLogger
+### EzLogger (Logger)
 
 **File:** `ezpl/handlers/file.py`
 
@@ -266,9 +240,9 @@ Robust file logger using **loguru**, with advanced formatting, separator managem
 **Initialization:**
 
 ```python
-from ezpl.handlers import FileLogger
+from ezpl.handlers import EzLogger
 
-logger_handler = FileLogger(
+logger_handler = EzLogger(
     log_file: Path | str,
     level: str = "INFO",
     rotation: Optional[str] = None,      # e.g., "10 MB", "1 day"
@@ -280,14 +254,14 @@ logger_handler = FileLogger(
 **Main methods:**
 
 - `set_level(level: str) -> None`: Changes the file log level
-- `get_logger() -> Logger`: Returns the configured loguru Logger instance
+- `get_logger() -> Logger`: Returns the internal loguru Logger instance for advanced features
 - `add_separator() -> None`: Adds a separator in the log file
 - `get_log_file() -> Path`: Get the current log file path
 - `get_file_size() -> int`: Get current log file size in bytes
 
 **Log Format:**
 
-```
+```txt
 YYYY-MM-DD HH:MM:SS | LEVEL      | module:function:line - message
 ```
 
@@ -304,10 +278,10 @@ YYYY-MM-DD HH:MM:SS | LEVEL      | module:function:line - message
 **Example:**
 
 ```python
-from ezpl.handlers import FileLogger
+from ezpl.handlers import EzLogger
 
 # File logger with rotation
-logger_handler = FileLogger(
+logger_handler = EzLogger(
     "app.log",
     level="INFO",
     rotation="10 MB",      # Rotate at 10 MB
@@ -566,6 +540,7 @@ with printer.wizard.dynamic_layered_progress(stages) as progress:
 **Hierarchy:**
 
 When a layer has `type="main"`, the system automatically:
+
 - Creates the main layer first
 - Creates sub-layers with indentation (`├─`)
 - Auto-configures main layer steps from sub-layers if not provided
@@ -767,8 +742,7 @@ except ValidationError as e:
 
 ```python
 from pathlib import Path
-from ezpl import Ezpl, Printer
-from loguru import Logger
+from ezpl import Ezpl, Printer, Logger
 
 # Get the singleton
 ezpl = Ezpl(log_file=Path("app.log"))
@@ -931,10 +905,10 @@ with printer.wizard.dynamic_layered_progress(stages) as progress:
 ### File Logger with Rotation
 
 ```python
-from ezpl.handlers import FileLogger
+from ezpl.handlers import EzLogger
 
 # File logger with rotation
-logger_handler = FileLogger(
+logger_handler = EzLogger(
     "app.log",
     level="INFO",
     rotation="10 MB",      # Rotate at 10 MB
@@ -1024,8 +998,7 @@ printer.info({"key": "value", "nested": {"a": 1}})
 ### Type Hints for Better IDE Support
 
 ```python
-from ezpl import Ezpl, Printer
-from loguru import Logger
+from ezpl import Ezpl, Printer, Logger
 
 ezpl = Ezpl()
 
@@ -1046,8 +1019,8 @@ logger.info("...")       # Autocompletion works!
 ### Type Safety
 
 - **Use type hints**: Import `Printer` from `ezpl` for better IDE support
-- **Type your variables**: `printer: Printer = ezpl.get_printer()` enables full autocompletion
-- **Import Logger from loguru**: `from loguru import Logger` for file logger type hints
+- **Type your variables**: `printer: Printer = ezpl.get_printer()` and `logger: Logger = ezpl.get_logger()` enable full autocompletion
+- **Use Ezpl type aliases**: `from ezpl import Printer, Logger` for type hints (no need to import from loguru)
 
 ### Logging Levels
 
@@ -1074,7 +1047,7 @@ logger.info("...")       # Autocompletion works!
 - All exceptions are custom and provide detailed error information
 - Catch specific exceptions (`ValidationError`, `FileOperationError`, etc.) for better error handling
 
-### Configuration
+### Configuration Best Practices
 
 **Priority Order:**
 
@@ -1124,24 +1097,24 @@ import lib_b  # Uses the same configured Ezpl instance
 ### Type Aliases
 
 ```python
-from ezpl import Printer  # Alias for ConsolePrinterWrapper
-from loguru import Logger  # For file logger type hints
+from ezpl import Printer  # Alias for EzPrinter
+from ezpl import Logger   # Alias for EzLogger
 ```
 
 ### Return Types
 
 ```python
 # Ezpl methods
-ezpl.get_printer() -> ConsolePrinterWrapper
-ezpl.get_logger() -> Logger  # loguru.Logger
+ezpl.get_printer() -> EzPrinter
+ezpl.get_logger() -> EzLogger
 ezpl.get_config() -> ConfigurationManager
 
-# ConsolePrinter methods
-printer.get_printer() -> ConsolePrinterWrapper
+# EzPrinter methods
+printer.get_printer() -> EzPrinter
 printer.wizard -> RichWizard  # Access to wizard features
 
-# FileLogger methods
-logger_handler.get_logger() -> Logger  # loguru.Logger
+# EzLogger methods
+logger_handler.get_logger() -> Logger  # Internal loguru.Logger for advanced features
 logger_handler.get_log_file() -> Path
 logger_handler.get_file_size() -> int
 

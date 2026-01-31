@@ -13,8 +13,8 @@ For detailed API documentation, see **[API_DOCUMENTATION.md](API_DOCUMENTATION.m
 ### Main Components
 
 - **`Ezpl`**: Singleton for centralized logging management
-- **`ConsolePrinterWrapper` (Printer)**: Rich-based console output with pattern format
-- **`FileLogger`**: loguru-based file logging with rotation support
+- **`EzPrinter` (Printer)**: Rich-based console output with pattern format
+- **`EzLogger`**: loguru-based file logging with rotation support
 - **`RichWizard`**: Advanced Rich display capabilities (panels, tables, JSON, progress bars, dynamic layered progress)
 - **`LogLevel`**: Custom log levels (DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL)
 - **`Pattern`**: Contextual patterns (SUCCESS, ERROR, WARN, TIP, SYSTEM, INSTALL, etc.)
@@ -24,8 +24,7 @@ For detailed API documentation, see **[API_DOCUMENTATION.md](API_DOCUMENTATION.m
 ### Quick Start
 
 ```python
-from ezpl import Ezpl, Printer
-from loguru import Logger
+from ezpl import Ezpl, Printer, Logger
 
 # Initialize
 ezpl = Ezpl()
@@ -51,7 +50,7 @@ logger.info("Logged to file")
 
 ### Key Features
 
-**ConsolePrinter:**
+**EzPrinter:**
 
 - Pattern-based format: `• PATTERN :: message`
 - Pattern methods: `tip()`, `system()`, `install()`, `detect()`, `config()`, `deps()`
@@ -65,7 +64,7 @@ logger.info("Logged to file")
 - **Progress Bars**: Generic, spinner, download, installation, layered progress bars
 - **Dynamic Layered Progress**: Multi-level progress bars with automatic layer management
 
-**FileLogger:**
+**EzLogger:**
 
 - Structured log format with timestamps
 - File rotation, retention, and compression
@@ -82,7 +81,7 @@ logger.info("Logged to file")
 
 **Type Safety:**
 
-- Type aliases: `Printer` (alias for `ConsolePrinterWrapper`)
+- Type aliases: `Printer` (alias for `EzPrinter`)
 - Full type hints for IDE autocompletion
 - Explicit return types for all methods
 
@@ -92,21 +91,21 @@ logger.info("Logged to file")
 
 - `Ezpl(log_file, log_level, printer_level, file_logger_level, log_rotation, log_retention, log_compression, indent_step, indent_symbol, base_indent_symbol) -> Ezpl`
   - Priority: arg > env > config file > default
-- `get_printer() -> ConsolePrinterWrapper`
+- `get_printer() -> EzPrinter`
 - `get_logger() -> Logger`
 - `set_level(level: str) -> None`
-- `configure(**kwargs) -> None`
+- `configure(**kwargs) -> bool` - Returns False if config is locked
 - `reload_config() -> None` - Reload from file/env vars
 - `manage_indent() -> Generator` (context manager)
 
-**Printer (ConsolePrinterWrapper):**
+**Printer (EzPrinter):**
 
 - Standard: `info()`, `debug()`, `success()`, `warning()`, `error()`, `critical()`
 - Patterns: `tip()`, `system()`, `install()`, `detect()`, `config()`, `deps()`
 - Rich: `print_table()`, `print_panel()`, `print_json()` (delegates to `wizard`)
 - Wizard: `printer.wizard` - Access to all RichWizard features
 
-**FileLogger:**
+**EzLogger:**
 
 - `get_logger() -> Logger`
 - `set_level(level: str) -> None`

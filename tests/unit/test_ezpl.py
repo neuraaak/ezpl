@@ -172,7 +172,7 @@ class TestLevelManagement:
         """Test that set_printer_level() only affects printer."""
         ezpl = Ezpl()
         ezpl.set_printer_level("WARNING")
-        # Access internal printer to check level (EzPrinter is ConsolePrinter, not ConsolePrinterWrapper)
+        # Access internal printer to check level
         assert ezpl._printer._level == "WARNING"
         # Logger level should remain unchanged (default or previous value)
         assert ezpl._logger._level is not None
@@ -239,7 +239,7 @@ class TestIndentation:
     def test_manage_indent_context_manager(self) -> None:
         """Test manage_indent() context manager."""
         ezpl = Ezpl()
-        # Access internal printer to check indent (EzPrinter is ConsolePrinter, not ConsolePrinterWrapper)
+        # Access internal printer to check indent
         initial_indent = ezpl._printer._indent
 
         with ezpl.manage_indent():
@@ -251,7 +251,7 @@ class TestIndentation:
     def test_manage_indent_nested(self) -> None:
         """Test nested manage_indent() context managers."""
         ezpl = Ezpl()
-        # Access internal printer to check indent (EzPrinter is ConsolePrinter, not ConsolePrinterWrapper)
+        # Access internal printer to check indent
         initial_indent = ezpl._printer._indent
 
         with ezpl.manage_indent():
@@ -333,8 +333,8 @@ class TestConfiguration:
 class TestGetters:
     """Tests for getter methods."""
 
-    def test_get_printer_returns_wrapper(self) -> None:
-        """Test that get_printer() returns ConsolePrinterWrapper."""
+    def test_get_printer_returns_ezprinter(self) -> None:
+        """Test that get_printer() returns EzPrinter."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         assert printer is not None

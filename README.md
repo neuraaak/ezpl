@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/OS-Independent-lightgray.svg?style=for-the-badge)](https://pypi.org/project/ezpl/)
-[![Version](https://img.shields.io/badge/Version-1.4.3-orange.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
+[![Version](https://img.shields.io/badge/Version-1.5.0-orange.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 [![PyPI](https://img.shields.io/badge/PyPI-ezplog-green.svg?style=for-the-badge&logo=pypi)](https://pypi.org/project/ezplog/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
@@ -113,6 +113,7 @@ git config core.hooksPath .hooks
 ```
 
 **Git Hooks:**
+
 - **pre-commit**: Automatically formats code (black, isort, ruff) before commit
 - **post-commit**: Automatically creates version tags after commit
 
@@ -121,8 +122,8 @@ See **[.hooks/README.md](.hooks/README.md)** for detailed hook documentation.
 ## 🎨 Main Components
 
 - **`Ezpl`**: Singleton main class for centralized logging management
-- **`Printer`** (ConsolePrinterWrapper): Rich-based console output with pattern format
-- **`FileLogger`**: loguru-based file logging with rotation support
+- **`EzPrinter`** (alias: `Printer`): Rich-based console output with pattern format
+- **`EzLogger`** (alias: `Logger`): loguru-based file logging with rotation support
 - **`RichWizard`**: Advanced Rich display (panels, tables, JSON, progress bars)
 - **`ConfigurationManager`**: Centralized configuration management
 
@@ -135,8 +136,7 @@ See **[.hooks/README.md](.hooks/README.md)** for detailed hook documentation.
 ## 🔧 Quick API Reference
 
 ```python
-from ezpl import Ezpl, Printer
-from loguru import Logger
+from ezpl import Ezpl, Printer, Logger
 
 ezpl = Ezpl()
 printer: Printer = ezpl.get_printer()

@@ -15,27 +15,16 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Local imports
-from .console import ConsolePrinter, ConsolePrinterWrapper
-from .file import FileLogger
+from .console import EzPrinter
+from .file import EzLogger
 from .wizard import RichWizard
-
-# Public API aliases
-# EzPrinter is the actual printer class (ConsolePrinter)
-# ConsolePrinterWrapper is returned by ConsolePrinter.get_printer()
-EzPrinter = ConsolePrinter
-EzLogger = FileLogger
 
 # ///////////////////////////////////////////////////////////////
 # PUBLIC API
 # ///////////////////////////////////////////////////////////////
 
 __all__ = [
-    # Handler class exports
-    "ConsolePrinter",
-    "ConsolePrinterWrapper",
-    "FileLogger",
-    "RichWizard",
-    # Public API exports
     "EzPrinter",
     "EzLogger",
+    "RichWizard",
 ]
