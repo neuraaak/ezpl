@@ -258,10 +258,20 @@ class Ezpl:
         """
         effective_printer = printer_level or global_level
         effective_logger = file_logger_level or global_level
+
         if effective_printer:
-            self.set_printer_level(effective_printer)
+            if printer_level and global_level and printer_level != global_level:
+                logger.debug(
+                    f"Ezpl: printer_level='{printer_level}' overrides global_level='{global_level}'"
+                )
+            self.set_printer_level(effective_printer, force=True)
+
         if effective_logger:
-            self.set_logger_level(effective_logger)
+            if file_logger_level and global_level and file_logger_level != global_level:
+                logger.debug(
+                    f"Ezpl: file_logger_level='{file_logger_level}' overrides global_level='{global_level}'"
+                )
+            self.set_logger_level(effective_logger, force=True)
 
     # ///////////////////////////////////////////////////////////////
     # GETTER
@@ -297,47 +307,84 @@ class Ezpl:
     # UTILS METHODS
     # ///////////////////////////////////////////////////////////////
 
-    def set_level(self, level: str) -> None:
+    @property
+    def printer_level(self) -> str:
+        """Return the current printer logging level."""
+        return self._printer.level
+
+    @property
+    def logger_level(self) -> str:
+        """Return the current file logger logging level."""
+        return self._logger.level
+
+    def set_level(self, level: str, *, force: bool = False) -> None:
         """
         Définit le niveau de log du printer et du logger en même temps (méthode de compatibilité).
 
         **Args:**
 
             * `level` (str): Le niveau de log désiré (ex: "INFO", "WARNING").
+            * `force` (bool): Si True, ignore le verrou de configuration.
 
         **Returns:**
 
             * `None`.
         """
+        if self._config_locked and not force:
+            warnings.warn(
+                "Ezpl configuration is locked. Call Ezpl.unlock_config() or "
+                "pass force=True to override.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return
         self.set_logger_level(level)
         self.set_printer_level(level)
 
-    def set_printer_level(self, level: str) -> None:
+    def set_printer_level(self, level: str, *, force: bool = False) -> None:
         """
         Définit le niveau de log du printer uniquement.
 
         **Args:**
 
             * `level` (str): Le niveau de log désiré pour le printer.
+            * `force` (bool): Si True, ignore le verrou de configuration.
 
         **Returns:**
 
             * `None`.
         """
+        if self._config_locked and not force:
+            warnings.warn(
+                "Ezpl configuration is locked. Call Ezpl.unlock_config() or "
+                "pass force=True to override.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return
         self._printer.set_level(level)
 
-    def set_logger_level(self, level: str) -> None:
+    def set_logger_level(self, level: str, *, force: bool = False) -> None:
         """
         Définit le niveau de log du logger uniquement.
 
         **Args:**
 
             * `level` (str): Le niveau de log désiré pour le logger.
+            * `force` (bool): Si True, ignore le verrou de configuration.
 
         **Returns:**
 
             * `None`.
         """
+        if self._config_locked and not force:
+            warnings.warn(
+                "Ezpl configuration is locked. Call Ezpl.unlock_config() or "
+                "pass force=True to override.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return
         self._logger.set_level(level)
 
     # ///////////////////////////////////////////////////////////////
@@ -709,20 +756,37 @@ class Ezpl:
         file_logger_level_explicit = self._config_manager.has_key("file-logger-level")
         global_log_level_explicit = self._config_manager.has_key("log-level")
 
-        # Reapply to handlers with priority logic
-        self._apply_level_priority(
-            printer_level=printer_level if printer_level_explicit else None,
-            file_logger_level=file_logger_level if file_logger_level_explicit else None,
-            global_level=global_log_level if global_log_level_explicit else None,
-        )
-        # Fallback: apply config defaults if no explicit override resolved
-        if not printer_level_explicit and not global_log_level_explicit:
-            self.set_printer_level(printer_level)
-        if not file_logger_level_explicit and not global_log_level_explicit:
-            self.set_logger_level(file_logger_level)
+        # Respect manually set levels: don't override if set via set_level()
+        printer_manually_set = getattr(self._printer, "_level_manually_set", False)
+        logger_manually_set = getattr(self._logger, "_level_manually_set", False)
+
+        # Reapply to handlers with priority logic (skip if manually set)
+        if not printer_manually_set:
+            effective_printer = (
+                printer_level
+                if printer_level_explicit
+                else global_log_level if global_log_level_explicit else printer_level
+            )
+            self.set_printer_level(effective_printer, force=True)
+            self._printer._level_manually_set = (
+                False  # Reset: this was a config reload, not a manual set
+            )
+
+        if not logger_manually_set:
+            effective_logger = (
+                file_logger_level
+                if file_logger_level_explicit
+                else (
+                    global_log_level if global_log_level_explicit else file_logger_level
+                )
+            )
+            self.set_logger_level(effective_logger, force=True)
+            self._logger._level_manually_set = (
+                False  # Reset: this was a config reload, not a manual set
+            )
 
         # Reinitialize logger with new rotation / retention / compression settings
-        # Preserve current level if logger was already initialized
+        # Preserve current level and manual flag if logger was already initialized
         current_logger_level = (
             self._logger._level
             if hasattr(self, "_logger") and self._logger
@@ -740,9 +804,10 @@ class Ezpl:
             retention=self._config_manager.get_log_retention(),
             compression=self._config_manager.get_log_compression(),
         )
+        self._logger._level_manually_set = logger_manually_set  # Preserve manual flag
 
         # Reinitialize printer with new indent settings
-        # Preserve current level if printer was already initialized
+        # Preserve current level and manual flag if printer was already initialized
         current_printer_level = (
             self._printer._level
             if hasattr(self, "_printer") and self._printer
@@ -754,6 +819,7 @@ class Ezpl:
             indent_symbol=self._config_manager.get_indent_symbol(),
             base_indent_symbol=self._config_manager.get_base_indent_symbol(),
         )
+        self._printer._level_manually_set = printer_manually_set  # Preserve manual flag
 
     def configure(self, config_dict: dict[str, Any] | None = None, **kwargs) -> bool:
         """

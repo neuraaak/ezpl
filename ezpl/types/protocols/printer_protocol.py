@@ -131,6 +131,11 @@ class PrinterProtocol(Protocol):
     # UTILITY METHODS
     # ///////////////////////////////////////////////////////////////
 
+    @property
+    def level(self) -> str:
+        """Get the current logging level."""
+        ...
+
     def set_level(self, level: str) -> None:
         """Set the logging level."""
         ...

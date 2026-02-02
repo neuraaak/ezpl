@@ -44,7 +44,7 @@ python examples/demo.py
 
 **Example Output:**
 
-```
+```text
 ================================================================================
 SECTION 1: NIVEAUX DE LOG
 ================================================================================
@@ -372,7 +372,7 @@ printer.info("Back to level 0")
 
 **Output:**
 
-```
+```text
 • INFO    :: Level 0
 • INFO    ::    > Level 1
 • INFO    ::       > Level 2
@@ -431,6 +431,28 @@ ezpl = Ezpl()
 
 # Reload from file and environment variables
 ezpl.reload_config()
+```
+
+**Configuration Locking & Level Protection:**
+
+```python
+from ezpl import Ezpl
+
+ezpl = Ezpl()
+
+# Lock configuration to prevent libraries from overriding it
+Ezpl.lock_config()
+
+# set_level() is now blocked (emits a warning)
+ezpl.set_level("DEBUG")  # ⚠ Warning: config is locked
+
+# Use force=True to override the lock
+ezpl.set_level("DEBUG", force=True)  # Works
+
+# Manually set levels are protected from reload_config()
+Ezpl.unlock_config()
+ezpl.set_level("DEBUG")       # Marks level as manually set
+ezpl.reload_config()          # Level stays DEBUG (not overwritten by config file)
 ```
 
 ### File Logging
@@ -538,7 +560,7 @@ import lib_b  # Uses the same configured Ezpl instance
 
 On Windows, progress bars with Unicode characters may cause encoding errors if the console is not configured for UTF-8.
 
-**Solution 1: Configure Console Encoding**
+#### Solution 1: Configure Console Encoding
 
 ```python
 import sys
@@ -552,14 +574,14 @@ if sys.platform == "win32":
 from ezpl import Ezpl
 ```
 
-**Solution 2: Use PowerShell with UTF-8**
+#### Solution 2: Use PowerShell with UTF-8
 
 ```powershell
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 python examples/demo.py
 ```
 
-**Solution 3: Avoid Progress Bars**
+#### Solution 3: Avoid Progress Bars
 
 If encoding issues persist, avoid progress bars (other features work normally).
 

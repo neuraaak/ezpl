@@ -63,7 +63,7 @@ from .types import (
 # META INFORMATIONS
 # ///////////////////////////////////////////////////////////////
 
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __description__ = "A module for easier logging"
