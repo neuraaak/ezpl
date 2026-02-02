@@ -123,9 +123,11 @@ logger: Logger = ezpl.get_logger()     # Type: EzLogger
 
 #### Level Management
 
-- `set_level(level: str) -> None`: Sets the log level for both printer and logger
-- `set_printer_level(level: str) -> None`: Sets the printer level only
-- `set_logger_level(level: str) -> None`: Sets the logger level only
+- `set_level(level: str, *, force: bool = False) -> None`: Sets the log level for both printer and logger
+- `set_printer_level(level: str, *, force: bool = False) -> None`: Sets the printer level only
+- `set_logger_level(level: str, *, force: bool = False) -> None`: Sets the logger level only
+
+> **Note:** These methods respect `lock_config()`. When configuration is locked, calling them without `force=True` emits a warning and has no effect. Calling them successfully marks the level as *manually set*, which protects it from being overwritten by `reload_config()`.
 
 #### File Operations
 
@@ -147,6 +149,7 @@ logger: Logger = ezpl.get_logger()     # Type: EzLogger
 - `reload_config() -> None`: Reload configuration from file and environment variables
   - Useful when environment variables or config file have changed after initialization
   - Reinitializes handlers with reloaded configuration
+  - **Respects manually set levels**: If a level was set via `set_level()` / `set_printer_level()` / `set_logger_level()`, `reload_config()` will not overwrite it
 
 #### Utilities
 
@@ -253,7 +256,7 @@ logger_handler = EzLogger(
 
 **Main methods:**
 
-- `set_level(level: str) -> None`: Changes the file log level
+- `set_level(level: str) -> None`: Changes the file log level (with rollback on failure)
 - `get_logger() -> Logger`: Returns the internal loguru Logger instance for advanced features
 - `add_separator() -> None`: Adds a separator in the log file
 - `get_log_file() -> Path`: Get the current log file path
@@ -1027,6 +1030,8 @@ logger.info("...")       # Autocompletion works!
 - Use `set_printer_level()` and `set_logger_level()` to adjust verbosity independently
 - Use `set_level()` to change both at once
 - Set appropriate levels for production vs development
+- Levels set via `set_level()` are protected from being overwritten by `reload_config()`
+- Use `lock_config()` to prevent any level changes, then `force=True` to override when needed
 
 ### Console Output
 
@@ -1061,7 +1066,8 @@ logger.info("...")       # Autocompletion works!
 - Configure Ezpl **before** importing libraries that use it (for Singleton propagation)
 - Use environment variables for sensitive or environment-specific settings
 - Use `configure()` for runtime configuration changes
-- Use `reload_config()` if environment variables change after initialization
+- Use `reload_config()` if environment variables change after initialization — levels set manually via `set_level()` will be preserved
+- Use `lock_config()` after initial setup to prevent libraries from overriding your configuration (applies to both `configure()` and `set_level()`)
 - Configuration changes are automatically propagated to all libraries using the Singleton
 
 **Singleton Propagation Example:**

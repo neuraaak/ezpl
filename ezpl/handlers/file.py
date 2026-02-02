@@ -76,6 +76,7 @@ class EzLogger(LoggingHandler):
             raise ValidationError(f"Invalid log level: {level}", "level", level)
 
         self._level = level.upper()
+        self._level_manually_set = False
         self._log_file = Path(log_file)
         self._logger = logger.bind(task="logger")
         self._logger_id: int | None = None
@@ -143,6 +144,11 @@ class EzLogger(LoggingHandler):
     # UTILS METHODS
     # ///////////////////////////////////////////////////////////////
 
+    @property
+    def level(self) -> str:
+        """Return the current logging level."""
+        return self._level
+
     def set_level(self, level: str) -> None:
         """
         Set the logging level.
@@ -157,10 +163,13 @@ class EzLogger(LoggingHandler):
         if not LogLevel.is_valid_level(level):
             raise ValidationError(f"Invalid log level: {level}", "level", level)
 
+        old_level = self._level
         try:
             self._level = level.upper()
+            self._level_manually_set = True
             self._initialize_logger()
         except Exception as e:
+            self._level = old_level  # Rollback to previous level on failure
             raise LoggingError(f"Failed to update log level: {e}", "file") from e
 
     def log(self, level: str, message: Any) -> None:
