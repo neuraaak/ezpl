@@ -36,6 +36,12 @@ class LoggingHandler(ABC):
     and implement the required methods.
     """
 
+    @property
+    @abstractmethod
+    def level(self) -> str:
+        """Get the current logging level."""
+        ...
+
     @abstractmethod
     def log(self, level: str, message: str) -> None:
         """Log a message with the specified level."""

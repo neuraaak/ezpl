@@ -78,6 +78,7 @@ class EzPrinter(LoggingHandler, IndentationManager):
             raise ValidationError(f"Invalid log level: {level}", "level", level)
 
         self._level = level.upper()
+        self._level_manually_set = False
         self._indent = 0
         self._indent_step = indent_step
         self._indent_symbol = indent_symbol
@@ -94,6 +95,11 @@ class EzPrinter(LoggingHandler, IndentationManager):
     # UTILS METHODS
     # ///////////////////////////////////////////////////////////////
 
+    @property
+    def level(self) -> str:
+        """Return the current logging level."""
+        return self._level
+
     def set_level(self, level: str) -> None:
         """
         Set the logging level.
@@ -109,6 +115,7 @@ class EzPrinter(LoggingHandler, IndentationManager):
 
         self._level = level.upper()
         self._level_numeric = LogLevel.get_no(self._level)
+        self._level_manually_set = True
 
     def log(self, level: str, message: Any) -> None:
         """

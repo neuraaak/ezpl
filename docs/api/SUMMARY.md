@@ -93,9 +93,11 @@ logger.info("Logged to file")
   - Priority: arg > env > config file > default
 - `get_printer() -> EzPrinter`
 - `get_logger() -> Logger`
-- `set_level(level: str) -> None`
+- `set_level(level: str, *, force: bool = False) -> None` - Respects `lock_config()`, protects against `reload_config()`
+- `set_printer_level(level: str, *, force: bool = False) -> None`
+- `set_logger_level(level: str, *, force: bool = False) -> None`
 - `configure(**kwargs) -> bool` - Returns False if config is locked
-- `reload_config() -> None` - Reload from file/env vars
+- `reload_config() -> None` - Reload from file/env vars (preserves manually set levels)
 - `manage_indent() -> Generator` (context manager)
 
 **Printer (EzPrinter):**
