@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ezplog"
-version = "1.5.1"
+version = "1.5.2"
 description = "Modern Python logging framework with Rich console output and loguru file logging, featuring advanced display capabilities, configuration management, and a simple typed API."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -82,7 +82,12 @@ test = [
     "pytest-mock>=3.10.0",
     "pytest-xdist>=3.0.0",
 ]
-
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.27.0",
+    "mkdocs-section-index>=0.3.0",
+]
 # ///////////////////////////////////////////////////////////////
 # 🔗 PROJECT URLS
 # Links to repository, documentation, and package index
@@ -90,6 +95,7 @@ test = [
 
 [project.urls]
 Homepage = "https://github.com/neuraaak/ezplog"
+Documentation = "https://neuraaak.github.io/ezplog/"
 Repository = "https://github.com/neuraaak/ezplog"
 PyPI = "https://pypi.org/project/ezplog/"
 

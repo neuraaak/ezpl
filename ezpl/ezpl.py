@@ -36,6 +36,33 @@ APP_PATH = Path(sys.argv[0]).parent
 
 
 class Ezpl:
+    """
+    Main logging singleton for the Ezpl framework.
+
+    Ezpl provides a unified, thread-safe interface for console and file logging
+    with advanced features including indentation management, pattern-based logging,
+    and dynamic progress bars. It implements the Singleton pattern to ensure only
+    one instance exists throughout the application lifecycle.
+
+    Attributes:
+        _instance: The singleton instance of Ezpl
+        _lock: Thread lock for synchronized access
+        _config_locked: Whether configuration can be modified
+        _log_file: Path to the log file
+        _printer: Console output handler
+        _logger: File logging handler
+        _config_manager: Configuration manager instance
+
+    Note:
+        Once initialized, Ezpl cannot be re-configured unless reset.
+        Access it via the singleton pattern or module-level functions.
+
+    Example:
+        >>> log = Ezpl()
+        >>> log.printer.log("INFO", "Application started")
+        >>> log.logger.log("INFO", "Starting logging to file")
+    """
+
     _instance: Ezpl | None = None
     _lock: threading.Lock = threading.Lock()
     _config_locked: bool = False
@@ -821,7 +848,9 @@ class Ezpl:
         )
         self._printer._level_manually_set = printer_manually_set  # Preserve manual flag
 
-    def configure(self, config_dict: dict[str, Any] | None = None, **kwargs) -> bool:
+    def configure(
+        self, config_dict: dict[str, Any] | None = None, **kwargs: Any
+    ) -> bool:
         """
         Configure Ezpl dynamically.
 
