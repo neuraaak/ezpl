@@ -4,6 +4,7 @@
 
 # Function to check if we're on the main branch
 check_main_branch() {
+    local current_branch
     current_branch=$(git rev-parse --abbrev-ref HEAD)
     if [ "$current_branch" != "main" ] && [ "$current_branch" != "master" ]; then
         echo "→ [AUTO-TAG] Not on main branch (current: $current_branch), skipping tag creation"
@@ -14,6 +15,7 @@ check_main_branch() {
 
 # Function to get version from pyproject.toml
 get_version_from_pyproject() {
+    local version
     if [ -f "pyproject.toml" ]; then
         version=$(grep -E '^version\s*=\s*"' pyproject.toml | sed 's/.*version\s*=\s*"\([^"]*\)".*/\1/')
         if [ -n "$version" ]; then
@@ -26,6 +28,7 @@ get_version_from_pyproject() {
 
 # Function to get version from setup.py
 get_version_from_setup() {
+    local version
     if [ -f "setup.py" ]; then
         version=$(grep -E "version\s*=\s*['\"]" setup.py | sed "s/.*version\s*=\s*['\"]\([^'\"]*\)['\"].*/\1/")
         if [ -n "$version" ]; then
@@ -89,12 +92,13 @@ fi
 
 if [ -n "$version" ]; then
     # Classic version tag
-    tag_name="v$version"
+    local tag_name="v$version"
     create_or_update_tag "$tag_name"
 
     # Major version "latest" tag
+    local major_version
+    local latest_tag_name=""
     major_version=$(echo "$version" | sed 's/^\([0-9]*\)\..*/\1/')
-    latest_tag_name=""
     if [ -n "$major_version" ]; then
         latest_tag_name="v$major_version-latest"
         create_or_update_tag "$latest_tag_name"

@@ -12,12 +12,6 @@ on:
         default: false
         type: boolean
   workflow_call:
-    inputs:
-      skip_tests:
-        description: "Skip tests before publishing (not recommended)"
-        required: false
-        default: false
-        type: boolean
     secrets:
       PYPI_API_TOKEN:
         description: "PyPI API token for package publishing"

@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/neuraaak/ezplog/blob/main/LICENSE)
 
 <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-  <img src="assets/logo-min.png" alt="Ezpl Logo" style="width: 80px; height: 80px; flex-shrink: 0;">
+  <img src="https://raw.githubusercontent.com/neuraaak/ezplog/refs/heads/main/docs/assets/logo-min.png" alt="Ezpl Logo" style="width: 80px; height: 80px; flex-shrink: 0;">
   <div>
     <strong>Ezpl</strong> is a modern Python logging framework with <strong>Rich</strong> console output and <strong>loguru</strong> file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
   </div>
