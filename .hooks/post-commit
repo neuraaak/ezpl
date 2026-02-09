@@ -46,22 +46,23 @@ create_or_update_tag() {
     # Check if tag already exists
     if git rev-parse "$tag_name" >/dev/null 2>&1; then
         # Update existing tag (force update)
-        if git tag -f "$tag_name"; then
+        if git tag -f "$tag_name" HEAD; then
             echo "✓ [AUTO-TAG] Updated: $tag_name"
+            return 0
         else
             echo "❌ [AUTO-TAG] Update error: $tag_name"
             return 1
         fi
     else
         # Create lightweight tag
-        if git tag "$tag_name"; then
+        if git tag "$tag_name" HEAD; then
             echo "✓ [AUTO-TAG] Created: $tag_name"
+            return 0
         else
             echo "❌ [AUTO-TAG] Creation error: $tag_name"
             return 1
         fi
     fi
-    return 0
 }
 
 # Function to check if a tag already points to HEAD
@@ -92,13 +93,12 @@ fi
 
 if [ -n "$version" ]; then
     # Classic version tag
-    local tag_name="v$version"
+    tag_name="v$version"
     create_or_update_tag "$tag_name"
 
     # Major version "latest" tag
-    local major_version
-    local latest_tag_name=""
     major_version=$(echo "$version" | sed 's/^\([0-9]*\)\..*/\1/')
+    latest_tag_name=""
     if [ -n "$major_version" ]; then
         latest_tag_name="v$major_version-latest"
         create_or_update_tag "$latest_tag_name"
