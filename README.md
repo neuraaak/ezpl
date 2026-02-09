@@ -2,8 +2,9 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/OS-Independent-lightgray.svg?style=for-the-badge)](https://pypi.org/project/ezpl/)
-[![Version](https://img.shields.io/badge/Version-1.5.1-orange.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
+[![Version](https://img.shields.io/badge/Version-1.5.2-orange.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 [![PyPI](https://img.shields.io/badge/PyPI-ezplog-green.svg?style=for-the-badge&logo=pypi)](https://pypi.org/project/ezplog/)
+[![Docs](https://img.shields.io/badge/Docs-Online-blue.svg?style=for-the-badge&logo=readthedocs)](https://neuraaak.github.io/ezplog/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 [![Tests](https://img.shields.io/badge/Tests-377%2F377%20passing-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
@@ -60,24 +61,26 @@ printer.wizard.table([{"Name": "Alice", "Age": 30}], title="Users")
 
 ## 📚 Documentation
 
-- **[📖 Complete API Documentation](docs/api/API_DOCUMENTATION.md)** – Full API reference with examples
-- **[📋 API Summary](docs/api/SUMMARY.md)** – Quick API overview
-- **[🖥️ CLI Documentation](docs/cli/CLI_DOCUMENTATION.md)** – Command-line interface guide
-- **[⚙️ Configuration Guide](docs/cli/CONFIG_GUIDE.md)** – Configuration management
-- **[💡 Examples](docs/examples/EXAMPLES.md)** – Usage examples and demonstrations
-- **[🧪 Test Documentation](docs/tests/TEST_DOCUMENTATION.md)** – Complete test suite documentation
-- **[📊 Test Summary](docs/tests/SUMMARY.md)** – Quick test overview
+Complete documentation is available at **[neuraaak.github.io/ezplog](https://neuraaak.github.io/ezplog/)**
+
+| Section                                                                   | Description                                    |
+| ------------------------------------------------------------------------- | ---------------------------------------------- |
+| **[Getting Started](https://neuraaak.github.io/ezplog/getting-started/)** | Installation, basic usage, and first steps     |
+| **[API Reference](https://neuraaak.github.io/ezplog/api/)**               | Complete API documentation with examples       |
+| **[CLI Reference](https://neuraaak.github.io/ezplog/cli/)**               | Command-line interface guide                   |
+| **[User Guides](https://neuraaak.github.io/ezplog/guides/)**              | Configuration, development, and testing guides |
+| **[Examples](https://neuraaak.github.io/ezplog/examples/)**               | Practical examples and demonstrations          |
 
 ## 🧪 Testing
 
 Comprehensive test suite with **377 tests** covering unit, integration, and robustness scenarios — **65% code coverage**.
 
-| Metric | Value |
-| ------ | ----- |
-| Total tests | 377 |
-| Passing | 377 (100%) |
-| Coverage | 65% |
-| Test types | Unit, Integration, Robustness |
+| Metric      | Value                         |
+| ----------- | ----------------------------- |
+| Total tests | 377                           |
+| Passing     | 377 (100%)                    |
+| Coverage    | 65%                           |
+| Test types  | Unit, Integration, Robustness |
 
 ```bash
 # Install dev dependencies
@@ -95,7 +98,7 @@ python tests/run_tests.py --type robustness
 python tests/run_tests.py --coverage
 ```
 
-See **[Test Documentation](docs/tests/TEST_DOCUMENTATION.md)** for complete details.
+See **[Testing Guide](https://neuraaak.github.io/ezplog/guides/testing/)** for complete details.
 
 ## 🛠️ Development Setup
 
@@ -125,7 +128,7 @@ git config core.hooksPath .hooks
 - **pre-commit**: Automatically formats code (black, isort, ruff) before commit
 - **post-commit**: Automatically creates version tags after commit
 
-See **[.hooks/README.md](.hooks/README.md)** for detailed hook documentation.
+See **[Development Guide](https://neuraaak.github.io/ezplog/guides/development/)** and **[.hooks/README.md](.hooks/README.md)** for detailed hook documentation.
 
 ## 🎨 Main Components
 
@@ -178,9 +181,10 @@ MIT License – See [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
 
+- **Documentation**: [https://neuraaak.github.io/ezplog/](https://neuraaak.github.io/ezplog/)
 - **Repository**: [https://github.com/neuraaak/ezplog](https://github.com/neuraaak/ezplog)
+- **PyPI**: [https://pypi.org/project/ezplog/](https://pypi.org/project/ezplog/)
 - **Issues**: [GitHub Issues](https://github.com/neuraaak/ezplog/issues)
-- **Documentation**: [Complete API Docs](docs/api/API_DOCUMENTATION.md)
 
 ---
 

@@ -86,6 +86,15 @@ class ConditionalStatusColumn(TextColumn):
         super().__init__("")  # Empty text format, we override render
 
     def render(self, task):
+        """
+        Render the status field if it exists in the task.
+
+        Args:
+            task: The task object to render
+
+        Returns:
+            Text object containing the status or empty text
+        """
         if hasattr(task, "fields") and "status" in task.fields:
             return Text(str(task.fields["status"]), style="dim")
         return Text("")
@@ -98,6 +107,15 @@ class ConditionalDetailsColumn(TextColumn):
         super().__init__("")  # Empty text format, we override render
 
     def render(self, task):
+        """
+        Render the details field if it exists in the task.
+
+        Args:
+            task: The task object to render
+
+        Returns:
+            Text object containing the details or empty text
+        """
         if hasattr(task, "fields") and "details" in task.fields:
             return Text(str(task.fields["details"]), style="dim")
         return Text("")

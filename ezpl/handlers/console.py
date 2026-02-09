@@ -16,6 +16,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+from collections.abc import Generator
 from contextlib import contextmanager
 from typing import Any
 
@@ -315,7 +316,7 @@ class EzPrinter(LoggingHandler, IndentationManager):
         self._indent = 0
 
     @contextmanager
-    def manage_indent(self):
+    def manage_indent(self) -> Generator[None, None, None]:
         """
         Context manager for temporary indentation.
 
