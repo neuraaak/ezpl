@@ -10,7 +10,12 @@
 [![Tests](https://img.shields.io/badge/Tests-377%2F377%20passing-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 [![Coverage](https://img.shields.io/badge/Coverage-65%25-yellow.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 
-**Ezpl** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
+<div style="display: flex; align-items: center; gap: 20px;">
+  <img src="docs/assets/logo-min.png" alt="Logo" style="width: 80px; height: 80px; flex-shrink: 0;">
+  <div>
+    <strong>Ezpl</strong> is a modern Python logging framework with <strong>Rich</strong> console output and <strong>loguru</strong> file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
+  </div>
+</div>
 
 ## 📦 Installation
 
