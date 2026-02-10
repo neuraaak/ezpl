@@ -90,6 +90,7 @@ docs = [
     "mkdocs-coverage>=1.1.0",
     "git-cliff>=2.7.0",
 ]
+
 # ///////////////////////////////////////////////////////////////
 # 🔗 PROJECT URLS
 # Links to repository, documentation, and package index
