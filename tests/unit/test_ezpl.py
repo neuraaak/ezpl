@@ -381,3 +381,67 @@ class TestErrorHandling:
             pytest.raises(FileOperationError),
         ):
             ezpl.set_log_file("x.log")
+
+
+class TestConfigLockV2:
+    """Tests for safer lock behavior with owner/token controls."""
+
+    def test_lock_config_returns_token_and_owner_info(self) -> None:
+        """lock_config() should expose lock state with owner metadata."""
+        Ezpl()
+        token = Ezpl.lock_config(owner="CustomA")
+        info = Ezpl.config_lock_info()
+
+        assert token is not None
+        assert info["locked"] is True
+        assert info["owner"] == "CustomA"
+        assert info["has_token"] is True
+
+    def test_second_owner_cannot_relock(self) -> None:
+        """A different owner should not be able to replace an active lock."""
+        Ezpl()
+        first_token = Ezpl.lock_config(owner="CustomA")
+
+        with pytest.warns(UserWarning, match="already locked"):
+            second_token = Ezpl.lock_config(owner="CustomB")
+
+        assert first_token is not None
+        assert second_token is None
+        assert Ezpl.config_lock_info()["owner"] == "CustomA"
+
+    def test_configure_force_requires_owner_or_token_when_locked(self) -> None:
+        """force=True alone should not bypass a lock with owner/token metadata."""
+        ezpl = Ezpl()
+        Ezpl.lock_config(owner="CustomA")
+
+        with pytest.warns(UserWarning, match="configuration is locked"):
+            applied = ezpl.configure(level="DEBUG", force=True)
+
+        assert applied is False
+
+    def test_configure_force_with_owner_or_token_is_allowed(self) -> None:
+        """A matching owner or token should authorize forced configure()."""
+        ezpl = Ezpl()
+        token = Ezpl.lock_config(owner="CustomA")
+        assert token is not None
+
+        by_owner = ezpl.configure(level="DEBUG", force=True, owner="CustomA")
+        assert by_owner is True
+
+        by_token = ezpl.configure(level="INFO", force=True, token=token)
+        assert by_token is True
+
+    def test_unlock_requires_owner_or_token(self) -> None:
+        """unlock_config() should deny unknown callers when lock is active."""
+        Ezpl()
+        token = Ezpl.lock_config(owner="CustomA")
+        assert token is not None
+
+        with pytest.warns(UserWarning, match="Unlock denied"):
+            unlocked = Ezpl.unlock_config(owner="CustomB")
+
+        assert unlocked is False
+        assert Ezpl.config_lock_info()["locked"] is True
+
+        assert Ezpl.unlock_config(token=token) is True
+        assert Ezpl.config_lock_info()["locked"] is False
