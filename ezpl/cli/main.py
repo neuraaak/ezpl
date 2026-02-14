@@ -80,7 +80,7 @@ def _display_welcome() -> None:
             padding=(1, 2),
         )
         console.print(panel)
-    except Exception:
+    except (OSError, RuntimeError, ValueError):
         # Fallback si Rich n'est pas disponible
         click.echo("🚀 Ezpl CLI - Modern Python Logging Framework")
 
@@ -117,10 +117,13 @@ def main() -> None:
     """
     try:
         cli()
+    except click.ClickException as e:
+        e.show()
+        raise SystemExit(e.exit_code) from e
     except KeyboardInterrupt as e:
         console.print("\n[yellow]Interrupted by user[/yellow]")
         raise SystemExit(1) from e
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         console.print(f"[bold red]Error:[/bold red] {e}")
         raise SystemExit(1) from e
 

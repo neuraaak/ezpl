@@ -85,6 +85,26 @@ class TestInitialization:
         assert config.get("log-level") == "ERROR"
         assert config.get("printer-level") == "DEBUG"
 
+    def test_init_loads_from_user_env_file(
+        self,
+        temp_dir: Path,
+        temp_config_file: Path,
+        clean_env: None,  # noqa: ARG002
+    ) -> None:
+        """Test that initialization loads from ~/.ezpl/.env fallback file."""
+        env_file = temp_dir / ".env"
+        env_file.write_text(
+            "EZPL_LOG_LEVEL=CRITICAL\nEZPL_PRINTER_LEVEL=WARNING\n",
+            encoding="utf-8",
+        )
+
+        with pytest.MonkeyPatch().context() as m:
+            m.setattr("ezpl.config.manager.DefaultConfiguration.CONFIG_DIR", temp_dir)
+            config = ConfigurationManager(config_file=temp_config_file)
+
+        assert config.get("log-level") == "CRITICAL"
+        assert config.get("printer-level") == "WARNING"
+
     def test_init_handles_invalid_json(self, temp_config_file: Path) -> None:
         """Test that initialization handles invalid JSON gracefully."""
         temp_config_file.parent.mkdir(parents=True, exist_ok=True)
@@ -283,7 +303,7 @@ class TestExport:
     def test_export_to_script_windows(self, temp_dir: Path) -> None:
         """Test export_to_script() for Windows."""
         config = ConfigurationManager()
-        config.set("test-key", "test-value")
+        config.set("log-level", "DEBUG")
         output_file = temp_dir / "config.bat"
 
         with patch("sys.platform", "win32"):
@@ -291,12 +311,13 @@ class TestExport:
 
         assert output_file.exists()
         content = output_file.read_text(encoding="utf-8")
-        assert "set" in content.lower()
+        assert "set EZPL_LOG_LEVEL=DEBUG" in content
+        assert "set log-level=" not in content
 
     def test_export_to_script_unix(self, temp_dir: Path) -> None:
         """Test export_to_script() for Unix."""
         config = ConfigurationManager()
-        config.set("test-key", "test-value")
+        config.set("log-rotation", "10 MB")
         output_file = temp_dir / "config.sh"
 
         with patch("sys.platform", "linux"):
@@ -304,7 +325,9 @@ class TestExport:
 
         assert output_file.exists()
         content = output_file.read_text(encoding="utf-8")
-        assert "export" in content or "#!/bin/bash" in content
+        assert "#!/bin/bash" in content
+        assert "export EZPL_LOG_ROTATION='10 MB'" in content
+        assert "export log-rotation=" not in content
 
     def test_export_handles_io_error(self, temp_dir: Path) -> None:
         """Test that export handles IO errors."""

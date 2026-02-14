@@ -375,18 +375,48 @@ from ezpl import Ezpl
 
 ezpl = Ezpl(log_level="INFO")
 
-# Lock configuration
-ezpl.lock_config()
+# Lock configuration and keep lock token
+token = ezpl.lock_config(owner="library.CustomA")
 
 # This will emit warning and have no effect
 ezpl.set_level("DEBUG")
 
-# Force change (bypasses lock)
-ezpl.set_level("DEBUG", force=True)
+# Force change with matching owner or token
+ezpl.set_level("DEBUG", force=True, owner="library.CustomA")
+ezpl.configure(level="INFO", force=True, token=token)
 
-# Unlock configuration
-ezpl.unlock_config()
+# Unlock configuration (owner/token required unless force=True)
+ezpl.unlock_config(owner="library.CustomA")
+
+# Optional diagnostics
+print(ezpl.config_lock_info())
 ```
+
+### App vs Library Pattern
+
+Use this simple layering approach when multiple libraries use Ezpl:
+
+```python
+from ezpl import Ezpl
+
+# In a library (CustomA / CustomB)
+ezpl = Ezpl()
+token = ezpl.lock_config(owner="library.CustomA")
+
+# Library can update only with matching owner/token
+ezpl.configure(level="DEBUG", force=True, token=token)
+
+# In the application entrypoint
+app_ezpl = Ezpl()
+app_ezpl.unlock_config(force=True)  # Take control at app level
+app_ezpl.configure(level="INFO")
+app_ezpl.lock_config(owner="app.main")
+```
+
+Guideline:
+
+- Libraries should set safe defaults and avoid hard-locking forever.
+- The application entrypoint should always decide final configuration.
 
 ## Environment-Specific Configuration
 
@@ -500,7 +530,10 @@ ezpl = Ezpl(
 ```python
 # In library code
 ezpl = Ezpl()
-ezpl.lock_config()  # Prevent application from changing library's log level
+token = ezpl.lock_config(owner="library.CustomA")
+
+# Later, if the same library needs to adjust config:
+ezpl.configure(level="DEBUG", force=True, token=token)
 ```
 
 ### 7. Document Your Configuration

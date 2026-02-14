@@ -21,6 +21,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+import inspect
 import time
 
 # Third-party imports
@@ -199,6 +200,32 @@ class TestJSON:
 class TestProgressBars:
     """Tests for progress bar methods."""
 
+    def test_progress_signatures_use_taskid(self) -> None:
+        """Progress context managers should type task IDs as TaskID."""
+        from ezpl.handlers.wizard.progress import ProgressMixin
+
+        methods = [
+            "progress",
+            "spinner",
+            "spinner_with_status",
+            "download_progress",
+            "file_download_progress",
+            "dependency_progress",
+            "package_install_progress",
+            "step_progress",
+            "file_copy_progress",
+            "installation_progress",
+            "build_progress",
+            "deployment_progress",
+        ]
+
+        for method_name in methods:
+            method = getattr(ProgressMixin, method_name)
+            signature_text = str(inspect.signature(method))
+            assert (
+                "TaskID" in signature_text
+            ), f"Expected TaskID in signature for {method_name}, got: {signature_text}"
+
     def test_progress_basic(self, wizard) -> None:
         """Test basic progress() method."""
         with wizard.progress("Processing...", total=100) as (progress, task):
@@ -213,7 +240,7 @@ class TestProgressBars:
 
     def test_spinner(self, wizard) -> None:
         """Test spinner() method."""
-        with wizard.spinner("Loading...") as (progress, task):
+        with wizard.spinner("Loading...") as (_progress, _task):
             time.sleep(0.1)
         # Verify no exception raised
 
@@ -242,12 +269,12 @@ class TestProgressBars:
         gen = wizard.dependency_progress(deps)
         # Get the first yield
         first_yield = gen.__enter__()
-        progress, task, dep = first_yield
+        progress, task, _dep = first_yield
         progress.advance(task)
         # Consume all remaining yields to allow the generator to complete
         try:
             while True:
-                progress, task, dep = next(gen.gen)
+                progress, task, _dep = next(gen.gen)
                 progress.advance(task)
         except (StopIteration, AttributeError):
             pass
@@ -261,12 +288,12 @@ class TestProgressBars:
         # package_install_progress is a context manager that yields multiple times
         gen = wizard.package_install_progress(packages)
         first_yield = gen.__enter__()
-        progress, task, pkg, ver = first_yield
+        progress, task, _pkg, _ver = first_yield
         progress.advance(task)
         # Consume all remaining yields
         try:
             while True:
-                progress, task, pkg, ver = next(gen.gen)
+                progress, task, _pkg, _ver = next(gen.gen)
                 progress.advance(task)
         except (StopIteration, AttributeError):
             pass
@@ -276,7 +303,7 @@ class TestProgressBars:
     def test_step_progress(self, wizard) -> None:
         """Test step_progress() method."""
         steps = [("Init", "Initializing"), ("Install", "Installing")]
-        with wizard.step_progress(steps) as (progress, task, steps_list):
+        with wizard.step_progress(steps) as (progress, task, _steps_list):
             for _i in range(len(steps)):
                 progress.advance(task)
         # Verify no exception raised
@@ -284,7 +311,7 @@ class TestProgressBars:
     def test_file_copy_progress(self, wizard) -> None:
         """Test file_copy_progress() method."""
         files = ["file1.txt", "file2.txt", "file3.txt"]
-        with wizard.file_copy_progress(files) as (progress, task, files_list):
+        with wizard.file_copy_progress(files) as (progress, task, _files_list):
             for _i in range(len(files)):
                 progress.advance(task)
         # Verify no exception raised
@@ -295,12 +322,12 @@ class TestProgressBars:
         # installation_progress is a context manager that yields multiple times
         gen = wizard.installation_progress(steps)
         first_yield = gen.__enter__()
-        progress, task, name, desc = first_yield
+        progress, task, _name, _desc = first_yield
         progress.advance(task)
         # Consume all remaining yields
         try:
             while True:
-                progress, task, name, desc = next(gen.gen)
+                progress, task, _name, _desc = next(gen.gen)
                 progress.advance(task)
         except (StopIteration, AttributeError):
             pass
@@ -313,12 +340,12 @@ class TestProgressBars:
         # build_progress is a context manager that yields multiple times
         gen = wizard.build_progress(phases)
         first_yield = gen.__enter__()
-        progress, task, phase, weight = first_yield
+        progress, task, _phase, weight = first_yield
         progress.update(task, completed=progress.tasks[task].completed + weight)
         # Consume all remaining yields
         try:
             while True:
-                progress, task, phase, weight = next(gen.gen)
+                progress, task, _phase, weight = next(gen.gen)
                 progress.update(task, completed=progress.tasks[task].completed + weight)
         except (StopIteration, AttributeError):
             pass
@@ -331,12 +358,12 @@ class TestProgressBars:
         # deployment_progress is a context manager that yields multiple times
         gen = wizard.deployment_progress(stages)
         first_yield = gen.__enter__()
-        progress, task, stage = first_yield
+        progress, task, _stage = first_yield
         progress.advance(task)
         # Consume all remaining yields
         try:
             while True:
-                progress, task, stage = next(gen.gen)
+                progress, task, _stage = next(gen.gen)
                 progress.advance(task)
         except (StopIteration, AttributeError):
             pass

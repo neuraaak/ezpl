@@ -217,11 +217,11 @@ config = {
     "features": ["logging", "caching", "monitoring"]
 }
 
-wizard.json_display(config, title="Configuration")
+wizard.json(config, title="Configuration")
 
 # From JSON string
 json_str = '{"status": "ok", "message": "Success"}'
-wizard.json_display(json_str)
+wizard.json(json_str)
 ```
 
 ## Progress Bars
@@ -236,10 +236,8 @@ ezpl = Ezpl()
 wizard = ezpl.get_printer().wizard
 
 # Simple progress bar
-with wizard.progress() as progress:
-    task = progress.add_task("[cyan]Processing...", total=100)
-
-    for i in range(100):
+with wizard.progress("[cyan]Processing...", total=100) as (progress, task):
+    for _ in range(100):
         time.sleep(0.05)
         progress.update(task, advance=1)
 ```
@@ -258,12 +256,12 @@ with wizard.spinner("Loading data..."):
     time.sleep(3)
 
 # Spinner with status updates
-with wizard.spinner_with_status("Processing") as update_status:
-    update_status("Loading configuration...")
+with wizard.spinner_with_status("Processing") as (progress, task):
+    progress.update(task, status="Loading configuration...")
     time.sleep(1)
-    update_status("Connecting to database...")
+    progress.update(task, status="Connecting to database...")
     time.sleep(1)
-    update_status("Fetching data...")
+    progress.update(task, status="Fetching data...")
     time.sleep(1)
 ```
 
@@ -281,10 +279,9 @@ with wizard.file_download_progress(
     filename="large-file.zip",
     total_size=104857600,  # 100 MB
     description="Downloading"
-) as progress:
-    task = progress.tasks[0]
+) as (progress, task):
 
-    for i in range(100):
+    for _ in range(100):
         time.sleep(0.05)
         progress.update(task, advance=1048576)  # 1 MB per iteration
 ```
@@ -308,9 +305,10 @@ steps = [
     "Deployment complete"
 ]
 
-with wizard.step_progress(steps, "Setup Process") as update_step:
-    for step in steps:
-        update_step(step)
+with wizard.step_progress(steps, "Setup Process") as (progress, task, steps_list):
+    for i, step in enumerate(steps_list):
+        progress.update(task, completed=i, current_step=step)
+        progress.advance(task)
         time.sleep(1)
 ```
 
@@ -334,10 +332,10 @@ packages = [
 with wizard.package_install_progress(
     packages,
     description="Installing Dependencies"
-) as update_package:
-    for package, version in packages:
-        update_package(f"{package}=={version}")
-        time.sleep(1)
+) as (progress, task, package, version):
+    progress.update(task, description=f"Installing {package}", version=version)
+    progress.advance(task)
+    time.sleep(1)
 ```
 
 ### Dynamic Layered Progress
@@ -402,21 +400,21 @@ printer = ezpl.get_printer()
 printer.info("Starting main process")
 
 # Increase indentation
-ezpl.increase_indent()
+printer.add_indent()
 printer.info("Step 1: Initialize")
 printer.info("Step 2: Load data")
 
 # Further indentation
-ezpl.increase_indent()
+printer.add_indent()
 printer.info("Substep 2.1: Validate")
 printer.info("Substep 2.2: Process")
 
 # Decrease indentation
-ezpl.decrease_indent()
+printer.del_indent()
 printer.info("Step 3: Finalize")
 
 # Reset indentation
-ezpl.reset_indent()
+printer.reset_indent()
 printer.success("Process complete")
 ```
 
@@ -563,11 +561,9 @@ def main():
     wizard.success_panel("Configuration", "All settings loaded successfully")
 
     # Processing with progress
-    with wizard.progress() as progress:
-        task = progress.add_task("[cyan]Processing data...", total=100)
-
+    with wizard.progress("[cyan]Processing data...", total=100) as (progress, task):
         for i in range(100):
-            logger.debug(f"Processing item {i+1}")
+            logger.debug(f"Processing item {i + 1}")
             time.sleep(0.05)
             progress.update(task, advance=1)
 
@@ -577,7 +573,7 @@ def main():
         "errors": 0,
         "duration": "5.2s"
     }
-    wizard.json_display(results, title="Processing Results")
+    wizard.json(results, title="Processing Results")
 
     # Summary table
     summary = [

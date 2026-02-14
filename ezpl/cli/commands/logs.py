@@ -203,8 +203,10 @@ def view_command(
             for entry in entries:
                 console.print(entry.raw_line)
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @logs_group.command(name="search", help="Search log entries")
@@ -266,8 +268,10 @@ def search_command(
         for entry in results:
             console.print(entry.raw_line)
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @logs_group.command(name="stats", help="Display log statistics")
@@ -354,8 +358,10 @@ def stats_command(file: Path | None, format: str) -> None:
                 console.print("\n")
                 console.print(level_table)
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @logs_group.command(name="tail", help="Display last lines of log file")
@@ -397,8 +403,10 @@ def tail_command(file: Path | None, lines: int, follow: bool) -> None:
             for entry in entries:
                 console.print(entry.raw_line)
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @logs_group.command(name="list", help="List log files")
@@ -448,13 +456,15 @@ def list_command(dir: Path | None) -> None:
                     f"{size_mb:.2f} MB",
                     modified.strftime("%Y-%m-%d %H:%M:%S"),
                 )
-            except Exception as e:
+            except OSError as e:
                 console.print(f"[bold red]Error:[/bold red] {e}")
 
         console.print(table)
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @logs_group.command(name="clean", help="Clean old log files")
@@ -556,13 +566,15 @@ def clean_command(
                 log_file.unlink()
                 deleted_count += 1
                 console.print(f"[green]✓[/green] Deleted: {log_file}")
-            except Exception as e:
+            except OSError as e:
                 console.print(f"[red]✗[/red] Failed to delete {log_file}: {e}")
 
         console.print(f"\n[green]Deleted {deleted_count} file(s)[/green]")
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @logs_group.command(name="export", help="Export log file")
@@ -637,5 +649,7 @@ def export_command(file: Path | None, format: str, output: Path | None) -> None:
         else:
             console.print(content)
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        raise click.ClickException(str(e)) from e
