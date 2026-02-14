@@ -1,8 +1,8 @@
 # Welcome to Ezpl Documentation
 
 [![PyPI](https://img.shields.io/badge/PyPI-ezplog-orange.svg)](https://pypi.org/project/ezplog/)
-[![PyPI version](https://img.shields.io/pypi/v/ezplog)](https://pypi.org/project/ezplog/)
 [![Python versions](https://img.shields.io/pypi/pyversions/ezplog)](https://pypi.org/project/ezplog/)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgray.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/neuraaak/ezplog/blob/main/LICENSE)
 
 ![Ezpl Logo](https://raw.githubusercontent.com/neuraaak/ezplog/refs/heads/main/docs/assets/logo-min.png)

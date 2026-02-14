@@ -164,7 +164,7 @@ printer = ezpl.get_printer()
 
 # Different patterns
 printer.success("Operation completed")
-printer.error_msg("Something went wrong")
+printer.error("Something went wrong")
 printer.warn("Warning message")
 printer.tip("Pro tip: Use type hints!")
 printer.system("System message")
@@ -184,21 +184,21 @@ printer = ezpl.get_printer()
 printer.info("Starting process")
 
 # Increase indentation
-ezpl.increase_indent()
+printer.add_indent()
 printer.info("Step 1")
 printer.info("Step 2")
 
 # Further indentation
-ezpl.increase_indent()
+printer.add_indent()
 printer.info("Substep 2.1")
 printer.info("Substep 2.2")
 
 # Decrease indentation
-ezpl.decrease_indent()
+printer.del_indent()
 printer.info("Step 3")
 
 # Reset indentation
-ezpl.reset_indent()
+printer.reset_indent()
 printer.info("Process complete")
 ```
 
@@ -271,7 +271,7 @@ data = {
     "features": ["rich", "loguru", "typed"]
 }
 
-printer.wizard.json_display(data)
+printer.wizard.json(data)
 ```
 
 ### Progress Bars
@@ -284,10 +284,8 @@ ezpl = Ezpl()
 printer = ezpl.get_printer()
 
 # Simple progress bar
-with printer.wizard.progress() as progress:
-    task = progress.add_task("[cyan]Processing...", total=100)
-
-    for i in range(100):
+with printer.wizard.progress("[cyan]Processing...", total=100) as (progress, task):
+    for _ in range(100):
         time.sleep(0.05)
         progress.update(task, advance=1)
 ```

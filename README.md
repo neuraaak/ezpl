@@ -2,13 +2,12 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/OS-Independent-lightgray.svg?style=for-the-badge)](https://pypi.org/project/ezpl/)
-[![Version](https://img.shields.io/badge/Version-1.5.4-orange.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
+[![Version](https://img.shields.io/badge/Version-1.6.0-orange.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
 [![PyPI](https://img.shields.io/badge/PyPI-ezplog-green.svg?style=for-the-badge&logo=pypi)](https://pypi.org/project/ezplog/)
 [![Docs](https://img.shields.io/badge/Docs-Online-blue.svg?style=for-the-badge&logo=readthedocs)](https://neuraaak.github.io/ezplog/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
-[![Tests](https://img.shields.io/badge/Tests-377%2F377%20passing-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
-[![Coverage](https://img.shields.io/badge/Coverage-65%25-yellow.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
+[![Tests](https://img.shields.io/badge/Tests-377%2F377%20passing-success.svg?style=for-the-badge)](https://neuraaak.github.io/ezplog/coverage)
 
 ![Logo](docs/assets/logo-min.png)
 

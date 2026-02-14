@@ -19,8 +19,13 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Standard library imports
+import inspect
+from contextlib import AbstractContextManager
+
 # Local imports
 from ezpl import Ezpl
+from ezpl.handlers.file import EzLogger
 from ezpl.types.protocols import LoggerProtocol, PrinterProtocol
 
 # ///////////////////////////////////////////////////////////////
@@ -258,4 +263,23 @@ class TestProtocolInheritance:
 
         for method in required_methods:
             assert hasattr(logger, method), f"Missing method: {method}"
-            assert callable(getattr(logger, method)), f"Method not callable: {method}"
+
+
+class TestStrictSignatureAlignment:
+    """Strict signature checks between protocols and implementations."""
+
+    def test_printer_manage_indent_returns_context_manager(self) -> None:
+        """manage_indent should provide a context manager compatible with protocol."""
+        ezpl = Ezpl()
+        printer = ezpl.get_printer()
+        manage_indent_context = printer.manage_indent()
+        assert isinstance(manage_indent_context, AbstractContextManager)
+
+    def test_logger_loguru_signatures_are_aligned(self) -> None:
+        """bind/opt/patch signatures should be strictly identical."""
+        for method_name in ("bind", "opt", "patch"):
+            protocol_method = getattr(LoggerProtocol, method_name)
+            implementation_method = getattr(EzLogger, method_name)
+            assert str(inspect.signature(protocol_method)) == str(
+                inspect.signature(implementation_method)
+            )

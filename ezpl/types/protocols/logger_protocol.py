@@ -20,6 +20,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
+# Third-party imports
+from loguru._logger import Logger as LoguruLogger
+
 # ///////////////////////////////////////////////////////////////
 # PROTOCOLS
 # ///////////////////////////////////////////////////////////////
@@ -87,15 +90,15 @@ class LoggerProtocol(Protocol):
     # LOGURU-SPECIFIC METHODS
     # ///////////////////////////////////////////////////////////////
 
-    def bind(self, **kwargs) -> Any:
+    def bind(self, **kwargs: Any) -> LoguruLogger:
         """Bind context variables to the logger."""
         ...
 
-    def opt(self, **kwargs) -> Any:
+    def opt(self, **kwargs: Any) -> LoguruLogger:
         """Configure logger options."""
         ...
 
-    def patch(self, patcher) -> Any:
+    def patch(self, patcher: Any) -> LoguruLogger:
         """Patch log records."""
         ...
 

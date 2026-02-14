@@ -63,7 +63,7 @@ class ProgressMixin:
         description: str = "Working...",
         total: int | None = None,
         transient: bool = False,
-    ) -> Generator[tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, TaskID], None, None]:
         """
         Create a progress bar context manager.
 
@@ -97,7 +97,7 @@ class ProgressMixin:
     @contextmanager
     def spinner(
         self, description: str = "Working..."
-    ) -> Generator[tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, TaskID], None, None]:
         """
         Create a simple spinner with description.
 
@@ -126,7 +126,7 @@ class ProgressMixin:
     @contextmanager
     def spinner_with_status(
         self, description: str = "Working..."
-    ) -> Generator[tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, TaskID], None, None]:
         """
         Create a spinner that can update status messages.
 
@@ -155,7 +155,7 @@ class ProgressMixin:
     @contextmanager
     def download_progress(
         self, description: str = "Downloading..."
-    ) -> Generator[tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, TaskID], None, None]:
         """
         Create a download progress bar with speed and size information.
 
@@ -187,7 +187,7 @@ class ProgressMixin:
     @contextmanager
     def file_download_progress(
         self, filename: str, total_size: int, description: str = "Downloading file..."
-    ) -> Generator[tuple[Progress, int], None, None]:
+    ) -> Generator[tuple[Progress, TaskID], None, None]:
         """
         Create a progress bar for downloading a specific file.
 
@@ -221,7 +221,7 @@ class ProgressMixin:
     @contextmanager
     def dependency_progress(
         self, dependencies: list[str], description: str = "Installing dependencies..."
-    ) -> Generator[tuple[Progress, int, str], None, None]:
+    ) -> Generator[tuple[Progress, TaskID, str], None, None]:
         """
         Create a progress bar for dependency installation.
 
@@ -277,7 +277,7 @@ class ProgressMixin:
         self,
         packages: list[tuple[str, str]],
         description: str = "Installing packages...",
-    ) -> Generator[tuple[Progress, int, str, str], None, None]:
+    ) -> Generator[tuple[Progress, TaskID, str, str], None, None]:
         """
         Create a progress bar for package installation with version info.
 
@@ -338,7 +338,7 @@ class ProgressMixin:
         description: str = "Processing...",
         show_step_numbers: bool = True,
         show_time: bool = True,
-    ) -> Generator[tuple[Progress, int, list[str]], None, None]:
+    ) -> Generator[tuple[Progress, TaskID, list[str]], None, None]:
         """
         Create a step-based progress bar with detailed step information.
 
@@ -402,7 +402,7 @@ class ProgressMixin:
     @contextmanager
     def file_copy_progress(
         self, files: list[str], description: str = "Copying files..."
-    ) -> Generator[tuple[Progress, int, list[str]], None, None]:
+    ) -> Generator[tuple[Progress, TaskID, list[str]], None, None]:
         """
         Create a progress bar specifically for file copying operations.
 
@@ -439,7 +439,7 @@ class ProgressMixin:
         self,
         steps: list[tuple[str, str]],
         description: str = "Installation in progress...",
-    ) -> Generator[tuple[Progress, int, str, str], None, None]:
+    ) -> Generator[tuple[Progress, TaskID, str, str], None, None]:
         """
         Create a progress bar for installation processes with step details.
 
@@ -491,7 +491,7 @@ class ProgressMixin:
     @contextmanager
     def build_progress(
         self, phases: list[tuple[str, int]], description: str = "Building project..."
-    ) -> Generator[tuple[Progress, int, str, int], None, None]:
+    ) -> Generator[tuple[Progress, TaskID, str, int], None, None]:
         """
         Create a progress bar for build processes with weighted phases.
 
@@ -533,7 +533,7 @@ class ProgressMixin:
     @contextmanager
     def deployment_progress(
         self, stages: list[str], description: str = "Deploying..."
-    ) -> Generator[tuple[Progress, int, str], None, None]:
+    ) -> Generator[tuple[Progress, TaskID, str], None, None]:
         """
         Create a progress bar for deployment processes.
 
