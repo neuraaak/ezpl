@@ -15,6 +15,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 import click
@@ -51,7 +52,7 @@ def info_command() -> None:
     """
     try:
         # Package info
-        version = getattr(ezpl, "__version__", "unknown")
+        ezpl_version = getattr(ezpl, "__version__", "unknown")
         author = getattr(ezpl, "__author__", "unknown")
         maintainer = getattr(ezpl, "__maintainer__", "unknown")
         license_type = getattr(ezpl, "__license__", "unknown")
@@ -63,7 +64,7 @@ def info_command() -> None:
             package_path = (
                 Path(ezpl.__file__).parent if hasattr(ezpl, "__file__") else None
             )
-        except Exception:
+        except (AttributeError, TypeError, OSError):
             package_path = None
 
         # Configuration info
@@ -78,7 +79,7 @@ def info_command() -> None:
 
         # Version
         text.append("Version: ", style="bold")
-        text.append(f"{version}\n", style="white")
+        text.append(f"{ezpl_version}\n", style="white")
 
         # Author
         text.append("Author: ", style="bold")
@@ -123,9 +124,13 @@ def info_command() -> None:
 
         # Dependencies table
         try:
-            import click as click_module
             import loguru
             import rich
+
+            try:
+                click_version = version("click")
+            except PackageNotFoundError:
+                click_version = "unknown"
 
             deps_table = Table(
                 title="Dependencies", show_header=True, header_style="bold blue"
@@ -135,12 +140,14 @@ def info_command() -> None:
 
             deps_table.add_row("loguru", getattr(loguru, "__version__", "unknown"))
             deps_table.add_row("rich", getattr(rich, "__version__", "unknown"))
-            deps_table.add_row("click", getattr(click_module, "__version__", "unknown"))
+            deps_table.add_row("click", click_version)
 
             console.print("\n")
             console.print(deps_table)
-        except Exception as e:
+        except (ImportError, OSError, RuntimeError, ValueError) as e:
             console.print(f"[bold red]Error:[/bold red] {e}")
 
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (OSError, RuntimeError, ValueError, TypeError, AttributeError) as e:
+        raise click.ClickException(str(e)) from e

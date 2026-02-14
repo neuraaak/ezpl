@@ -187,19 +187,19 @@ class TestLevelManagement:
     def test_set_level_invalid_raises_error(self) -> None:
         """Test that set_level() with invalid level raises error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_level("INVALID_LEVEL")
 
     def test_set_printer_level_invalid_raises_error(self) -> None:
         """Test that set_printer_level() with invalid level raises error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_printer_level("INVALID_LEVEL")
 
     def test_set_logger_level_invalid_raises_error(self) -> None:
         """Test that set_logger_level() with invalid level raises error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_logger_level("INVALID_LEVEL")
 
 
@@ -360,29 +360,88 @@ class TestErrorHandling:
     def test_invalid_log_level_raises_error(self) -> None:
         """Test that invalid log level raises appropriate error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_level("NOT_A_VALID_LEVEL")
 
     def test_invalid_config_key_handled_gracefully(self) -> None:
-        """Test that invalid config keys are handled gracefully."""
+        """Test that unknown config keys are accepted and persisted as-is."""
         ezpl = Ezpl()
-        # Should not raise error, just ignore invalid keys
-        try:
-            ezpl.configure(invalid_key="invalid_value")
-        except Exception:
-            # If it raises, that's also acceptable behavior
-            pass
+        applied = ezpl.configure(invalid_key="invalid_value")
+        assert applied is True
+        assert ezpl.get_config().get("invalid_key") == "invalid_value"
 
     def test_file_operations_with_invalid_path(self) -> None:
-        """Test file operations with invalid paths."""
+        """Test that set_log_file propagates logger creation failure."""
         ezpl = Ezpl()
-        # Try to set invalid log file path
-        # Should handle gracefully or raise appropriate error
-        try:
-            invalid_path = Path("/invalid/path/that/does/not/exist.log")
-            ezpl.set_log_file(invalid_path)
-            # If no error, verify it was set
-            assert ezpl._log_file == invalid_path
-        except (OSError, FileOperationError, Exception):
-            # Expected behavior - invalid path should raise error
-            pass
+        with (
+            patch(
+                "ezpl.ezpl.EzLogger",
+                side_effect=FileOperationError("boom", "x.log", "write"),
+            ),
+            pytest.raises(FileOperationError),
+        ):
+            ezpl.set_log_file("x.log")
+
+
+class TestConfigLockV2:
+    """Tests for safer lock behavior with owner/token controls."""
+
+    def test_lock_config_returns_token_and_owner_info(self) -> None:
+        """lock_config() should expose lock state with owner metadata."""
+        Ezpl()
+        token = Ezpl.lock_config(owner="CustomA")
+        info = Ezpl.config_lock_info()
+
+        assert token is not None
+        assert info["locked"] is True
+        assert info["owner"] == "CustomA"
+        assert info["has_token"] is True
+
+    def test_second_owner_cannot_relock(self) -> None:
+        """A different owner should not be able to replace an active lock."""
+        Ezpl()
+        first_token = Ezpl.lock_config(owner="CustomA")
+
+        with pytest.warns(UserWarning, match="already locked"):
+            second_token = Ezpl.lock_config(owner="CustomB")
+
+        assert first_token is not None
+        assert second_token is None
+        assert Ezpl.config_lock_info()["owner"] == "CustomA"
+
+    def test_configure_force_requires_owner_or_token_when_locked(self) -> None:
+        """force=True alone should not bypass a lock with owner/token metadata."""
+        ezpl = Ezpl()
+        Ezpl.lock_config(owner="CustomA")
+
+        with pytest.warns(UserWarning, match="configuration is locked"):
+            applied = ezpl.configure(level="DEBUG", force=True)
+
+        assert applied is False
+
+    def test_configure_force_with_owner_or_token_is_allowed(self) -> None:
+        """A matching owner or token should authorize forced configure()."""
+        ezpl = Ezpl()
+        token = Ezpl.lock_config(owner="CustomA")
+        assert token is not None
+
+        by_owner = ezpl.configure(level="DEBUG", force=True, owner="CustomA")
+        assert by_owner is True
+
+        by_token = ezpl.configure(level="INFO", force=True, token=token)
+        assert by_token is True
+
+    def test_unlock_requires_owner_or_token(self) -> None:
+        """unlock_config() should deny unknown callers when lock is active."""
+        Ezpl()
+        token = Ezpl.lock_config(owner="CustomA")
+        assert token is not None
+
+        with pytest.warns(UserWarning, match="Unlock denied"):
+            unlocked = Ezpl.unlock_config(owner="CustomB")
+
+        assert unlocked is False
+        assert Ezpl.config_lock_info()["locked"] is True
+
+        assert Ezpl.unlock_config(token=token) is True
+        assert Ezpl.config_lock_info()["locked"] is False
