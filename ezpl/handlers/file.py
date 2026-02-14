@@ -149,6 +149,30 @@ class EzLogger(LoggingHandler):
         """Return the current logging level."""
         return self._level
 
+    @property
+    def level_manually_set(self) -> bool:
+        """Return whether level was set manually at runtime."""
+        return self._level_manually_set
+
+    @property
+    def rotation(self) -> str | None:
+        """Return current rotation setting."""
+        return self._rotation
+
+    @property
+    def retention(self) -> str | None:
+        """Return current retention setting."""
+        return self._retention
+
+    @property
+    def compression(self) -> str | None:
+        """Return current compression setting."""
+        return self._compression
+
+    def mark_level_as_configured(self) -> None:
+        """Mark the current level as coming from configuration (not manual set)."""
+        self._level_manually_set = False
+
     def set_level(self, level: str) -> None:
         """
         Set the logging level.

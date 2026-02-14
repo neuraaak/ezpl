@@ -7,8 +7,7 @@
 [![Docs](https://img.shields.io/badge/Docs-Online-blue.svg?style=for-the-badge&logo=readthedocs)](https://neuraaak.github.io/ezplog/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
-[![Tests](https://img.shields.io/badge/Tests-377%2F377%20passing-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
-[![Coverage](https://img.shields.io/badge/Coverage-65%25-yellow.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
+[![Tests](https://img.shields.io/badge/Tests-377%2F377%20passing-success.svg?style=for-the-badge)](https://neuraaak.github.io/ezplog/coverage)
 
 ![Logo](docs/assets/logo-min.png)
 

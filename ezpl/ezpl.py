@@ -22,6 +22,7 @@ from loguru import logger
 
 # Local imports
 from .config import ConfigurationManager
+from .core.exceptions import EzplError
 from .handlers import EzLogger, EzPrinter
 
 # ///////////////////////////////////////////////////////////////
@@ -456,7 +457,7 @@ class Ezpl:
             try:
                 if hasattr(cls._instance, "_logger") and cls._instance._logger:
                     cls._instance._logger.close()
-            except Exception as e:
+            except (EzplError, OSError, RuntimeError) as e:
                 logger.error(f"Error during cleanup: {e}")
             cls._instance = None
         # Also reset configuration lock
@@ -507,12 +508,12 @@ class Ezpl:
             try:
                 if hasattr(self, "_logger") and self._logger:
                     self._logger.close()
-            except Exception as e:
+            except (EzplError, OSError, RuntimeError) as e:
                 logger.error(f"Error while closing previous logger: {e}")
             # Reinitialize logger with the new file and current parameters
             self._logger = EzLogger(
                 log_file=self._log_file,
-                level=self._logger._level,
+                level=self._logger.level,
                 rotation=self._config_manager.get_log_rotation(),
                 retention=self._config_manager.get_log_retention(),
                 compression=self._config_manager.get_log_compression(),
@@ -591,23 +592,23 @@ class Ezpl:
 
             # Preserve current configuration values if not provided
             current_level = (
-                self._printer._level
-                if hasattr(self._printer, "_level")
+                self._printer.level
+                if hasattr(self, "_printer") and self._printer
                 else self._config_manager.get_printer_level()
             )
             current_indent_step = (
-                self._printer._indent_step
-                if hasattr(self._printer, "_indent_step")
+                self._printer.indent_step
+                if hasattr(self, "_printer") and self._printer
                 else self._config_manager.get_indent_step()
             )
             current_indent_symbol = (
-                self._printer._indent_symbol
-                if hasattr(self._printer, "_indent_symbol")
+                self._printer.indent_symbol
+                if hasattr(self, "_printer") and self._printer
                 else self._config_manager.get_indent_symbol()
             )
             current_base_indent_symbol = (
-                self._printer._base_indent_symbol
-                if hasattr(self._printer, "_base_indent_symbol")
+                self._printer.base_indent_symbol
+                if hasattr(self, "_printer") and self._printer
                 else self._config_manager.get_base_indent_symbol()
             )
 
@@ -694,8 +695,8 @@ class Ezpl:
 
             # Preserve current configuration values if not provided
             current_level = (
-                self._logger._level
-                if hasattr(self._logger, "_level")
+                self._logger.level
+                if hasattr(self, "_logger") and self._logger
                 else self._config_manager.get_file_logger_level()
             )
             current_log_file = (
@@ -704,18 +705,18 @@ class Ezpl:
                 else self._config_manager.get_log_file()
             )
             current_rotation = (
-                self._logger._rotation
-                if hasattr(self._logger, "_rotation")
+                self._logger.rotation
+                if hasattr(self, "_logger") and self._logger
                 else self._config_manager.get_log_rotation()
             )
             current_retention = (
-                self._logger._retention
-                if hasattr(self._logger, "_retention")
+                self._logger.retention
+                if hasattr(self, "_logger") and self._logger
                 else self._config_manager.get_log_retention()
             )
             current_compression = (
-                self._logger._compression
-                if hasattr(self._logger, "_compression")
+                self._logger.compression
+                if hasattr(self, "_logger") and self._logger
                 else self._config_manager.get_log_compression()
             )
 
@@ -733,7 +734,7 @@ class Ezpl:
             try:
                 if hasattr(self, "_logger") and self._logger:
                     self._logger.close()
-            except Exception as e:
+            except (EzplError, OSError, RuntimeError) as e:
                 logger.error(f"Error while closing previous logger: {e}")
 
             # Create new instance
@@ -784,8 +785,8 @@ class Ezpl:
         global_log_level_explicit = self._config_manager.has_key("log-level")
 
         # Respect manually set levels: don't override if set via set_level()
-        printer_manually_set = getattr(self._printer, "_level_manually_set", False)
-        logger_manually_set = getattr(self._logger, "_level_manually_set", False)
+        printer_manually_set = self._printer.level_manually_set
+        logger_manually_set = self._logger.level_manually_set
 
         # Reapply to handlers with priority logic (skip if manually set)
         if not printer_manually_set:
@@ -795,9 +796,7 @@ class Ezpl:
                 else global_log_level if global_log_level_explicit else printer_level
             )
             self.set_printer_level(effective_printer, force=True)
-            self._printer._level_manually_set = (
-                False  # Reset: this was a config reload, not a manual set
-            )
+            self._printer.mark_level_as_configured()
 
         if not logger_manually_set:
             effective_logger = (
@@ -808,21 +807,19 @@ class Ezpl:
                 )
             )
             self.set_logger_level(effective_logger, force=True)
-            self._logger._level_manually_set = (
-                False  # Reset: this was a config reload, not a manual set
-            )
+            self._logger.mark_level_as_configured()
 
         # Reinitialize logger with new rotation / retention / compression settings
         # Preserve current level and manual flag if logger was already initialized
         current_logger_level = (
-            self._logger._level
+            self._logger.level
             if hasattr(self, "_logger") and self._logger
             else file_logger_level
         )
         try:
             if hasattr(self, "_logger") and self._logger:
                 self._logger.close()
-        except Exception as e:
+        except (EzplError, OSError, RuntimeError) as e:
             logger.error(f"Error while closing logger during reload_config: {e}")
         self._logger = EzLogger(
             log_file=self._log_file,
@@ -831,12 +828,13 @@ class Ezpl:
             retention=self._config_manager.get_log_retention(),
             compression=self._config_manager.get_log_compression(),
         )
-        self._logger._level_manually_set = logger_manually_set  # Preserve manual flag
+        if not logger_manually_set:
+            self._logger.mark_level_as_configured()
 
         # Reinitialize printer with new indent settings
         # Preserve current level and manual flag if printer was already initialized
         current_printer_level = (
-            self._printer._level
+            self._printer.level
             if hasattr(self, "_printer") and self._printer
             else printer_level
         )
@@ -846,7 +844,8 @@ class Ezpl:
             indent_symbol=self._config_manager.get_indent_symbol(),
             base_indent_symbol=self._config_manager.get_base_indent_symbol(),
         )
-        self._printer._level_manually_set = printer_manually_set  # Preserve manual flag
+        if not printer_manually_set:
+            self._printer.mark_level_as_configured()
 
     def configure(
         self, config_dict: dict[str, Any] | None = None, **kwargs: Any
@@ -934,7 +933,7 @@ class Ezpl:
         if rotation_changed:
             # Save current level before closing logger
             current_logger_level = (
-                self._logger._level
+                self._logger.level
                 if hasattr(self, "_logger") and self._logger
                 else self._config_manager.get_file_logger_level()
             )
@@ -942,7 +941,7 @@ class Ezpl:
             try:
                 if hasattr(self, "_logger") and self._logger:
                     self._logger.close()
-            except Exception as e:
+            except (EzplError, OSError, RuntimeError) as e:
                 logger.error(f"Error while closing logger during configure(): {e}")
             self._logger = EzLogger(
                 log_file=self._log_file,
@@ -961,7 +960,7 @@ class Ezpl:
         if indent_changed:
             # Save current level before reinitializing printer
             current_printer_level = (
-                self._printer._level
+                self._printer.level
                 if hasattr(self, "_printer") and self._printer
                 else self._config_manager.get_printer_level()
             )

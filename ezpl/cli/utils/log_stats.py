@@ -102,7 +102,7 @@ class LogStatistics:
                 "line_count": line_count,
                 "date_range": date_range,
             }
-        except Exception:
+        except (OSError, ValueError, TypeError):
             return {
                 "file_path": str(self.log_file),
                 "size_bytes": 0,

@@ -187,19 +187,19 @@ class TestLevelManagement:
     def test_set_level_invalid_raises_error(self) -> None:
         """Test that set_level() with invalid level raises error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_level("INVALID_LEVEL")
 
     def test_set_printer_level_invalid_raises_error(self) -> None:
         """Test that set_printer_level() with invalid level raises error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_printer_level("INVALID_LEVEL")
 
     def test_set_logger_level_invalid_raises_error(self) -> None:
         """Test that set_logger_level() with invalid level raises error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_logger_level("INVALID_LEVEL")
 
 
@@ -360,29 +360,24 @@ class TestErrorHandling:
     def test_invalid_log_level_raises_error(self) -> None:
         """Test that invalid log level raises appropriate error."""
         ezpl = Ezpl()
-        with pytest.raises((ValidationError, ValueError, Exception)):
+        with pytest.raises(ValidationError):
             ezpl.set_level("NOT_A_VALID_LEVEL")
 
     def test_invalid_config_key_handled_gracefully(self) -> None:
-        """Test that invalid config keys are handled gracefully."""
+        """Test that unknown config keys are accepted and persisted as-is."""
         ezpl = Ezpl()
-        # Should not raise error, just ignore invalid keys
-        try:
-            ezpl.configure(invalid_key="invalid_value")
-        except Exception:
-            # If it raises, that's also acceptable behavior
-            pass
+        applied = ezpl.configure(invalid_key="invalid_value")
+        assert applied is True
+        assert ezpl.get_config().get("invalid_key") == "invalid_value"
 
     def test_file_operations_with_invalid_path(self) -> None:
-        """Test file operations with invalid paths."""
+        """Test that set_log_file propagates logger creation failure."""
         ezpl = Ezpl()
-        # Try to set invalid log file path
-        # Should handle gracefully or raise appropriate error
-        try:
-            invalid_path = Path("/invalid/path/that/does/not/exist.log")
-            ezpl.set_log_file(invalid_path)
-            # If no error, verify it was set
-            assert ezpl._log_file == invalid_path
-        except (OSError, FileOperationError, Exception):
-            # Expected behavior - invalid path should raise error
-            pass
+        with (
+            patch(
+                "ezpl.ezpl.EzLogger",
+                side_effect=FileOperationError("boom", "x.log", "write"),
+            ),
+            pytest.raises(FileOperationError),
+        ):
+            ezpl.set_log_file("x.log")

@@ -24,6 +24,7 @@ from rich.table import Table
 
 # Local imports
 from ...config import ConfigurationManager
+from ...core.exceptions import FileOperationError
 from ..utils.env_manager import UserEnvManager
 
 # ///////////////////////////////////////////////////////////////
@@ -118,8 +119,10 @@ def get_command(key: str | None, show_env: bool) -> None:
                     table.add_row(k, str(v))
 
             console.print(table)
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (FileOperationError, OSError, ValueError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @config_group.command(name="set", help="Set configuration value")
@@ -176,8 +179,10 @@ def set_command(key: str, value: str, env: bool) -> None:
                 console.print(
                     f"[yellow]⚠[/yellow] Could not set environment variable '{env_var_name}' for '{key}'"
                 )
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (FileOperationError, OSError, ValueError) as e:
+        raise click.ClickException(str(e)) from e
 
 
 @config_group.command(name="reset", help="Reset configuration to defaults")
@@ -210,5 +215,7 @@ def reset_command(confirm: bool) -> None:
 
         console.print("[green]✓[/green] Configuration reset to defaults")
         console.print("[green]✓[/green] User environment variables removed")
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+    except click.ClickException:
+        raise
+    except (FileOperationError, OSError, ValueError) as e:
+        raise click.ClickException(str(e)) from e
