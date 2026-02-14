@@ -18,6 +18,7 @@ from __future__ import annotations
 # Standard library imports
 import json
 import os
+import shlex
 from pathlib import Path
 from typing import Any, cast
 
@@ -37,6 +38,21 @@ class ConfigurationManager:
     This class handles all configuration operations including loading,
     saving, and merging configuration from multiple sources.
     """
+
+    ENV_MAPPINGS = {
+        "EZPL_LOG_LEVEL": "log-level",
+        "EZPL_LOG_FILE": "log-file",
+        "EZPL_LOG_DIR": "log-dir",
+        "EZPL_PRINTER_LEVEL": "printer-level",
+        "EZPL_INDENT_STEP": "indent-step",
+        "EZPL_INDENT_SYMBOL": "indent-symbol",
+        "EZPL_BASE_INDENT_SYMBOL": "base-indent-symbol",
+        "EZPL_FILE_LOGGER_LEVEL": "file-logger-level",
+        "EZPL_LOG_FORMAT": "log-format",
+        "EZPL_LOG_ROTATION": "log-rotation",
+        "EZPL_LOG_RETENTION": "log-retention",
+        "EZPL_LOG_COMPRESSION": "log-compression",
+    }
 
     # ///////////////////////////////////////////////////////////////
     # INIT
@@ -90,23 +106,12 @@ class ConfigurationManager:
         Environment variables should be prefixed with 'EZPL_' and use
         uppercase with underscores (e.g., EZPL_LOG_LEVEL).
         """
-        env_mappings = {
-            "EZPL_LOG_LEVEL": "log-level",
-            "EZPL_LOG_FILE": "log-file",
-            "EZPL_LOG_DIR": "log-dir",
-            "EZPL_PRINTER_LEVEL": "printer-level",
-            "EZPL_INDENT_STEP": "indent-step",
-            "EZPL_INDENT_SYMBOL": "indent-symbol",
-            "EZPL_BASE_INDENT_SYMBOL": "base-indent-symbol",
-            "EZPL_FILE_LOGGER_LEVEL": "file-logger-level",
-            "EZPL_LOG_FORMAT": "log-format",
-            "EZPL_LOG_ROTATION": "log-rotation",
-            "EZPL_LOG_RETENTION": "log-retention",
-            "EZPL_LOG_COMPRESSION": "log-compression",
-        }
+        user_env_vars = self._load_user_env_file()
 
-        for env_var, config_key in env_mappings.items():
+        for env_var, config_key in self.ENV_MAPPINGS.items():
             value = os.getenv(env_var)
+            if value is None:
+                value = user_env_vars.get(env_var)
             if value is not None:
                 # Convert string values to appropriate types
                 if config_key in ["indent-step"]:
@@ -118,6 +123,32 @@ class ConfigurationManager:
                         ) from e
                 else:
                     self._config[config_key] = value
+
+    def _load_user_env_file(self) -> dict[str, str]:
+        """
+        Load user-level EZPL environment variables from ~/.ezpl/.env.
+
+        Returns:
+            Dictionary of environment variables found in user env file.
+        """
+        env_file = DefaultConfiguration.CONFIG_DIR / ".env"
+        env_vars: dict[str, str] = {}
+
+        if not env_file.exists():
+            return env_vars
+
+        try:
+            with open(env_file, encoding="utf-8") as f:
+                for line in f:
+                    stripped = line.strip()
+                    if not stripped or stripped.startswith("#") or "=" not in stripped:
+                        continue
+                    key, value = stripped.split("=", 1)
+                    env_vars[key.strip()] = value.strip()
+        except OSError:
+            return {}
+
+        return env_vars
 
     # ///////////////////////////////////////////////////////////////
     # GETTER
@@ -312,13 +343,19 @@ class ConfigurationManager:
             with open(output_path, "w", encoding="utf-8") as f:
                 if platform == "windows":
                     # Generate Batch script for Windows
-                    for key, value in self._config.items():
-                        f.write(f"set {key}={value}\n")
+                    for env_var, config_key in self.ENV_MAPPINGS.items():
+                        value = self._config.get(config_key)
+                        if value is None:
+                            continue
+                        f.write(f"set {env_var}={value}\n")
                 else:
                     # Generate Bash script for Unix/Linux/macOS
                     f.write("#!/bin/bash\n")
-                    for key, value in self._config.items():
-                        f.write(f"export {key}={value}\n")
+                    for env_var, config_key in self.ENV_MAPPINGS.items():
+                        value = self._config.get(config_key)
+                        if value is None:
+                            continue
+                        f.write(f"export {env_var}={shlex.quote(str(value))}\n")
         except OSError as e:
             raise FileOperationError(
                 f"Could not write to {output_path}: {e}",

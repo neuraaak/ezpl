@@ -66,15 +66,16 @@ class TestCLIWithEzpl:
         logger.info("Test message 1")
         logger.info("Test message 2")
 
-        result = cli_runner.invoke(cli, ["logs", "list"])
-        # Should not crash, may or may not find logs
-        assert result.exit_code in [0, 1]
+        result = cli_runner.invoke(
+            cli,
+            ["logs", "list", "--dir", str(temp_log_file.parent)],
+        )
+        assert result.exit_code == 0
 
     def test_config_get_command(self, cli_runner: CliRunner) -> None:
         """Test config get command."""
         result = cli_runner.invoke(cli, ["config", "get", "log-level"])
-        # Should display config value or error
-        assert result.exit_code in [0, 1, 2]
+        assert result.exit_code == 0
 
     def test_config_set_command(
         self,
@@ -83,14 +84,12 @@ class TestCLIWithEzpl:
     ) -> None:
         """Test config set command."""
         result = cli_runner.invoke(cli, ["config", "set", "log-level", "DEBUG"])
-        # Should set config or show error
-        assert result.exit_code in [0, 1, 2]
+        assert result.exit_code == 0
 
     def test_config_reset_command(self, cli_runner: CliRunner) -> None:
         """Test config reset command."""
-        result = cli_runner.invoke(cli, ["config", "reset"])
-        # Should reset config or show error
-        assert result.exit_code in [0, 1, 2]
+        result = cli_runner.invoke(cli, ["config", "reset", "--confirm"])
+        assert result.exit_code == 0
 
 
 class TestCLILogParsing:
@@ -107,9 +106,11 @@ class TestCLILogParsing:
         logger.warning("Test message 2")
         logger.error("Test message 3")
 
-        result = cli_runner.invoke(cli, ["logs", "view", str(temp_log_file)])
-        # Should display logs or show error
-        assert result.exit_code in [0, 1, 2]
+        result = cli_runner.invoke(
+            cli,
+            ["logs", "view", "--file", str(temp_log_file)],
+        )
+        assert result.exit_code == 0
 
     def test_logs_search_with_real_log(
         self, cli_runner: CliRunner, temp_log_file: Path
@@ -122,10 +123,17 @@ class TestCLILogParsing:
         logger.info("Another message")
 
         result = cli_runner.invoke(
-            cli, ["logs", "search", "keyword", str(temp_log_file)]
+            cli,
+            [
+                "logs",
+                "search",
+                "--pattern",
+                "keyword",
+                "--file",
+                str(temp_log_file),
+            ],
         )
-        # Should search logs or show error
-        assert result.exit_code in [0, 1, 2]
+        assert result.exit_code == 0
 
     def test_logs_stats_with_real_log(
         self, cli_runner: CliRunner, temp_log_file: Path
@@ -138,9 +146,11 @@ class TestCLILogParsing:
         logger.warning("Test message 2")
         logger.error("Test message 3")
 
-        result = cli_runner.invoke(cli, ["logs", "stats", str(temp_log_file)])
-        # Should show statistics or error
-        assert result.exit_code in [0, 1, 2]
+        result = cli_runner.invoke(
+            cli,
+            ["logs", "stats", "--file", str(temp_log_file)],
+        )
+        assert result.exit_code == 0
 
 
 class TestCLIConfigManagement:
@@ -149,17 +159,15 @@ class TestCLIConfigManagement:
     def test_config_get_all(self, cli_runner: CliRunner) -> None:
         """Test config get all."""
         result = cli_runner.invoke(cli, ["config", "get"])
-        # Should display all config or error
-        assert result.exit_code in [0, 1, 2]
+        assert result.exit_code == 0
 
     def test_config_set_multiple(
         self,
         cli_runner: CliRunner,
         clean_env: None,  # noqa: ARG002
     ) -> None:
-        """Test config set with multiple values."""
+        """Test config set rejects unexpected extra arguments."""
         result = cli_runner.invoke(
             cli, ["config", "set", "log-level", "DEBUG", "printer-level", "INFO"]
         )
-        # Should set config or show error
-        assert result.exit_code in [0, 1, 2]
+        assert result.exit_code != 0

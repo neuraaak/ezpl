@@ -101,6 +101,30 @@ class EzPrinter(LoggingHandler, IndentationManager):
         """Return the current logging level."""
         return self._level
 
+    @property
+    def level_manually_set(self) -> bool:
+        """Return whether level was set manually at runtime."""
+        return self._level_manually_set
+
+    @property
+    def indent_step(self) -> int:
+        """Return the configured indentation step."""
+        return self._indent_step
+
+    @property
+    def indent_symbol(self) -> str:
+        """Return the configured indentation symbol."""
+        return self._indent_symbol
+
+    @property
+    def base_indent_symbol(self) -> str:
+        """Return the configured base indentation symbol."""
+        return self._base_indent_symbol
+
+    def mark_level_as_configured(self) -> None:
+        """Mark the current level as coming from configuration (not manual set)."""
+        self._level_manually_set = False
+
     def set_level(self, level: str) -> None:
         """
         Set the logging level.

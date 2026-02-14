@@ -124,7 +124,7 @@ printer.install("Installing package...")
 # RichWizard features
 printer.wizard.success_panel("Success", "Operation completed")
 printer.wizard.table([{"Name": "Alice", "Age": 30}], title="Users")
-printer.wizard.json_display({"config": "value"})
+printer.wizard.json({"config": "value"})
 ```
 
 ### Configuration
