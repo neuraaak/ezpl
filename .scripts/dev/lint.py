@@ -6,7 +6,7 @@
 """
 Code quality check script.
 
-Runs Black, isort, and Ruff on the codebase.
+Runs Ruff formatting and linting on the codebase.
 
 Usage:
     python .scripts/dev/lint.py [options]
@@ -71,7 +71,7 @@ class CodeQualityChecker:
         self.project_root = Path(__file__).resolve().parents[2]
         # Directories to scan (relative to project root)
         self.scan_dirs = [
-            project_name.lower(),
+            "src",
             "tests",
             ".scripts",
         ]
@@ -139,48 +139,6 @@ class CodeQualityChecker:
     # ///////////////////////////////////////////////////////////////
     # PUBLIC METHODS
     # ///////////////////////////////////////////////////////////////
-
-    def run_black(self) -> bool:
-        """Run Black code formatter.
-
-        Black will automatically read configuration from pyproject.toml.
-
-        Returns:
-            bool: True if formatting succeeded, False otherwise
-        """
-        mode = "--check" if self.check_only else ""
-        command = [
-            sys.executable,
-            "-m",
-            "black",
-            "--line-length=88",
-        ]
-
-        if mode:
-            command.append(mode)
-
-        # Use directories instead of individual files for better performance
-        # Black will read target-version from pyproject.toml automatically
-        command.extend([str(p) for p in self._get_scan_paths()])
-
-        return self._run_command(command, "Black code formatting")
-
-    def run_isort(self) -> bool:
-        """Run isort import organizer.
-
-        Returns:
-            bool: True if organization succeeded, False otherwise
-        """
-        mode = "--check-only" if self.check_only else ""
-        command = [sys.executable, "-m", "isort", "--profile=black", "--line-length=88"]
-
-        if mode:
-            command.append(mode)
-
-        # Use directories instead of individual files for better performance
-        command.extend([str(p) for p in self._get_scan_paths()])
-
-        return self._run_command(command, "isort import organization")
 
     def run_ruff(self) -> bool:
         """Run Ruff linter.
@@ -252,8 +210,6 @@ class CodeQualityChecker:
         # Ruff format should run before Ruff check to avoid conflicts
         checks = [
             ("Ruff Format", self.run_ruff_format, "🎨"),
-            ("Black", self.run_black, "⚫"),
-            ("isort", self.run_isort, "📦"),
             ("Ruff", self.run_ruff, "🔍"),
         ]
 

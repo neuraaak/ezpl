@@ -1,5 +1,5 @@
 # ///////////////////////////////////////////////////////////////
-# EZPL - Tests de robustesse - Gestion d'erreurs
+# EZPL - Robustness Tests - Error Handling
 # Project: ezpl
 # ///////////////////////////////////////////////////////////////
 
@@ -28,9 +28,14 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
+# Third-party imports
+import pytest
+
 # Local imports
 from ezpl import Ezpl
-from ezpl.core.exceptions import FileOperationError
+from ezpl.core.exceptions import FileOperationError, ValidationError
+
+pytestmark = pytest.mark.robustness
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -173,8 +178,7 @@ class TestFileOperationErrors:
         with patch("builtins.open", side_effect=OSError("No space left on device")):
             try:
                 logger.info("Test message")
-            except (OSError, Exception):
-                # Should handle gracefully
+            except OSError:
                 pass
 
     def test_read_only_file_system(self, temp_log_file: Path) -> None:
@@ -188,8 +192,7 @@ class TestFileOperationErrors:
         ):
             try:
                 logger.info("Test message")
-            except (PermissionError, Exception):
-                # Should handle gracefully
+            except PermissionError:
                 pass
 
 
@@ -197,36 +200,22 @@ class TestInvalidInputs:
     """Tests for invalid input handling."""
 
     def test_invalid_log_level_handling(self) -> None:
-        """Test handling of invalid log level."""
+        """Invalid log level string should raise ValidationError."""
         ezpl = Ezpl()
-        try:
+        with pytest.raises(ValidationError):
             ezpl.set_level("INVALID_LEVEL")
-        except (ValueError, Exception):
-            # Expected behavior
-            pass
 
     def test_invalid_file_path_handling(self) -> None:
-        """Test handling of invalid file path."""
-        # Try with invalid path characters
-        try:
-            invalid_path = Path('<>:"|?*')  # Invalid Windows characters
+        """Invalid path characters should raise FileOperationError or OSError."""
+        invalid_path = Path('<>:"|?*')  # Invalid Windows characters
+        with pytest.raises((OSError, FileOperationError)):
             _ = Ezpl(log_file=invalid_path)
-            # Should handle gracefully or raise appropriate error
-        except (OSError, FileOperationError, Exception):
-            # Expected behavior
-            pass
 
     def test_invalid_config_value_handling(self) -> None:
-        """Test handling of invalid config values."""
+        """ConfigurationManager.set() accepts any value — should not raise."""
         ezpl = Ezpl()
         config = ezpl.get_config()
-        # Try to set invalid values
-        try:
-            config.set("log-level", 12345)  # Should be string
-            # Should handle gracefully
-        except (TypeError, ValueError, Exception):
-            # Expected behavior
-            pass
+        config.set("log-level", 12345)  # Stores value as-is, no validation here
 
 
 class TestConcurrentOperations:
@@ -244,7 +233,7 @@ class TestConcurrentOperations:
             printer.info(f"Message {i}")
 
         # Should not crash
-        assert temp_log_file.exists() or True
+        assert temp_log_file.exists()
 
     def test_concurrent_file_access(self, temp_log_file: Path) -> None:
         """Test concurrent file access (simulated)."""
@@ -256,4 +245,4 @@ class TestConcurrentOperations:
             logger.info(f"Concurrent message {i}")
 
         # Should not crash
-        assert temp_log_file.exists() or True
+        assert temp_log_file.exists()
