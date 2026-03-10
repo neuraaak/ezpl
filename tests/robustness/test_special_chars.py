@@ -1,5 +1,5 @@
 # ///////////////////////////////////////////////////////////////
-# EZPL - Tests de robustesse - Caractères spéciaux
+# EZPL - Robustness Tests - Special Characters
 # Project: ezpl
 # ///////////////////////////////////////////////////////////////
 
@@ -25,8 +25,13 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
+# Third-party imports
+import pytest
+
 # Local imports
 from ezpl import Ezpl
+
+pytestmark = pytest.mark.robustness
 
 # ///////////////////////////////////////////////////////////////
 # HELPER FUNCTIONS

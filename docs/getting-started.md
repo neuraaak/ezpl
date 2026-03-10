@@ -28,6 +28,8 @@ pip install -e ".[dev]"
 
 This installs Ezpl in editable mode with all development dependencies (testing, linting, formatting tools).
 
+Note: The project uses a `src/` layout (`src/ezpl`).
+
 ## First Steps
 
 ### Basic Console Logging

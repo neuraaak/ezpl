@@ -29,13 +29,19 @@ from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import Mock
 
+# Ensure src layout is importable for tests
+project_root = Path(__file__).resolve().parents[1]
+src_path = project_root / "src"
+if src_path.exists() and str(src_path) not in sys.path:
+    sys.path.insert(0, str(src_path))
+
 # Third-party imports
-import pytest
-from rich.console import Console
+import pytest  # noqa: E402
+from rich.console import Console  # noqa: E402
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.config import ConfigurationManager
+from ezpl import Ezpl  # noqa: E402
+from ezpl.config import ConfigurationManager  # noqa: E402
 
 # ///////////////////////////////////////////////////////////////
 # FIXTURES

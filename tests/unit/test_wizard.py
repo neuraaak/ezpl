@@ -222,9 +222,9 @@ class TestProgressBars:
         for method_name in methods:
             method = getattr(ProgressMixin, method_name)
             signature_text = str(inspect.signature(method))
-            assert (
-                "TaskID" in signature_text
-            ), f"Expected TaskID in signature for {method_name}, got: {signature_text}"
+            assert "TaskID" in signature_text, (
+                f"Expected TaskID in signature for {method_name}, got: {signature_text}"
+            )
 
     def test_progress_basic(self, wizard) -> None:
         """Test basic progress() method."""
