@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -2416,6 +2416,7 @@
 <p>Comprehensive guide to the <strong>Ezpl</strong> test suite and testing practices.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section">&para;</a></h2>
 <p>Ezpl includes a comprehensive test suite with <strong>377 tests</strong> covering unit, integration, and robustness scenarios with <strong>65% code coverage</strong>.</p>
+<p>The project uses a <code>src/</code> layout (<code>src/ezpl</code>). The test suite adds <code>src/</code> to the import path in <code>tests/conftest.py</code>, so tests can run without a separate install step.</p>
 <h2 id="test-statistics">Test Statistics<a class="headerlink" href="#test-statistics" title="Anchor link to this section">&para;</a></h2>
 <table>
 <thead>

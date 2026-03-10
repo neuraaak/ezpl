@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -2663,7 +2663,7 @@
 </span></code></pre></div>
 <p>This installs:</p>
 <ul>
-<li><strong>Development tools</strong>: black, isort, ruff, pyright</li>
+<li><strong>Development tools</strong>: ruff, pyright</li>
 <li><strong>Testing</strong>: pytest, pytest-cov, pytest-mock, pytest-xdist</li>
 <li><strong>Build</strong>: build, twine</li>
 <li><strong>Security</strong>: bandit</li>
@@ -2682,28 +2682,29 @@
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│   └── workflows/         # CI/CD workflows
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>├── .hooks/                # Custom Git hooks
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>├── docs/                  # Documentation (mkdocs)
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>├── ezpl/                  # Source code
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>│   ├── cli/              # CLI commands
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>│   ├── config/           # Configuration management
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>│   ├── core/             # Core interfaces and exceptions
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>│   ├── handlers/         # Printer and logger handlers
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>│   │   └── wizard/       # RichWizard components
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>│   ├── types/            # Type definitions and enums
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>│   └── utils/            # Utilities
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>├── tests/                # Test suite
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>│   ├── unit/            # Unit tests
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>│   ├── integration/     # Integration tests
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>│   └── robustness/      # Robustness tests
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>├── examples/            # Example scripts
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>├── pyproject.toml       # Project configuration
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>└── mkdocs.yml          # Documentation configuration
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>├── src/                   # Source code
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>│   └── ezpl/
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>│       ├── cli/              # CLI commands
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>│       ├── config/           # Configuration management
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>│       ├── core/             # Core interfaces and exceptions
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>│       ├── handlers/         # Printer and logger handlers
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>│       │   └── wizard/       # RichWizard components
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>│       ├── types/            # Type definitions and enums
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>│       └── utils/            # Utilities
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>├── tests/                # Test suite
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>│   ├── unit/            # Unit tests
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>│   ├── integration/     # Integration tests
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>│   └── robustness/      # Robustness tests
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>├── examples/            # Example scripts
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>├── pyproject.toml       # Project configuration
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>└── mkdocs.yml          # Documentation configuration
 </span></code></pre></div>
 <h2 id="coding-standards">Coding Standards<a class="headerlink" href="#coding-standards" title="Anchor link to this section">&para;</a></h2>
 <h3 id="python-style">Python Style<a class="headerlink" href="#python-style" title="Anchor link to this section">&para;</a></h3>
 <p>Follow the project's coding standards defined in <code>.github/instructions/</code>:</p>
 <ul>
 <li><strong>PEP 8</strong> compliance</li>
-<li><strong>Line length</strong>: 88 characters (Black default)</li>
+<li><strong>Line length</strong>: 88 characters (Ruff default)</li>
 <li><strong>Type hints</strong>: Required for all public APIs</li>
 <li><strong>Docstrings</strong>: Google style</li>
 <li><strong>Imports</strong>: Standard library → Third-party → Local</li>
@@ -2755,18 +2756,16 @@
 <p>Follow the coding standards and add tests for new features.</p>
 <h3 id="3-run-code-quality-tools">3. Run Code Quality Tools<a class="headerlink" href="#3-run-code-quality-tools" title="Anchor link to this section">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Format code</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>black<span class="w"> </span>ezpl/
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>isort<span class="w"> </span>ezpl/
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="c1"># Lint</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>ruff<span class="w"> </span>check<span class="w"> </span>ezpl/<span class="w"> </span>--fix
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>ruff<span class="w"> </span>format<span class="w"> </span>ezpl/
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="c1"># Type check</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>pyright<span class="w"> </span>ezpl/
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="c1"># Security scan</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>bandit<span class="w"> </span>-r<span class="w"> </span>ezpl/
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>ruff<span class="w"> </span>format<span class="w"> </span>src/ezpl/
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Lint</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>ruff<span class="w"> </span>check<span class="w"> </span>src/ezpl/<span class="w"> </span>--fix
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Type check</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>pyright<span class="w"> </span>src/ezpl/
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># Security scan</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>bandit<span class="w"> </span>-r<span class="w"> </span>src/ezpl/
 </span></code></pre></div>
 <h3 id="4-run-tests">4. Run Tests<a class="headerlink" href="#4-run-tests" title="Anchor link to this section">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># All tests</span>
@@ -2792,7 +2791,7 @@
 </span></code></pre></div>
 <p>The pre-commit hook will automatically:</p>
 <ul>
-<li>Format code with black, isort, ruff</li>
+<li>Format and lint code with ruff</li>
 <li>Run linting checks</li>
 <li>Update version badge in README</li>
 <li>Auto-stage reformatted files</li>
@@ -2805,7 +2804,7 @@
 <h3 id="pre-commit-hook">Pre-commit Hook<a class="headerlink" href="#pre-commit-hook" title="Anchor link to this section">&para;</a></h3>
 <p>Runs before each commit:</p>
 <ol>
-<li><strong>Lint &amp; Format</strong>: Black + isort + Ruff</li>
+<li><strong>Lint &amp; Format</strong>: Ruff</li>
 <li><strong>Update Version Badge</strong>: In README.md</li>
 <li><strong>Auto-stage</strong>: Reformatted files</li>
 </ol>
@@ -2920,7 +2919,7 @@
 </span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="nt">paths</span><span class="p">:</span>
 </span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;docs/**&quot;</span>
 </span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;mkdocs.yml&quot;</span>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;ezpl/**&quot;</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;src/ezpl/**&quot;</span>
 </span></code></pre></div>
 <h2 id="cicd">CI/CD<a class="headerlink" href="#cicd" title="Anchor link to this section">&para;</a></h2>
 <h3 id="github-actions-workflows">GitHub Actions Workflows<a class="headerlink" href="#github-actions-workflows" title="Anchor link to this section">&para;</a></h3>
@@ -2945,13 +2944,13 @@
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">[project]</span>
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;1.5.2&quot;</span>
 </span></code></pre></div>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># ezpl/__init__.py</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># src/ezpl/__init__.py</span>
 </span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.5.2&quot;</span>
 </span></code></pre></div>
 <h3 id="2-update-changelog">2. Update CHANGELOG<a class="headerlink" href="#2-update-changelog" title="Anchor link to this section">&para;</a></h3>
 <p>Document changes in CHANGELOG.md (if exists).</p>
 <h3 id="3-commit-and-push">3. Commit and Push<a class="headerlink" href="#3-commit-and-push" title="Anchor link to this section">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>git<span class="w"> </span>add<span class="w"> </span>pyproject.toml<span class="w"> </span>ezpl/__init__.py
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>git<span class="w"> </span>add<span class="w"> </span>pyproject.toml<span class="w"> </span>src/ezpl/__init__.py
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;chore: bump version to 1.5.2&quot;</span>
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </span></code></pre></div>
@@ -2977,7 +2976,7 @@
 </span></code></pre></div>
 <h4 id="type-check-failures">Type Check Failures<a class="headerlink" href="#type-check-failures" title="Anchor link to this section">&para;</a></h4>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Run pyright with verbose output</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>pyright<span class="w"> </span>ezpl/<span class="w"> </span>--verbose
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>pyright<span class="w"> </span>src/ezpl/<span class="w"> </span>--verbose
 </span></code></pre></div>
 <h4 id="test-failures-on-windows">Test Failures on Windows<a class="headerlink" href="#test-failures-on-windows" title="Anchor link to this section">&para;</a></h4>
 <p>Some tests may fail on Windows due to file locking:</p>
@@ -3064,7 +3063,6 @@
 </ul>
 <h3 id="external-resources">External Resources<a class="headerlink" href="#external-resources" title="Anchor link to this section">&para;</a></h3>
 <ul>
-<li><a href="https://black.readthedocs.io/">Black Documentation</a></li>
 <li><a href="https://docs.astral.sh/ruff/">Ruff Documentation</a></li>
 <li><a href="https://docs.pytest.org/">pytest Documentation</a></li>
 <li><a href="https://www.mkdocs.org/">mkdocs Documentation</a></li>
