@@ -19,7 +19,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Local imports
-from ezpl.handlers.utils import (
+from ezpl.utils import (
     safe_str_convert,
     sanitize_for_console,
     sanitize_for_file,

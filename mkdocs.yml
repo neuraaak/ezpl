@@ -90,11 +90,13 @@ plugins:
   - search
   - section-index
   - coverage:
+      page_path: coverage
       html_report_dir: htmlcov
   - mkdocstrings:
       default_handler: python
       handlers:
         python:
+          paths: [src]
           options:
             docstring_style: google
             docstring_section_style: spacy

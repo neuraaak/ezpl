@@ -39,7 +39,7 @@ pip install -e ".[dev]"
 
 This installs:
 
-- **Development tools**: black, isort, ruff, pyright
+- **Development tools**: ruff, pyright
 - **Testing**: pytest, pytest-cov, pytest-mock, pytest-xdist
 - **Build**: build, twine
 - **Security**: bandit
@@ -63,14 +63,15 @@ ezplog/
 │   └── workflows/         # CI/CD workflows
 ├── .hooks/                # Custom Git hooks
 ├── docs/                  # Documentation (mkdocs)
-├── ezpl/                  # Source code
-│   ├── cli/              # CLI commands
-│   ├── config/           # Configuration management
-│   ├── core/             # Core interfaces and exceptions
-│   ├── handlers/         # Printer and logger handlers
-│   │   └── wizard/       # RichWizard components
-│   ├── types/            # Type definitions and enums
-│   └── utils/            # Utilities
+├── src/                   # Source code
+│   └── ezpl/
+│       ├── cli/              # CLI commands
+│       ├── config/           # Configuration management
+│       ├── core/             # Core interfaces and exceptions
+│       ├── handlers/         # Printer and logger handlers
+│       │   └── wizard/       # RichWizard components
+│       ├── types/            # Type definitions and enums
+│       └── utils/            # Utilities
 ├── tests/                # Test suite
 │   ├── unit/            # Unit tests
 │   ├── integration/     # Integration tests
@@ -87,7 +88,7 @@ ezplog/
 Follow the project's coding standards defined in `.github/instructions/`:
 
 - **PEP 8** compliance
-- **Line length**: 88 characters (Black default)
+- **Line length**: 88 characters (Ruff default)
 - **Type hints**: Required for all public APIs
 - **Docstrings**: Google style
 - **Imports**: Standard library → Third-party → Local
@@ -153,18 +154,16 @@ Follow the coding standards and add tests for new features.
 
 ```bash
 # Format code
-black ezpl/
-isort ezpl/
+ruff format src/ezpl/
 
 # Lint
-ruff check ezpl/ --fix
-ruff format ezpl/
+ruff check src/ezpl/ --fix
 
 # Type check
-pyright ezpl/
+pyright src/ezpl/
 
 # Security scan
-bandit -r ezpl/
+bandit -r src/ezpl/
 ```
 
 ### 4. Run Tests
@@ -197,7 +196,7 @@ git commit -m "feat: add new feature"
 
 The pre-commit hook will automatically:
 
-- Format code with black, isort, ruff
+- Format and lint code with ruff
 - Run linting checks
 - Update version badge in README
 - Auto-stage reformatted files
@@ -216,7 +215,7 @@ Then create a Pull Request on GitHub.
 
 Runs before each commit:
 
-1. **Lint & Format**: Black + isort + Ruff
+1. **Lint & Format**: Ruff
 2. **Update Version Badge**: In README.md
 3. **Auto-stage**: Reformatted files
 
@@ -360,7 +359,7 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
-      - "ezpl/**"
+    - "src/ezpl/**"
 ```
 
 ## CI/CD
@@ -395,7 +394,7 @@ version = "1.5.2"
 ```
 
 ```python
-# ezpl/__init__.py
+# src/ezpl/__init__.py
 __version__ = "1.5.2"
 ```
 
@@ -406,7 +405,7 @@ Document changes in CHANGELOG.md (if exists).
 ### 3. Commit and Push
 
 ```bash
-git add pyproject.toml ezpl/__init__.py
+git add pyproject.toml src/ezpl/__init__.py
 git commit -m "chore: bump version to 1.5.2"
 git push origin main
 ```
@@ -443,7 +442,7 @@ pip install -e ".[dev]"
 
 ```bash
 # Run pyright with verbose output
-pyright ezpl/ --verbose
+pyright src/ezpl/ --verbose
 ```
 
 #### Test Failures on Windows
@@ -539,7 +538,6 @@ Follow conventional commits:
 
 ### External Resources
 
-- [Black Documentation](https://black.readthedocs.io/)
 - [Ruff Documentation](https://docs.astral.sh/ruff/)
 - [pytest Documentation](https://docs.pytest.org/)
 - [mkdocs Documentation](https://www.mkdocs.org/)

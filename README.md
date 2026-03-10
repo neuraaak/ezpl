@@ -124,9 +124,11 @@ pre-commit install
 git config core.hooksPath .hooks
 ```
 
+Source code uses a `src/` layout (`src/ezpl`).
+
 **Git Hooks:**
 
-- **pre-commit**: Automatically formats code (black, isort, ruff) before commit
+- **pre-commit**: Automatically formats and lints code with ruff before commit
 - **post-commit**: Automatically creates version tags after commit
 
 See **[Development Guide](https://neuraaak.github.io/ezplog/guides/development/)** and **[.hooks/README.md](.hooks/README.md)** for detailed hook documentation.
