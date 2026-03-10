@@ -1,5 +1,5 @@
 # ///////////////////////////////////////////////////////////////
-# EZPL - Tests d'intégration CLI
+# EZPL - CLI Integration Tests
 # Project: ezpl
 # ///////////////////////////////////////////////////////////////
 
@@ -28,6 +28,8 @@ from click.testing import CliRunner
 # Local imports
 from ezpl import Ezpl
 from ezpl.cli.main import cli
+
+pytestmark = [pytest.mark.integration, pytest.mark.cli]
 
 # ///////////////////////////////////////////////////////////////
 # TESTS

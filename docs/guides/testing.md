@@ -6,6 +6,8 @@ Comprehensive guide to the **Ezpl** test suite and testing practices.
 
 Ezpl includes a comprehensive test suite with **377 tests** covering unit, integration, and robustness scenarios with **65% code coverage**.
 
+The project uses a `src/` layout (`src/ezpl`). The test suite adds `src/` to the import path in `tests/conftest.py`, so tests can run without a separate install step.
+
 ## Test Statistics
 
 | Metric      | Value                         |

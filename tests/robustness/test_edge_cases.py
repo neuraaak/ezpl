@@ -1,5 +1,5 @@
 # ///////////////////////////////////////////////////////////////
-# EZPL - Tests de robustesse - Cas limites
+# EZPL - Robustness Tests - Edge Cases
 # Project: ezpl
 # ///////////////////////////////////////////////////////////////
 
@@ -29,9 +29,14 @@ from __future__ import annotations
 import threading
 from pathlib import Path
 
+# Third-party imports
+import pytest
+
 # Local imports
 from ezpl import Ezpl
-from ezpl.core.exceptions import FileOperationError, ValidationError
+from ezpl.core.exceptions import FileOperationError, LoggingError, ValidationError
+
+pytestmark = pytest.mark.robustness
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -88,7 +93,7 @@ class TestLargeFiles:
             logger.info(f"Message {i} " * 10)
 
         # Should not crash
-        assert log_file.exists() or True
+        assert log_file.exists()
 
     def test_rotation_with_large_file(self, temp_dir: Path) -> None:
         """Test rotation with large file."""
@@ -112,69 +117,40 @@ class TestInvalidConfiguration:
     """Tests for invalid configuration handling."""
 
     def test_invalid_rotation_format(self, temp_log_file: Path) -> None:
-        """Test handling of invalid rotation format."""
-        # Should handle gracefully or raise appropriate error
-        try:
-            ezpl = Ezpl(log_file=temp_log_file, log_rotation="INVALID_FORMAT")
-            # If it succeeds, verify it was set
-            assert ezpl is not None
-        except (ValueError, Exception):
-            # Expected behavior
-            pass
+        """Loguru validates rotation at init — should raise LoggingError."""
+        with pytest.raises(LoggingError):
+            Ezpl(log_file=temp_log_file, log_rotation="INVALID_FORMAT")
 
     def test_invalid_retention_format(self, temp_log_file: Path) -> None:
-        """Test handling of invalid retention format."""
-        try:
-            ezpl = Ezpl(log_file=temp_log_file, log_retention="INVALID_FORMAT")
-            assert ezpl is not None
-        except (ValueError, Exception):
-            # Expected behavior
-            pass
+        """Loguru validates retention at init — should raise LoggingError."""
+        with pytest.raises(LoggingError):
+            Ezpl(log_file=temp_log_file, log_retention="INVALID_FORMAT")
 
     def test_invalid_compression_format(self, temp_log_file: Path) -> None:
-        """Test handling of invalid compression format."""
-        try:
-            ezpl = Ezpl(log_file=temp_log_file, log_compression="INVALID_FORMAT")
-            assert ezpl is not None
-        except (ValueError, Exception):
-            # Expected behavior
-            pass
+        """Loguru validates compression at init — should raise LoggingError."""
+        with pytest.raises(LoggingError):
+            Ezpl(log_file=temp_log_file, log_compression="INVALID_FORMAT")
 
     def test_negative_indent_step(self) -> None:
-        """Test handling of negative indent step."""
-        try:
-            ezpl = Ezpl(indent_step=-1)
-            # Should handle gracefully (use default or clamp)
-            assert ezpl is not None
-        except (ValueError, ValidationError, Exception):
-            # Expected behavior
-            pass
+        """EzPrinter does not validate indent_step — Ezpl init should succeed."""
+        ezpl = Ezpl(indent_step=-1)
+        assert ezpl is not None
 
 
 class TestInvalidPaths:
     """Tests for invalid file path handling."""
 
     def test_path_with_invalid_characters(self) -> None:
-        """Test handling of path with invalid characters."""
-        # Windows invalid characters: < > : " | ? *
-        try:
-            invalid_path = Path('test<>:"|?*.log')
+        """Invalid path characters should raise FileOperationError or OSError."""
+        invalid_path = Path('test<>:"|?*.log')
+        with pytest.raises((OSError, FileOperationError)):
             _ = Ezpl(log_file=invalid_path)
-            # Should handle gracefully or raise error
-        except (OSError, FileOperationError, Exception):
-            # Expected behavior
-            pass
 
     def test_path_too_long(self) -> None:
-        """Test handling of path that is too long."""
-        # Create a very long path
-        try:
-            long_path = Path("A" * 300) / "test.log"
+        """Excessively long paths should raise FileOperationError or OSError."""
+        long_path = Path("A" * 300) / "test.log"
+        with pytest.raises((OSError, FileOperationError)):
             _ = Ezpl(log_file=long_path)
-            # Should handle gracefully or raise error
-        except (OSError, FileOperationError, Exception):
-            # Expected behavior
-            pass
 
     def test_nonexistent_parent_directory(self, temp_dir: Path) -> None:
         """Test handling of nonexistent parent directory."""
@@ -183,40 +159,30 @@ class TestInvalidPaths:
         ezpl = Ezpl(log_file=log_file)
         logger = ezpl.get_logger()
         logger.info("Test")
-        # Should create directory
-        assert log_file.parent.exists() or True
+        # Directory should have been created automatically
+        assert log_file.parent.exists()
 
 
 class TestInvalidLogLevels:
     """Tests for invalid log level handling."""
 
     def test_empty_log_level(self) -> None:
-        """Test handling of empty log level."""
-        try:
-            ezpl = Ezpl()
+        """Empty string is not a valid log level — should raise ValidationError."""
+        ezpl = Ezpl()
+        with pytest.raises(ValidationError):
             ezpl.set_level("")
-        except (ValidationError, ValueError, Exception):
-            # Expected behavior
-            pass
 
     def test_none_log_level(self) -> None:
-        """Test handling of None log level."""
-        try:
-            _ = Ezpl()
-            # set_level expects string, None would cause error
-            # This tests the validation
-        except (TypeError, ValidationError, Exception):
-            # Expected behavior
-            pass
+        """None is not a valid log level — should raise AttributeError or ValidationError."""
+        ezpl = Ezpl()
+        with pytest.raises((AttributeError, ValidationError)):
+            ezpl.set_level(None)  # type: ignore[arg-type]
 
     def test_numeric_log_level(self) -> None:
-        """Test handling of numeric log level."""
-        try:
-            _ = Ezpl()
-            # Should accept string, not int
-        except (TypeError, ValidationError, Exception):
-            # Expected behavior
-            pass
+        """Integer is not a valid log level — should raise AttributeError or ValidationError."""
+        ezpl = Ezpl()
+        with pytest.raises((AttributeError, ValidationError)):
+            ezpl.set_level(42)  # type: ignore[arg-type]
 
 
 class TestExcessiveIndentation:
@@ -286,4 +252,4 @@ class TestRotationEdgeCases:
         logger.info(message)
 
         # Should not crash
-        assert log_file.exists() or True
+        assert log_file.exists()
