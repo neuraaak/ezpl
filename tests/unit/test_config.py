@@ -110,8 +110,9 @@ class TestInitialization:
         temp_config_file.parent.mkdir(parents=True, exist_ok=True)
         temp_config_file.write_text("{invalid json}", encoding="utf-8")
 
-        # Should not raise error, should use defaults
-        config = ConfigurationManager(config_file=temp_config_file)
+        # Should warn and fall back to defaults
+        with pytest.warns(UserWarning, match="Could not load config file"):
+            config = ConfigurationManager(config_file=temp_config_file)
         assert config is not None
 
 
@@ -356,6 +357,7 @@ class TestErrorHandling:
         temp_config_file.parent.mkdir(parents=True, exist_ok=True)
         temp_config_file.write_text("{invalid json}", encoding="utf-8")
 
-        # Should not raise error, should use defaults
-        config = ConfigurationManager(config_file=temp_config_file)
+        # Should warn and fall back to defaults
+        with pytest.warns(UserWarning, match="Could not load config file"):
+            config = ConfigurationManager(config_file=temp_config_file)
         assert config is not None
