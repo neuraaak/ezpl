@@ -26,6 +26,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+import sys
 import threading
 from pathlib import Path
 
@@ -141,10 +142,14 @@ class TestInvalidPaths:
     """Tests for invalid file path handling."""
 
     def test_path_with_invalid_characters(self) -> None:
-        """Invalid path characters should raise FileOperationError or OSError."""
+        """Invalid path characters should raise on Windows only."""
         invalid_path = Path('test<>:"|?*.log')
-        with pytest.raises((OSError, FileOperationError)):
-            _ = Ezpl(log_file=invalid_path)
+        if sys.platform == "win32":
+            with pytest.raises((OSError, FileOperationError)):
+                _ = Ezpl(log_file=invalid_path)
+        else:
+            ezpl = Ezpl(log_file=invalid_path)
+            assert ezpl is not None
 
     def test_path_too_long(self) -> None:
         """Excessively long paths should raise FileOperationError or OSError."""

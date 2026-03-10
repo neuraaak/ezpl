@@ -25,6 +25,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -206,10 +207,14 @@ class TestInvalidInputs:
             ezpl.set_level("INVALID_LEVEL")
 
     def test_invalid_file_path_handling(self) -> None:
-        """Invalid path characters should raise FileOperationError or OSError."""
+        """Invalid path characters should raise on Windows only."""
         invalid_path = Path('<>:"|?*')  # Invalid Windows characters
-        with pytest.raises((OSError, FileOperationError)):
-            _ = Ezpl(log_file=invalid_path)
+        if sys.platform == "win32":
+            with pytest.raises((OSError, FileOperationError)):
+                _ = Ezpl(log_file=invalid_path)
+        else:
+            ezpl = Ezpl(log_file=invalid_path)
+            assert ezpl is not None
 
     def test_invalid_config_value_handling(self) -> None:
         """ConfigurationManager.set() accepts any value — should not raise."""
