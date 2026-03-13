@@ -36,7 +36,9 @@ from ezpl.types.protocols import LoggerProtocol, PrinterProtocol
 class TestPrinterProtocol:
     """Tests for PrinterProtocol conformance."""
 
-    def test_printer_implements_protocol(self) -> None:
+    def test_should_conform_to_printer_protocol_when_get_printer_is_called(
+        self,
+    ) -> None:
         """Test that get_printer() returns a PrinterProtocol-conforming object."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -44,7 +46,9 @@ class TestPrinterProtocol:
         # Runtime check
         assert isinstance(printer, PrinterProtocol)
 
-    def test_printer_has_core_methods(self) -> None:
+    def test_should_have_all_core_log_methods_when_printer_is_instantiated(
+        self,
+    ) -> None:
         """Test that printer has all core logging methods."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -62,7 +66,7 @@ class TestPrinterProtocol:
         assert callable(printer.debug)
         assert callable(printer.success)
 
-    def test_printer_has_pattern_methods(self) -> None:
+    def test_should_have_all_pattern_methods_when_printer_is_instantiated(self) -> None:
         """Test that printer has all pattern methods."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -74,7 +78,7 @@ class TestPrinterProtocol:
         assert hasattr(printer, "config")
         assert hasattr(printer, "deps")
 
-    def test_printer_has_indentation_methods(self) -> None:
+    def test_should_have_all_indent_methods_when_printer_is_instantiated(self) -> None:
         """Test that printer has indentation management methods."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -84,7 +88,7 @@ class TestPrinterProtocol:
         assert hasattr(printer, "reset_indent")
         assert hasattr(printer, "manage_indent")
 
-    def test_printer_has_wizard_property(self) -> None:
+    def test_should_have_wizard_property_when_printer_is_instantiated(self) -> None:
         """Test that printer has wizard property."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -97,7 +101,7 @@ class TestPrinterProtocol:
 class TestLoggerProtocol:
     """Tests for LoggerProtocol conformance."""
 
-    def test_logger_implements_protocol(self) -> None:
+    def test_should_conform_to_logger_protocol_when_get_logger_is_called(self) -> None:
         """Test that get_logger() returns a LoggerProtocol-conforming object."""
         ezpl = Ezpl()
         logger = ezpl.get_logger()
@@ -105,7 +109,7 @@ class TestLoggerProtocol:
         # Runtime check
         assert isinstance(logger, LoggerProtocol)
 
-    def test_logger_has_core_methods(self) -> None:
+    def test_should_have_all_core_log_methods_when_logger_is_instantiated(self) -> None:
         """Test that logger has all core logging methods."""
         ezpl = Ezpl()
         logger = ezpl.get_logger()
@@ -125,7 +129,9 @@ class TestLoggerProtocol:
         assert callable(logger.debug)
         assert callable(logger.error)
 
-    def test_logger_has_loguru_methods(self) -> None:
+    def test_should_have_bind_opt_and_patch_methods_when_logger_is_instantiated(
+        self,
+    ) -> None:
         """Test that logger has loguru-specific methods."""
         ezpl = Ezpl()
         logger = ezpl.get_logger()
@@ -134,7 +140,9 @@ class TestLoggerProtocol:
         assert hasattr(logger, "opt")
         assert hasattr(logger, "patch")
 
-    def test_logger_has_ezpl_methods(self) -> None:
+    def test_should_have_set_level_and_separator_methods_when_logger_is_instantiated(
+        self,
+    ) -> None:
         """Test that logger has Ezpl-specific methods."""
         ezpl = Ezpl()
         logger = ezpl.get_logger()
@@ -145,7 +153,7 @@ class TestLoggerProtocol:
         assert hasattr(logger, "get_log_file")
         assert hasattr(logger, "close")
 
-    def test_logger_methods_work(self) -> None:
+    def test_should_not_crash_when_all_core_logger_methods_are_called(self) -> None:
         """Test that logger methods actually work."""
         ezpl = Ezpl()
         logger = ezpl.get_logger()
@@ -160,7 +168,9 @@ class TestLoggerProtocol:
 class TestProtocolTypeAnnotations:
     """Tests for type annotations with protocols."""
 
-    def test_function_with_printer_protocol_annotation(self) -> None:
+    def test_should_accept_printer_argument_when_function_uses_printer_protocol_annotation(
+        self,
+    ) -> None:
         """Test function accepting PrinterProtocol."""
 
         def process(printer: PrinterProtocol) -> None:
@@ -171,7 +181,9 @@ class TestProtocolTypeAnnotations:
         # Should work without type errors
         process(ezpl.get_printer())
 
-    def test_function_with_logger_protocol_annotation(self) -> None:
+    def test_should_accept_logger_argument_when_function_uses_logger_protocol_annotation(
+        self,
+    ) -> None:
         """Test function accepting LoggerProtocol."""
 
         def log_process(logger: LoggerProtocol) -> None:
@@ -182,7 +194,9 @@ class TestProtocolTypeAnnotations:
         # Should work without type errors
         log_process(ezpl.get_logger())
 
-    def test_both_protocols_together(self) -> None:
+    def test_should_not_crash_when_function_accepts_both_printer_and_logger_protocols(
+        self,
+    ) -> None:
         """Test function accepting both protocols."""
 
         def dual_log(printer: PrinterProtocol, logger: LoggerProtocol) -> None:
@@ -196,7 +210,9 @@ class TestProtocolTypeAnnotations:
 class TestProtocolInheritance:
     """Tests for protocol inheritance and extension."""
 
-    def test_printer_protocol_extensible(self) -> None:
+    def test_should_have_all_required_protocol_methods_when_printer_is_validated(
+        self,
+    ) -> None:
         """Test that protocols can be used for custom implementations."""
         # This test verifies that the protocol is properly defined
         # and can be used to validate custom implementations
@@ -233,7 +249,9 @@ class TestProtocolInheritance:
             assert hasattr(printer, method), f"Missing method: {method}"
             assert callable(getattr(printer, method)), f"Method not callable: {method}"
 
-    def test_logger_protocol_extensible(self) -> None:
+    def test_should_have_all_required_protocol_methods_when_logger_is_validated(
+        self,
+    ) -> None:
         """Test that LoggerProtocol can validate custom implementations."""
         ezpl = Ezpl()
         logger = ezpl.get_logger()
@@ -268,14 +286,18 @@ class TestProtocolInheritance:
 class TestStrictSignatureAlignment:
     """Strict signature checks between protocols and implementations."""
 
-    def test_printer_manage_indent_returns_context_manager(self) -> None:
+    def test_should_return_context_manager_when_manage_indent_is_called_on_printer(
+        self,
+    ) -> None:
         """manage_indent should provide a context manager compatible with protocol."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         manage_indent_context = printer.manage_indent()
         assert isinstance(manage_indent_context, AbstractContextManager)
 
-    def test_logger_loguru_signatures_are_aligned(self) -> None:
+    def test_should_have_matching_signatures_when_logger_bind_opt_patch_are_compared_to_protocol(
+        self,
+    ) -> None:
         """bind/opt/patch signatures should be strictly identical."""
         for method_name in ("bind", "opt", "patch"):
             protocol_method = getattr(LoggerProtocol, method_name)

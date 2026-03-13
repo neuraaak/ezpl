@@ -46,7 +46,9 @@ pytestmark = pytest.mark.robustness
 class TestExceptionMessages:
     """Tests for exceptions passed as messages."""
 
-    def test_value_error_as_message_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_value_error_as_message(
+        self,
+    ) -> None:
         """Test printer with ValueError exception."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -56,7 +58,9 @@ class TestExceptionMessages:
             printer.error(exc)
             # Should not crash
 
-    def test_value_error_as_message_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_value_error_as_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with ValueError exception."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -66,7 +70,7 @@ class TestExceptionMessages:
             logger.error(exc)
             # Should not crash
 
-    def test_key_error_as_message(self) -> None:
+    def test_should_not_crash_when_printer_receives_key_error_as_message(self) -> None:
         """Test with KeyError exception."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -76,7 +80,7 @@ class TestExceptionMessages:
             printer.error(exc)
             # Should not crash
 
-    def test_nested_exception(self) -> None:
+    def test_should_not_crash_when_printer_receives_chained_exception(self) -> None:
         """Test with nested exception."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -93,7 +97,7 @@ class TestExceptionMessages:
 class TestComplexObjects:
     """Tests for complex objects as messages."""
 
-    def test_nested_dict_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_deeply_nested_dict(self) -> None:
         """Test printer with nested dictionary."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -101,7 +105,9 @@ class TestComplexObjects:
         printer.info(nested)
         # Should not crash
 
-    def test_nested_dict_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_deeply_nested_dict(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with nested dictionary."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -109,7 +115,7 @@ class TestComplexObjects:
         logger.info(nested)
         # Should not crash
 
-    def test_list_of_objects_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_heterogeneous_list(self) -> None:
         """Test printer with list of objects."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -123,7 +129,9 @@ class TestComplexObjects:
         printer.info(complex_list)
         # Should not crash
 
-    def test_custom_object_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_object_with_str_method(
+        self,
+    ) -> None:
         """Test printer with custom object."""
 
         class CustomObject:
@@ -139,7 +147,9 @@ class TestComplexObjects:
         printer.info(custom)
         # Should not crash
 
-    def test_object_without_str(self) -> None:
+    def test_should_not_crash_when_printer_receives_object_without_str_method(
+        self,
+    ) -> None:
         """Test with object without __str__ method."""
 
         class NoStrObject:
@@ -156,7 +166,9 @@ class TestComplexObjects:
 class TestFileOperationErrors:
     """Tests for file operation error handling."""
 
-    def test_permission_error_handling(self, temp_dir: Path) -> None:
+    def test_should_handle_gracefully_when_log_path_has_permission_issues(
+        self, temp_dir: Path
+    ) -> None:
         """Test handling of permission errors."""
         # Create a path that might have permission issues
         invalid_path = temp_dir / "invalid" / "path" / "test.log"
@@ -170,7 +182,9 @@ class TestFileOperationErrors:
             # Expected behavior for permission errors
             pass
 
-    def test_disk_full_simulation(self, temp_log_file: Path) -> None:
+    def test_should_handle_gracefully_when_disk_is_full(
+        self, temp_log_file: Path
+    ) -> None:
         """Test handling of disk full scenario (simulated)."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -182,7 +196,9 @@ class TestFileOperationErrors:
             except OSError:
                 pass
 
-    def test_read_only_file_system(self, temp_log_file: Path) -> None:
+    def test_should_handle_gracefully_when_file_system_is_read_only(
+        self, temp_log_file: Path
+    ) -> None:
         """Test handling of read-only file system (simulated)."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -200,13 +216,17 @@ class TestFileOperationErrors:
 class TestInvalidInputs:
     """Tests for invalid input handling."""
 
-    def test_invalid_log_level_handling(self) -> None:
+    def test_should_raise_validation_error_when_log_level_is_invalid_string(
+        self,
+    ) -> None:
         """Invalid log level string should raise ValidationError."""
         ezpl = Ezpl()
         with pytest.raises(ValidationError):
             ezpl.set_level("INVALID_LEVEL")
 
-    def test_invalid_file_path_handling(self) -> None:
+    def test_should_raise_error_when_file_path_contains_invalid_characters_on_windows(
+        self,
+    ) -> None:
         """Invalid path characters should raise on Windows only."""
         invalid_path = Path('<>:"|?*')  # Invalid Windows characters
         if sys.platform == "win32":
@@ -216,7 +236,7 @@ class TestInvalidInputs:
             ezpl = Ezpl(log_file=invalid_path)
             assert ezpl is not None
 
-    def test_invalid_config_value_handling(self) -> None:
+    def test_should_accept_non_string_values_when_config_set_is_called(self) -> None:
         """ConfigurationManager.set() accepts any value — should not raise."""
         ezpl = Ezpl()
         config = ezpl.get_config()
@@ -226,7 +246,9 @@ class TestInvalidInputs:
 class TestConcurrentOperations:
     """Tests for concurrent operation handling."""
 
-    def test_rapid_logging(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_many_log_operations_happen_rapidly(
+        self, temp_log_file: Path
+    ) -> None:
         """Test rapid logging operations."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -240,7 +262,9 @@ class TestConcurrentOperations:
         # Should not crash
         assert temp_log_file.exists()
 
-    def test_concurrent_file_access(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_file_is_written_to_many_times_concurrently(
+        self, temp_log_file: Path
+    ) -> None:
         """Test concurrent file access (simulated)."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()

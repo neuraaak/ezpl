@@ -47,14 +47,14 @@ from ezpl.core.exceptions import FileOperationError, ValidationError
 class TestSingleton:
     """Tests for singleton pattern."""
 
-    def test_singleton_returns_same_instance(self) -> None:
+    def test_should_return_same_instance_when_called_multiple_times(self) -> None:
         """Test that Ezpl() always returns the same instance."""
         Ezpl.reset()
         e1 = Ezpl()
         e2 = Ezpl()
         assert e1 is e2
 
-    def test_reset_creates_new_instance(self) -> None:
+    def test_should_allow_creating_new_instance_when_reset_is_called(self) -> None:
         """Test that reset() allows creating a new instance."""
         Ezpl.reset()
         e1 = Ezpl()
@@ -69,12 +69,16 @@ class TestSingleton:
 class TestInitialization:
     """Tests for Ezpl initialization."""
 
-    def test_initialization_with_log_file(self, temp_log_file: Path) -> None:
+    def test_should_store_log_file_path_when_log_file_is_given(
+        self, temp_log_file: Path
+    ) -> None:
         """Test initialization with custom log file."""
         ezpl = Ezpl(log_file=temp_log_file)
         assert ezpl._log_file == temp_log_file
 
-    def test_initialization_with_all_parameters(self, temp_log_file: Path) -> None:
+    def test_should_configure_all_components_when_all_parameters_are_given(
+        self, temp_log_file: Path
+    ) -> None:
         """Test initialization with all parameters."""
         ezpl = Ezpl(
             log_file=temp_log_file,
@@ -93,7 +97,9 @@ class TestInitialization:
         assert ezpl._printer._level == "INFO"
         assert ezpl._logger._level == "WARNING"
 
-    def test_initialization_with_defaults(self) -> None:
+    def test_should_initialize_with_valid_defaults_when_no_parameters_are_given(
+        self,
+    ) -> None:
         """Test initialization with default values."""
         ezpl = Ezpl()
         assert ezpl._log_file is not None
@@ -104,7 +110,7 @@ class TestInitialization:
 class TestConfigurationPriority:
     """Tests for configuration priority order (arg > env > file > default)."""
 
-    def test_arg_overrides_env_and_file(
+    def test_should_give_highest_priority_to_arg_when_env_and_file_are_also_set(
         self,
         temp_config_file: Path,
         clean_env: None,  # noqa: ARG002
@@ -123,7 +129,7 @@ class TestConfigurationPriority:
         assert ezpl._printer._level == "DEBUG"
         assert ezpl._logger._level == "DEBUG"
 
-    def test_env_overrides_file(
+    def test_should_prioritize_env_over_file_when_both_are_set(
         self,
         temp_config_file: Path,
         clean_env: None,  # noqa: ARG002
@@ -141,7 +147,9 @@ class TestConfigurationPriority:
         # Note: We can't easily test this without mocking, but we verify no errors
         assert ezpl is not None
 
-    def test_file_overrides_default(self, temp_config_file: Path) -> None:
+    def test_should_prioritize_file_over_default_when_config_file_is_present(
+        self, temp_config_file: Path
+    ) -> None:
         """Test that config file overrides defaults."""
         # Set config file
         config_data = {"log-level": "ERROR", "printer-level": "WARNING"}
@@ -160,7 +168,9 @@ class TestConfigurationPriority:
 class TestLevelManagement:
     """Tests for log level management."""
 
-    def test_set_level_changes_both_printer_and_logger(self) -> None:
+    def test_should_update_both_printer_and_logger_levels_when_set_level_is_called(
+        self,
+    ) -> None:
         """Test that set_level() changes both printer and logger levels."""
         ezpl = Ezpl()
         ezpl.set_level("DEBUG")
@@ -168,7 +178,9 @@ class TestLevelManagement:
         assert ezpl._printer._level == "DEBUG"
         assert ezpl._logger._level == "DEBUG"
 
-    def test_set_printer_level_only(self) -> None:
+    def test_should_update_only_printer_level_when_set_printer_level_is_called(
+        self,
+    ) -> None:
         """Test that set_printer_level() only affects printer."""
         ezpl = Ezpl()
         ezpl.set_printer_level("WARNING")
@@ -177,26 +189,34 @@ class TestLevelManagement:
         # Logger level should remain unchanged (default or previous value)
         assert ezpl._logger._level is not None
 
-    def test_set_logger_level_only(self) -> None:
+    def test_should_update_only_logger_level_when_set_logger_level_is_called(
+        self,
+    ) -> None:
         """Test that set_logger_level() only affects logger."""
         ezpl = Ezpl()
         ezpl.set_logger_level("ERROR")
         assert ezpl._logger._level == "ERROR"
         # Printer level should remain unchanged
 
-    def test_set_level_invalid_raises_error(self) -> None:
+    def test_should_raise_validation_error_when_set_level_is_given_invalid_level(
+        self,
+    ) -> None:
         """Test that set_level() with invalid level raises error."""
         ezpl = Ezpl()
         with pytest.raises(ValidationError):
             ezpl.set_level("INVALID_LEVEL")
 
-    def test_set_printer_level_invalid_raises_error(self) -> None:
+    def test_should_raise_validation_error_when_set_printer_level_is_given_invalid_level(
+        self,
+    ) -> None:
         """Test that set_printer_level() with invalid level raises error."""
         ezpl = Ezpl()
         with pytest.raises(ValidationError):
             ezpl.set_printer_level("INVALID_LEVEL")
 
-    def test_set_logger_level_invalid_raises_error(self) -> None:
+    def test_should_raise_validation_error_when_set_logger_level_is_given_invalid_level(
+        self,
+    ) -> None:
         """Test that set_logger_level() with invalid level raises error."""
         ezpl = Ezpl()
         with pytest.raises(ValidationError):
@@ -206,14 +226,18 @@ class TestLevelManagement:
 class TestFileOperations:
     """Tests for file operations."""
 
-    def test_set_log_file(self, temp_log_file: Path, temp_dir: Path) -> None:
+    def test_should_update_log_file_path_when_set_log_file_is_called(
+        self, temp_log_file: Path, temp_dir: Path
+    ) -> None:
         """Test changing log file."""
         ezpl = Ezpl(log_file=temp_log_file)
         new_file = temp_dir / "new.log"
         ezpl.set_log_file(new_file)
         assert ezpl._log_file == new_file
 
-    def test_get_log_file(self, temp_log_file: Path) -> None:
+    def test_should_return_log_file_config_entry_when_get_log_file_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test getting log file path."""
         ezpl = Ezpl(log_file=temp_log_file)
         # Access internal _log_file or use get_config
@@ -221,7 +245,9 @@ class TestFileOperations:
         log_file_from_config = config.get("log-file")
         assert log_file_from_config is not None
 
-    def test_add_separator(self, temp_log_file: Path) -> None:
+    def test_should_write_separator_to_log_when_add_separator_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test adding separator to log file."""
         ezpl = Ezpl(log_file=temp_log_file)
         ezpl.add_separator()
@@ -236,7 +262,9 @@ class TestFileOperations:
 class TestIndentation:
     """Tests for indentation management."""
 
-    def test_manage_indent_context_manager(self) -> None:
+    def test_should_increment_then_restore_indent_when_manage_indent_context_is_used(
+        self,
+    ) -> None:
         """Test manage_indent() context manager."""
         ezpl = Ezpl()
         # Access internal printer to check indent
@@ -248,7 +276,9 @@ class TestIndentation:
         # After context, indent should return to initial
         assert ezpl._printer._indent == initial_indent
 
-    def test_manage_indent_nested(self) -> None:
+    def test_should_support_multiple_indent_levels_when_manage_indent_contexts_are_nested(
+        self,
+    ) -> None:
         """Test nested manage_indent() context managers."""
         ezpl = Ezpl()
         # Access internal printer to check indent
@@ -265,7 +295,9 @@ class TestIndentation:
 class TestConfiguration:
     """Tests for configuration management."""
 
-    def test_get_config_returns_config_manager(self) -> None:
+    def test_should_return_config_manager_with_get_and_set_methods_when_get_config_is_called(
+        self,
+    ) -> None:
         """Test that get_config() returns ConfigurationManager."""
         ezpl = Ezpl()
         config = ezpl.get_config()
@@ -274,7 +306,10 @@ class TestConfiguration:
         assert hasattr(config, "get")
         assert hasattr(config, "set")
 
-    def test_configure_with_dict(self, temp_config_file: Path) -> None:  # noqa: ARG002
+    def test_should_apply_all_dict_values_when_configure_receives_a_dict(
+        self,
+        temp_config_file: Path,  # noqa: ARG002
+    ) -> None:
         """Test configure() with dictionary."""
         ezpl = Ezpl()
         ezpl.configure({"level": "DEBUG", "log-rotation": "10 MB"})
@@ -282,7 +317,9 @@ class TestConfiguration:
         assert config.get("log-level") == "DEBUG"
         assert config.get("log-rotation") == "10 MB"
 
-    def test_configure_with_kwargs(self) -> None:
+    def test_should_apply_all_kwargs_when_configure_receives_keyword_arguments(
+        self,
+    ) -> None:
         """Test configure() with keyword arguments."""
         ezpl = Ezpl()
         ezpl.configure(level="WARNING", log_rotation="5 MB")
@@ -290,7 +327,9 @@ class TestConfiguration:
         assert config.get("log-level") == "WARNING"
         assert config.get("log-rotation") == "5 MB"
 
-    def test_configure_with_mixed_formats(self) -> None:
+    def test_should_accept_both_underscore_and_hyphen_keys_when_configure_is_called(
+        self,
+    ) -> None:
         """Test configure() with mixed key formats (underscore and hyphen)."""
         ezpl = Ezpl()
         # Mix of underscore and hyphen formats
@@ -305,7 +344,7 @@ class TestConfiguration:
         assert config.get("printer-level") == "DEBUG"
         assert config.get("log-rotation") == "10 MB"
 
-    def test_reload_config(
+    def test_should_reload_config_from_updated_file_when_reload_config_is_called(
         self,
         temp_config_file: Path,
         clean_env: None,  # noqa: ARG002
@@ -333,7 +372,9 @@ class TestConfiguration:
 class TestGetters:
     """Tests for getter methods."""
 
-    def test_get_printer_returns_ezprinter(self) -> None:
+    def test_should_return_printer_with_info_and_debug_methods_when_get_printer_is_called(
+        self,
+    ) -> None:
         """Test that get_printer() returns EzPrinter."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -343,7 +384,9 @@ class TestGetters:
         assert hasattr(printer, "debug")
         assert hasattr(printer, "success")
 
-    def test_get_logger_returns_loguru_logger(self) -> None:
+    def test_should_return_logger_with_standard_methods_when_get_logger_is_called(
+        self,
+    ) -> None:
         """Test that get_logger() returns loguru Logger."""
         ezpl = Ezpl()
         logger = ezpl.get_logger()
@@ -357,20 +400,26 @@ class TestGetters:
 class TestErrorHandling:
     """Tests for error handling."""
 
-    def test_invalid_log_level_raises_error(self) -> None:
+    def test_should_raise_validation_error_when_set_level_is_given_non_valid_level(
+        self,
+    ) -> None:
         """Test that invalid log level raises appropriate error."""
         ezpl = Ezpl()
         with pytest.raises(ValidationError):
             ezpl.set_level("NOT_A_VALID_LEVEL")
 
-    def test_invalid_config_key_handled_gracefully(self) -> None:
+    def test_should_persist_and_return_true_when_configure_receives_unknown_key(
+        self,
+    ) -> None:
         """Test that unknown config keys are accepted and persisted as-is."""
         ezpl = Ezpl()
         applied = ezpl.configure(invalid_key="invalid_value")
         assert applied is True
         assert ezpl.get_config().get("invalid_key") == "invalid_value"
 
-    def test_file_operations_with_invalid_path(self) -> None:
+    def test_should_raise_file_operation_error_when_set_log_file_creation_fails(
+        self,
+    ) -> None:
         """Test that set_log_file propagates logger creation failure."""
         ezpl = Ezpl()
         with (
@@ -386,7 +435,9 @@ class TestErrorHandling:
 class TestConfigLockV2:
     """Tests for safer lock behavior with owner/token controls."""
 
-    def test_lock_config_returns_token_and_owner_info(self) -> None:
+    def test_should_expose_lock_state_and_owner_metadata_when_lock_config_is_called(
+        self,
+    ) -> None:
         """lock_config() should expose lock state with owner metadata."""
         Ezpl()
         token = Ezpl.lock_config(owner="CustomA")
@@ -397,7 +448,9 @@ class TestConfigLockV2:
         assert info["owner"] == "CustomA"
         assert info["has_token"] is True
 
-    def test_second_owner_cannot_relock(self) -> None:
+    def test_should_deny_new_lock_and_warn_when_config_is_already_locked_by_different_owner(
+        self,
+    ) -> None:
         """A different owner should not be able to replace an active lock."""
         Ezpl()
         first_token = Ezpl.lock_config(owner="CustomA")
@@ -409,7 +462,9 @@ class TestConfigLockV2:
         assert second_token is None
         assert Ezpl.config_lock_info()["owner"] == "CustomA"
 
-    def test_configure_force_requires_owner_or_token_when_locked(self) -> None:
+    def test_should_deny_force_configure_and_warn_when_locked_and_no_owner_or_token_is_given(
+        self,
+    ) -> None:
         """force=True alone should not bypass a lock with owner/token metadata."""
         ezpl = Ezpl()
         Ezpl.lock_config(owner="CustomA")
@@ -419,7 +474,9 @@ class TestConfigLockV2:
 
         assert applied is False
 
-    def test_configure_force_with_owner_or_token_is_allowed(self) -> None:
+    def test_should_allow_force_configure_when_matching_owner_or_token_is_given(
+        self,
+    ) -> None:
         """A matching owner or token should authorize forced configure()."""
         ezpl = Ezpl()
         token = Ezpl.lock_config(owner="CustomA")
@@ -431,7 +488,9 @@ class TestConfigLockV2:
         by_token = ezpl.configure(level="INFO", force=True, token=token)
         assert by_token is True
 
-    def test_unlock_requires_owner_or_token(self) -> None:
+    def test_should_deny_unlock_and_warn_when_different_owner_tries_to_unlock(
+        self,
+    ) -> None:
         """unlock_config() should deny unknown callers when lock is active."""
         Ezpl()
         token = Ezpl.lock_config(owner="CustomA")

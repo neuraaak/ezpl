@@ -6,7 +6,7 @@
 """
 Code quality check script.
 
-Runs Ruff formatting and linting on the codebase.
+Runs Ruff on the codebase.
 
 Usage:
     python .scripts/dev/lint.py [options]
@@ -71,7 +71,7 @@ class CodeQualityChecker:
         self.project_root = Path(__file__).resolve().parents[2]
         # Directories to scan (relative to project root)
         self.scan_dirs = [
-            "src",
+            f"src/{project_name.lower()}",
             "tests",
             ".scripts",
         ]
@@ -140,6 +140,94 @@ class CodeQualityChecker:
     # PUBLIC METHODS
     # ///////////////////////////////////////////////////////////////
 
+    def run_import_linter(self) -> bool:
+        """Run import-linter to check layer dependency contracts.
+
+        Returns:
+            bool: True if contracts are respected, False otherwise
+        """
+        command = ["lint-imports"]
+        env = {"PYTHONPATH": str(self.project_root / "src")}
+
+        if self.verbose:
+            self.console.print("[cyan]Running import-linter...[/cyan]")
+            self.console.print(
+                f"  [dim]Command: PYTHONPATH=src {' '.join(command)}[/dim]"
+            )
+
+        try:
+            import os
+
+            full_env = {**os.environ, **env}
+            result = subprocess.run(  # noqa: S603
+                command,
+                check=True,
+                capture_output=not self.verbose,
+                text=True,
+                cwd=self.project_root,
+                env=full_env,
+            )
+        except subprocess.CalledProcessError as e:
+            self.console.print("[red]❌ ERROR:[/red] import-linter failed:")
+            if e.stdout:
+                self.console.print(f"[dim]STDOUT:[/dim]\n{e.stdout}")
+            if e.stderr:
+                self.console.print(f"[dim]STDERR:[/dim]\n{e.stderr}")
+            return False
+        except FileNotFoundError:
+            self.console.print(
+                "[yellow]⚠[/yellow]  import-linter not found — skipping (install with: pip install import-linter)"
+            )
+            return True
+        else:
+            if self.verbose and result.stdout:
+                self.console.print(result.stdout)
+            self.console.print(
+                "[green]✓[/green] [green]SUCCESS:[/green] import-linter completed successfully"
+            )
+            return True
+
+    def run_ty(self) -> bool:
+        """Run ty type checker.
+
+        Returns:
+            bool: True if type checking succeeded, False otherwise
+        """
+        command = ["ty", "check", "--output-format=concise"]
+        command.extend([str(p) for p in self._get_scan_paths()])
+
+        if self.verbose:
+            self.console.print("[cyan]Running ty...[/cyan]")
+            self.console.print(f"  [dim]Command: {' '.join(command)}[/dim]")
+
+        try:
+            result = subprocess.run(  # noqa: S603
+                command,
+                check=True,
+                capture_output=not self.verbose,
+                text=True,
+                cwd=self.project_root,
+            )
+        except subprocess.CalledProcessError as e:
+            self.console.print("[red]❌ ERROR:[/red] ty type checking failed:")
+            if e.stdout:
+                self.console.print(f"[dim]STDOUT:[/dim]\n{e.stdout}")
+            if e.stderr:
+                self.console.print(f"[dim]STDERR:[/dim]\n{e.stderr}")
+            return False
+        except FileNotFoundError:
+            self.console.print(
+                "[yellow]⚠[/yellow]  ty not found — skipping (install with: pip install ty)"
+            )
+            return True
+        else:
+            if self.verbose and result.stdout:
+                self.console.print(result.stdout)
+            self.console.print(
+                "[green]✓[/green] [green]SUCCESS:[/green] ty type checking completed successfully"
+            )
+            return True
+
     def run_ruff(self) -> bool:
         """Run Ruff linter.
 
@@ -147,7 +235,14 @@ class CodeQualityChecker:
             bool: True if linting succeeded, False otherwise
         """
         if self.check_only:
-            command = [sys.executable, "-m", "ruff", "check", "--line-length=88"]
+            command = [
+                sys.executable,
+                "-m",
+                "ruff",
+                "check",
+                "--line-length=88",
+                "--output-format=concise",
+            ]
         else:
             command = [
                 sys.executable,
@@ -156,6 +251,7 @@ class CodeQualityChecker:
                 "check",
                 "--fix",
                 "--line-length=88",
+                "--output-format=concise",
             ]
 
         # Use directories instead of individual files for better performance
@@ -206,11 +302,12 @@ class CodeQualityChecker:
         self.console.print(f"[bold]Scanning directories:[/bold] {dirs_text}")
         self.console.print()
 
-        # Order matters: format first, then lint
-        # Ruff format should run before Ruff check to avoid conflicts
+        # Order matters: format first, then lint, then types, then architecture contracts
         checks = [
             ("Ruff Format", self.run_ruff_format, "🎨"),
             ("Ruff", self.run_ruff, "🔍"),
+            ("Ty", self.run_ty, "🔎"),
+            ("Import Linter", self.run_import_linter, "🏗️"),
         ]
 
         all_passed = True

@@ -62,7 +62,9 @@ def wait_for_file(path: Path, timeout: float = 2.0) -> None:
 class TestLogLevels:
     """Tests for all log levels."""
 
-    def test_debug_level(self, temp_log_file: Path) -> None:
+    def test_should_create_log_file_when_debug_messages_are_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test debug() level."""
         logger_handler = EzLogger(temp_log_file, level="DEBUG")
         logger = logger_handler.get_loguru()
@@ -70,7 +72,9 @@ class TestLogLevels:
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
 
-    def test_info_level(self, temp_log_file: Path) -> None:
+    def test_should_create_log_file_when_info_messages_are_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test info() level."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -78,7 +82,9 @@ class TestLogLevels:
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
 
-    def test_warning_level(self, temp_log_file: Path) -> None:
+    def test_should_create_log_file_when_warning_messages_are_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test warning() level."""
         logger_handler = EzLogger(temp_log_file, level="WARNING")
         logger = logger_handler.get_loguru()
@@ -86,7 +92,9 @@ class TestLogLevels:
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
 
-    def test_error_level(self, temp_log_file: Path) -> None:
+    def test_should_create_log_file_when_error_messages_are_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test error() level."""
         logger_handler = EzLogger(temp_log_file, level="ERROR")
         logger = logger_handler.get_loguru()
@@ -94,7 +102,9 @@ class TestLogLevels:
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
 
-    def test_critical_level(self, temp_log_file: Path) -> None:
+    def test_should_create_log_file_when_critical_messages_are_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test critical() level."""
         logger_handler = EzLogger(temp_log_file, level="CRITICAL")
         logger = logger_handler.get_loguru()
@@ -102,13 +112,17 @@ class TestLogLevels:
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
 
-    def test_set_level(self, temp_log_file: Path) -> None:
+    def test_should_update_internal_level_attribute_when_set_level_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test set_level() method."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger_handler.set_level("DEBUG")
         assert logger_handler._level == "DEBUG"
 
-    def test_invalid_level_raises_error(self, temp_log_file: Path) -> None:
+    def test_should_raise_validation_error_when_logger_is_created_with_invalid_level(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that invalid level raises ValidationError."""
         with pytest.raises(ValidationError):
             EzLogger(temp_log_file, level="INVALID_LEVEL")
@@ -117,7 +131,9 @@ class TestLogLevels:
 class TestFileRotation:
     """Tests for file rotation."""
 
-    def test_rotation_by_size(self, temp_dir: Path) -> None:
+    def test_should_rotate_log_when_file_reaches_size_threshold(
+        self, temp_dir: Path
+    ) -> None:
         """Test rotation by file size."""
         log_file = temp_dir / "rotation_size.log"
         logger_handler = EzLogger(
@@ -132,7 +148,7 @@ class TestFileRotation:
         # Verify file exists or rotation occurred
         assert log_file.exists() or any(log_file.parent.glob("rotation_size.log.*"))
 
-    def test_rotation_by_time(self, temp_dir: Path) -> None:
+    def test_should_rotate_log_when_time_interval_elapses(self, temp_dir: Path) -> None:
         """Test rotation by time."""
         log_file = temp_dir / "rotation_time.log"
         logger_handler = EzLogger(
@@ -147,7 +163,9 @@ class TestFileRotation:
         # Verify rotation occurred
         assert log_file.exists() or any(log_file.parent.glob("rotation_time.log.*"))
 
-    def test_rotation_by_date(self, temp_dir: Path) -> None:
+    def test_should_create_log_file_when_rotation_is_set_by_date(
+        self, temp_dir: Path
+    ) -> None:
         """Test rotation by date."""
         log_file = temp_dir / "rotation_date.log"
         logger_handler = EzLogger(
@@ -158,7 +176,9 @@ class TestFileRotation:
         # Verify file exists
         assert log_file.exists()
 
-    def test_rotation_at_time(self, temp_dir: Path) -> None:
+    def test_should_create_log_file_when_rotation_is_set_at_specific_time(
+        self, temp_dir: Path
+    ) -> None:
         """Test rotation at specific time."""
         log_file = temp_dir / "rotation_at_time.log"
         logger_handler = EzLogger(
@@ -173,7 +193,9 @@ class TestFileRotation:
 class TestRetention:
     """Tests for log retention."""
 
-    def test_retention_by_duration(self, temp_dir: Path) -> None:
+    def test_should_create_log_file_when_retention_is_set_by_duration(
+        self, temp_dir: Path
+    ) -> None:
         """Test retention by duration."""
         log_file = temp_dir / "retention_duration.log"
         logger_handler = EzLogger(log_file, level="INFO", retention="1 day")
@@ -182,7 +204,9 @@ class TestRetention:
         # Verify file exists
         assert log_file.exists()
 
-    def test_retention_by_count(self, temp_dir: Path) -> None:
+    def test_should_create_log_files_when_rotation_and_retention_are_configured(
+        self, temp_dir: Path
+    ) -> None:
         """Test retention by duration (loguru doesn't support file count directly)."""
         log_file = temp_dir / "retention_count.log"
         logger_handler = EzLogger(
@@ -201,7 +225,9 @@ class TestRetention:
 class TestCompression:
     """Tests for log compression."""
 
-    def test_compression_zip(self, temp_dir: Path) -> None:
+    def test_should_create_zip_compressed_archives_when_compression_is_zip(
+        self, temp_dir: Path
+    ) -> None:
         """Test compression with zip format."""
         log_file = temp_dir / "compression_zip.log"
         logger_handler = EzLogger(
@@ -222,7 +248,9 @@ class TestCompression:
             log_file.parent.glob("compression_zip.log.*.zip")
         )
 
-    def test_compression_gz(self, temp_dir: Path) -> None:
+    def test_should_create_gz_compressed_archives_when_compression_is_gz(
+        self, temp_dir: Path
+    ) -> None:
         """Test compression with gz format."""
         log_file = temp_dir / "compression_gz.log"
         logger_handler = EzLogger(
@@ -241,7 +269,9 @@ class TestCompression:
         # Verify file exists
         assert log_file.exists() or any(log_file.parent.glob("compression_gz.log.*.gz"))
 
-    def test_compression_tar_gz(self, temp_dir: Path) -> None:
+    def test_should_create_targz_compressed_archives_when_compression_is_tar_gz(
+        self, temp_dir: Path
+    ) -> None:
         """Test compression with tar.gz format."""
         log_file = temp_dir / "compression_tar_gz.log"
         logger_handler = EzLogger(
@@ -266,7 +296,9 @@ class TestCompression:
 class TestSeparators:
     """Tests for log separators."""
 
-    def test_add_separator(self, temp_log_file: Path) -> None:
+    def test_should_write_separator_markers_to_log_when_add_separator_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test add_separator() method."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger_handler.add_separator()
@@ -276,7 +308,9 @@ class TestSeparators:
         content = temp_log_file.read_text(encoding="utf-8")
         assert "==>" in content or "---" in content or len(content) > 0
 
-    def test_separator_with_ezpl(self, temp_log_file: Path) -> None:
+    def test_should_write_separator_markers_to_log_when_add_separator_is_called_via_ezpl(
+        self, temp_log_file: Path
+    ) -> None:
         """Test separator via Ezpl."""
         ezpl = Ezpl(log_file=temp_log_file)
         ezpl.add_separator()
@@ -289,12 +323,16 @@ class TestSeparators:
 class TestFileOperations:
     """Tests for file operations."""
 
-    def test_get_log_file(self, temp_log_file: Path) -> None:
+    def test_should_return_correct_path_when_get_log_file_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test get_log_file() method."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         assert logger_handler.get_log_file() == temp_log_file
 
-    def test_get_file_size(self, temp_log_file: Path) -> None:
+    def test_should_return_positive_size_when_messages_have_been_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test get_file_size() method."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -304,7 +342,9 @@ class TestFileOperations:
         size = logger_handler.get_file_size()
         assert size > 0
 
-    def test_get_file_size_empty_file(self, temp_log_file: Path) -> None:
+    def test_should_return_zero_or_more_when_no_messages_have_been_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test get_file_size() with empty file."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         size = logger_handler.get_file_size()
@@ -314,7 +354,9 @@ class TestFileOperations:
 class TestSpecialCharacters:
     """Tests for special character handling."""
 
-    def test_unicode_characters(self, temp_log_file: Path) -> None:
+    def test_should_preserve_unicode_in_log_file_when_unicode_messages_are_written(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with Unicode characters."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -326,7 +368,9 @@ class TestSpecialCharacters:
         assert "漢字" in content
         assert "🚀" in content
 
-    def test_control_characters(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_messages_contain_control_characters(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with control characters."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -336,7 +380,9 @@ class TestSpecialCharacters:
         # Should not crash
         assert temp_log_file.exists()
 
-    def test_html_tags(self, temp_log_file: Path) -> None:
+    def test_should_log_message_when_it_contains_html_tags(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with HTML tags."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -350,7 +396,9 @@ class TestSpecialCharacters:
 class TestTypeConversion:
     """Tests for automatic type conversion."""
 
-    def test_exception_object(self, temp_log_file: Path) -> None:
+    def test_should_log_exception_details_when_exception_object_is_passed(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with exception object."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -363,7 +411,9 @@ class TestTypeConversion:
         content = temp_log_file.read_text(encoding="utf-8")
         assert "Exception" in content or "KeyError" in content
 
-    def test_dict_message(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_dict_is_passed_as_log_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with dictionary message."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -371,7 +421,9 @@ class TestTypeConversion:
         wait_for_file(temp_log_file)
         assert temp_log_file.exists()
 
-    def test_list_message(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_list_is_passed_as_log_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with list message."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -383,7 +435,9 @@ class TestTypeConversion:
 class TestErrorHandling:
     """Tests for error handling."""
 
-    def test_invalid_directory_permissions(self, temp_dir: Path) -> None:
+    def test_should_handle_gracefully_when_log_directory_has_permission_issues(
+        self, temp_dir: Path
+    ) -> None:
         """Test handling of invalid directory permissions."""
         # Create a path that might have permission issues
         invalid_path = temp_dir / "invalid" / "path" / "test.log"
@@ -396,7 +450,9 @@ class TestErrorHandling:
             # Expected behavior for permission errors
             pass
 
-    def test_file_write_error_handling(self, temp_log_file: Path) -> None:
+    def test_should_handle_gracefully_when_file_write_fails(
+        self, temp_log_file: Path
+    ) -> None:
         """Test handling of file write errors."""
         logger_handler = EzLogger(temp_log_file, level="INFO")
         logger = logger_handler.get_loguru()
@@ -413,14 +469,18 @@ class TestErrorHandling:
 class TestDirectoryCreation:
     """Tests for automatic directory creation."""
 
-    def test_creates_parent_directory(self, temp_dir: Path) -> None:
+    def test_should_create_parent_directory_when_log_file_is_in_nested_subdir(
+        self, temp_dir: Path
+    ) -> None:
         """Test that parent directory is created automatically."""
         log_file = temp_dir / "subdir" / "nested" / "test.log"
         logger_handler = EzLogger(log_file, level="INFO")
         assert log_file.parent.exists()
         assert logger_handler.get_log_file() == log_file
 
-    def test_handles_existing_directory(self, temp_dir: Path) -> None:
+    def test_should_not_crash_when_log_directory_already_exists(
+        self, temp_dir: Path
+    ) -> None:
         """Test handling of existing directory."""
         log_file = temp_dir / "existing" / "test.log"
         log_file.parent.mkdir(parents=True, exist_ok=True)
