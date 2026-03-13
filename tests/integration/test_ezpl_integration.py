@@ -37,7 +37,9 @@ from ezpl import Ezpl
 class TestEzplPrinterLoggerIntegration:
     """Tests for Ezpl + Printer + Logger integration."""
 
-    def test_ezpl_provides_both_printer_and_logger(self, temp_log_file: Path) -> None:
+    def test_should_provide_both_printer_and_logger_when_ezpl_is_created(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that Ezpl provides both printer and logger."""
         ezpl = Ezpl(log_file=temp_log_file)
         printer = ezpl.get_printer()
@@ -48,7 +50,9 @@ class TestEzplPrinterLoggerIntegration:
         assert hasattr(printer, "info")
         assert hasattr(logger, "info")
 
-    def test_shared_indentation(self, temp_log_file: Path) -> None:
+    def test_should_share_indentation_state_when_manage_indent_context_is_active(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that indentation is shared between printer and logger."""
         ezpl = Ezpl(log_file=temp_log_file)
         printer = ezpl.get_printer()
@@ -61,7 +65,9 @@ class TestEzplPrinterLoggerIntegration:
         # Verify no exception raised
         assert printer._indent == 0
 
-    def test_global_level_affects_both(self, temp_log_file: Path) -> None:
+    def test_should_affect_both_printer_and_logger_when_set_level_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that set_level() affects both printer and logger."""
         ezpl = Ezpl(log_file=temp_log_file)
         ezpl.set_level("DEBUG")
@@ -77,7 +83,9 @@ class TestEzplPrinterLoggerIntegration:
         assert printer._level == "DEBUG"
         assert ezpl._logger._level == "DEBUG"
 
-    def test_printer_level_independent(self, temp_log_file: Path) -> None:
+    def test_should_set_only_printer_level_when_set_printer_level_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that printer level can be set independently."""
         ezpl = Ezpl(log_file=temp_log_file)
         ezpl.set_printer_level("WARNING")
@@ -88,7 +96,9 @@ class TestEzplPrinterLoggerIntegration:
         assert printer._level == "WARNING"
         assert ezpl._logger._level == "DEBUG"
 
-    def test_logger_level_independent(self, temp_log_file: Path) -> None:
+    def test_should_set_only_logger_level_when_set_logger_level_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that logger level can be set independently."""
         ezpl = Ezpl(log_file=temp_log_file)
         ezpl.set_printer_level("DEBUG")
@@ -99,7 +109,9 @@ class TestEzplPrinterLoggerIntegration:
         assert printer._level == "DEBUG"
         assert ezpl._logger._level == "ERROR"
 
-    def test_singleton_propagation(self, temp_log_file: Path) -> None:
+    def test_should_propagate_config_to_same_instance_when_singleton_is_reused(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that singleton instance propagates configuration."""
         ezpl1 = Ezpl(log_file=temp_log_file, log_level="DEBUG")
         printer1 = ezpl1.get_printer()
@@ -110,7 +122,9 @@ class TestEzplPrinterLoggerIntegration:
         assert ezpl1 is ezpl2
         assert printer1 is printer2
 
-    def test_file_rotation_with_active_logging(self, temp_dir: Path) -> None:
+    def test_should_rotate_log_file_when_active_logging_exceeds_threshold(
+        self, temp_dir: Path
+    ) -> None:
         """Test file rotation while logging is active."""
         log_file = temp_dir / "rotation_active.log"
         ezpl = Ezpl(
@@ -132,7 +146,9 @@ class TestEzplPrinterLoggerIntegration:
 class TestConfigurationIntegration:
     """Tests for configuration integration."""
 
-    def test_config_via_args(self, temp_log_file: Path) -> None:
+    def test_should_apply_config_when_constructor_args_are_given(
+        self, temp_log_file: Path
+    ) -> None:
         """Test configuration via constructor arguments."""
         ezpl = Ezpl(
             log_file=temp_log_file,
@@ -143,7 +159,9 @@ class TestConfigurationIntegration:
         assert ezpl.get_printer()._level == "WARNING"
         assert ezpl._logger._level == "WARNING"
 
-    def test_config_via_configure(self, temp_log_file: Path) -> None:
+    def test_should_apply_config_when_configure_method_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test configuration via configure() method."""
         ezpl = Ezpl(log_file=temp_log_file)
         ezpl.configure(level="DEBUG", log_rotation="5 MB")
@@ -152,7 +170,9 @@ class TestConfigurationIntegration:
         assert config.get("log-level") == "DEBUG"
         assert config.get("log-rotation") == "5 MB"
 
-    def test_config_reload(self, temp_config_file: Path, temp_log_file: Path) -> None:
+    def test_should_reload_config_from_file_when_reload_config_is_invoked(
+        self, temp_config_file: Path, temp_log_file: Path
+    ) -> None:
         """Test configuration reload."""
         # Create initial config
         import json
@@ -175,7 +195,9 @@ class TestConfigurationIntegration:
 class TestWizardIntegration:
     """Tests for RichWizard integration with Ezpl."""
 
-    def test_wizard_accessible_via_printer(self, temp_log_file: Path) -> None:
+    def test_should_expose_wizard_on_printer_when_accessed_via_get_printer(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that wizard is accessible via printer."""
         ezpl = Ezpl(log_file=temp_log_file)
         printer = ezpl.get_printer()
@@ -186,7 +208,9 @@ class TestWizardIntegration:
         assert hasattr(wizard, "table")
         assert hasattr(wizard, "json")
 
-    def test_wizard_with_printer_and_logger(self, temp_log_file: Path) -> None:
+    def test_should_render_wizard_components_when_printer_and_logger_are_both_used(
+        self, temp_log_file: Path
+    ) -> None:
         """Test wizard usage with printer and logger."""
         ezpl = Ezpl(log_file=temp_log_file)
         printer = ezpl.get_printer()

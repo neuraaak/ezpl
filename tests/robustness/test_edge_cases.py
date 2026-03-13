@@ -47,7 +47,7 @@ pytestmark = pytest.mark.robustness
 class TestSingletonEdgeCases:
     """Tests for singleton edge cases."""
 
-    def test_singleton_thread_safety(self) -> None:
+    def test_should_return_same_instance_when_multiple_threads_call_ezpl(self) -> None:
         """Test singleton behavior with multiple threads."""
         instances = []
 
@@ -63,7 +63,7 @@ class TestSingletonEdgeCases:
         # All instances should be the same
         assert len({id(inst) for inst in instances}) == 1
 
-    def test_reset_during_use(self) -> None:
+    def test_should_not_crash_when_reset_is_called_while_instance_is_used(self) -> None:
         """Test reset() while instance is in use."""
         ezpl1 = Ezpl()
         printer1 = ezpl1.get_printer()
@@ -83,7 +83,9 @@ class TestSingletonEdgeCases:
 class TestLargeFiles:
     """Tests for very large log files."""
 
-    def test_large_log_file_creation(self, temp_dir: Path) -> None:
+    def test_should_create_log_file_when_many_messages_are_written(
+        self, temp_dir: Path
+    ) -> None:
         """Test creating a large log file."""
         log_file = temp_dir / "large.log"
         ezpl = Ezpl(log_file=log_file)
@@ -96,7 +98,9 @@ class TestLargeFiles:
         # Should not crash
         assert log_file.exists()
 
-    def test_rotation_with_large_file(self, temp_dir: Path) -> None:
+    def test_should_rotate_log_when_file_exceeds_size_threshold(
+        self, temp_dir: Path
+    ) -> None:
         """Test rotation with large file."""
         log_file = temp_dir / "large_rotation.log"
         ezpl = Ezpl(
@@ -117,22 +121,28 @@ class TestLargeFiles:
 class TestInvalidConfiguration:
     """Tests for invalid configuration handling."""
 
-    def test_invalid_rotation_format(self, temp_log_file: Path) -> None:
+    def test_should_raise_logging_error_when_rotation_format_is_invalid(
+        self, temp_log_file: Path
+    ) -> None:
         """Loguru validates rotation at init — should raise LoggingError."""
         with pytest.raises(LoggingError):
             Ezpl(log_file=temp_log_file, log_rotation="INVALID_FORMAT")
 
-    def test_invalid_retention_format(self, temp_log_file: Path) -> None:
+    def test_should_raise_logging_error_when_retention_format_is_invalid(
+        self, temp_log_file: Path
+    ) -> None:
         """Loguru validates retention at init — should raise LoggingError."""
         with pytest.raises(LoggingError):
             Ezpl(log_file=temp_log_file, log_retention="INVALID_FORMAT")
 
-    def test_invalid_compression_format(self, temp_log_file: Path) -> None:
+    def test_should_raise_logging_error_when_compression_format_is_invalid(
+        self, temp_log_file: Path
+    ) -> None:
         """Loguru validates compression at init — should raise LoggingError."""
         with pytest.raises(LoggingError):
             Ezpl(log_file=temp_log_file, log_compression="INVALID_FORMAT")
 
-    def test_negative_indent_step(self) -> None:
+    def test_should_succeed_when_indent_step_is_negative(self) -> None:
         """EzPrinter does not validate indent_step — Ezpl init should succeed."""
         ezpl = Ezpl(indent_step=-1)
         assert ezpl is not None
@@ -141,7 +151,9 @@ class TestInvalidConfiguration:
 class TestInvalidPaths:
     """Tests for invalid file path handling."""
 
-    def test_path_with_invalid_characters(self) -> None:
+    def test_should_raise_error_when_path_contains_invalid_windows_characters(
+        self,
+    ) -> None:
         """Invalid path characters should raise on Windows only."""
         invalid_path = Path('test<>:"|?*.log')
         if sys.platform == "win32":
@@ -151,13 +163,15 @@ class TestInvalidPaths:
             ezpl = Ezpl(log_file=invalid_path)
             assert ezpl is not None
 
-    def test_path_too_long(self) -> None:
+    def test_should_raise_error_when_path_exceeds_maximum_length(self) -> None:
         """Excessively long paths should raise FileOperationError or OSError."""
         long_path = Path("A" * 300) / "test.log"
         with pytest.raises((OSError, FileOperationError)):
             _ = Ezpl(log_file=long_path)
 
-    def test_nonexistent_parent_directory(self, temp_dir: Path) -> None:
+    def test_should_create_parent_directory_automatically_when_it_does_not_exist(
+        self, temp_dir: Path
+    ) -> None:
         """Test handling of nonexistent parent directory."""
         # Should create directory automatically
         log_file = temp_dir / "nonexistent" / "subdir" / "test.log"
@@ -171,19 +185,19 @@ class TestInvalidPaths:
 class TestInvalidLogLevels:
     """Tests for invalid log level handling."""
 
-    def test_empty_log_level(self) -> None:
+    def test_should_raise_validation_error_when_log_level_is_empty_string(self) -> None:
         """Empty string is not a valid log level — should raise ValidationError."""
         ezpl = Ezpl()
         with pytest.raises(ValidationError):
             ezpl.set_level("")
 
-    def test_none_log_level(self) -> None:
+    def test_should_raise_error_when_log_level_is_none(self) -> None:
         """None is not a valid log level — should raise AttributeError or ValidationError."""
         ezpl = Ezpl()
         with pytest.raises((AttributeError, ValidationError)):
             ezpl.set_level(None)  # type: ignore[arg-type]
 
-    def test_numeric_log_level(self) -> None:
+    def test_should_raise_error_when_log_level_is_an_integer(self) -> None:
         """Integer is not a valid log level — should raise AttributeError or ValidationError."""
         ezpl = Ezpl()
         with pytest.raises((AttributeError, ValidationError)):
@@ -193,7 +207,9 @@ class TestInvalidLogLevels:
 class TestExcessiveIndentation:
     """Tests for excessive indentation handling."""
 
-    def test_excessive_indent_adds(self) -> None:
+    def test_should_cap_indent_at_max_when_add_indent_is_called_excessively(
+        self,
+    ) -> None:
         """Test that excessive indent adds are limited."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -205,7 +221,9 @@ class TestExcessiveIndentation:
         # Should be limited to MAX_INDENT (10)
         assert printer._indent <= 10
 
-    def test_excessive_nested_indent(self) -> None:
+    def test_should_cap_indent_at_max_when_nested_context_managers_exceed_limit(
+        self,
+    ) -> None:
         """Test excessive nested indentation."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -222,7 +240,9 @@ class TestExcessiveIndentation:
 class TestRotationEdgeCases:
     """Tests for rotation edge cases."""
 
-    def test_rotation_with_compression(self, temp_dir: Path) -> None:
+    def test_should_rotate_and_compress_log_when_rotation_and_compression_are_enabled(
+        self, temp_dir: Path
+    ) -> None:
         """Test rotation with compression enabled."""
         log_file = temp_dir / "rotation_compressed.log"
         ezpl = Ezpl(
@@ -242,7 +262,9 @@ class TestRotationEdgeCases:
             log_file.parent.glob("rotation_compressed.log.*.zip")
         )
 
-    def test_rotation_at_exact_size(self, temp_dir: Path) -> None:
+    def test_should_not_crash_when_log_message_equals_rotation_threshold_size(
+        self, temp_dir: Path
+    ) -> None:
         """Test rotation at exact size threshold."""
         log_file = temp_dir / "exact_size.log"
         ezpl = Ezpl(

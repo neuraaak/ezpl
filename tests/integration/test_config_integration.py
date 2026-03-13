@@ -38,7 +38,9 @@ from ezpl.config import ConfigurationManager
 class TestConfigManagerEzplIntegration:
     """Tests for ConfigurationManager + Ezpl integration."""
 
-    def test_ezpl_uses_config_manager(self, temp_log_file: Path) -> None:
+    def test_should_provide_config_manager_when_get_config_is_called(
+        self, temp_log_file: Path
+    ) -> None:
         """Test that Ezpl uses ConfigurationManager."""
         ezpl = Ezpl(log_file=temp_log_file)
         config = ezpl.get_config()
@@ -46,7 +48,7 @@ class TestConfigManagerEzplIntegration:
         assert isinstance(config, ConfigurationManager)
         assert config is not None
 
-    def test_config_changes_reflect_in_ezpl(
+    def test_should_apply_config_changes_immediately_when_configure_is_called(
         self,
         temp_log_file: Path,
         temp_config_file: Path,  # noqa: ARG002
@@ -64,7 +66,7 @@ class TestConfigManagerEzplIntegration:
         # The default logger level should still be there
         assert ezpl._logger._level is not None
 
-    def test_env_and_file_config_integration(
+    def test_should_prioritize_env_over_file_when_both_are_set(
         self,
         temp_config_file: Path,
         temp_log_file: Path,
@@ -88,7 +90,7 @@ class TestConfigManagerEzplIntegration:
             # Environment should override file
             # Note: This tests the integration, actual priority is tested in unit tests
 
-    def test_config_save_and_reload(
+    def test_should_persist_and_restore_values_when_save_and_reload_are_called(
         self,
         temp_config_file: Path,
         temp_log_file: Path,  # noqa: ARG002
@@ -110,7 +112,7 @@ class TestConfigManagerEzplIntegration:
         config.reload()
         assert config.get("log-level") == "DEBUG"
 
-    def test_config_export_integration(
+    def test_should_create_export_script_when_export_to_script_is_called(
         self, temp_dir: Path, temp_log_file: Path
     ) -> None:
         """Test exporting configuration to script."""

@@ -58,12 +58,12 @@ from .types import (
     get_pattern_color,
     get_pattern_color_by_name,
 )
+from .version import __version__
 
 # ///////////////////////////////////////////////////////////////
 # META INFORMATIONS
 # ///////////////////////////////////////////////////////////////
 
-__version__ = "1.6.1"
 __author__ = "Neuraaak"
 __maintainer__ = "Neuraaak"
 __description__ = "A module for easier logging"

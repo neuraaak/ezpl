@@ -14,17 +14,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ezplog"
-version = "1.6.1"
+version = "1.6.2"
 description = "Modern Python logging framework with Rich console output and loguru file logging, featuring advanced display capabilities, configuration management, and a simple typed API."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Neuraaak" }]
 maintainers = [{ name = "Neuraaak" }]
 keywords = ["logging", "rich", "loguru", "console", "file", "framework", "cli"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -60,6 +59,7 @@ dev = [
     "ty>=0.0.13",
     "pyright>=1.1.0",
     "pre-commit>=3.0.0",
+    "import-linter>=2.0.0",
 
     # Security
     "bandit>=1.7.0",
@@ -79,6 +79,7 @@ test = [
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
     "pytest-xdist>=3.0.0",
+    "import-linter>=2.0.0",
 ]
 docs = [
     "mkdocs>=1.6.0,<2.0.0",
@@ -113,12 +114,12 @@ ezpl = "ezpl.cli.main:cli"
 # Package discovery and inclusion/exclusion patterns
 # ///////////////////////////////////////////////////////////////
 
-[tool.setuptools.package-dir]
-"" = "src"
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["ezpl", "ezpl.*"]
+include = ["ezpl*"]
 exclude = [
     "tests*",
     "build*",
@@ -149,6 +150,9 @@ exclude = [
     ".hooks*",
 ]
 
+[tool.setuptools.package-data]
+ezpl = ["py.typed"]
+
 # ///////////////////////////////////////////////////////////////
 # 🎨 CODE FORMATTING & LINTING TOOLS
 # Auto-formatting, import sorting, and style checking
@@ -156,7 +160,7 @@ exclude = [
 
 # Ruff: All-in-one linter with comprehensive rule sets
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 88
 
 [tool.ruff.lint]
@@ -164,7 +168,7 @@ select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
     "F",   # pyflakes
-    "I",   # import sorting
+    "I",   # isort-compatible import sorting (via ruff)
     "B",   # flake8-bugbear
     "C4",  # flake8-comprehensions
     "UP",  # pyupgrade
@@ -175,15 +179,16 @@ select = [
     "SIM", # flake8-simplify
 ]
 ignore = [
-    "E501", # line too long, handled by formatter
+    "E501", # line too long, handled by ruff format
     "B008", # do not perform function calls in argument defaults
     "S101", # assert_used (for tests)
     "S106", # hardcoded_password_funcarg
     "T201", # print statements (for init.py and scripts)
+    "S603", # subprocess.run without check=True
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*" = ["S101", "S311", "E501"]
+"tests/**/*" = ["S101", "S311", "E501", "ARG002"]
 "examples/**/*" = ["T201", "E501"]
 "src/ezpl/cli/**/*" = ["T201", "E501"]
 
@@ -203,17 +208,11 @@ line-ending = "auto"
 
 # ty: Type checking with minimal configuration
 [tool.ty.environment]
-# Target Python version
-python-version = "3.10"
-
-# Project root paths (first-party modules)
-root = ["./src"]
+python-version = "3.11"
+root = ["src", "src/ezpl"]
 
 [tool.ty.src]
-# Files to check
 include = ["src/ezpl/**/*.py"]
-
-# Files/directories to exclude
 exclude = [
     "**/__pycache__",
     ".venv",
@@ -229,18 +228,12 @@ exclude = [
 respect-ignore-files = true
 
 [tool.ty.terminal]
-# Output format (full or concise)
 output-format = "full"
-
-# Warnings are not treated as errors
 error-on-warning = false
 
 # Pyright: Comprehensive type checking with detailed reporting
 [tool.pyright]
-# Target Python version
-pythonVersion = "3.10"
-
-# Type checking mode (off, basic, standard, strict)
+pythonVersion = "3.11"
 typeCheckingMode = "basic"
 
 # Include/exclude paths
@@ -254,6 +247,8 @@ exclude = [
     "tests",
     "docs",
     "examples",
+    "**/node_modules",
+    "**/.*",
 ]
 
 # Reporting rules: flag missing imports and duplicates
@@ -287,7 +282,30 @@ reportIncompatibleVariableOverride = true
 reportInconsistentConstructor = true
 
 # ///////////////////////////////////////////////////////////////
-# 🧪 TESTING & COVERAGE TOOLS
+# � IMPORT LINTER CONTRACTS
+# Layer dependency contracts enforced in CI
+# ///////////////////////////////////////////////////////////////
+
+[tool.importlinter]
+root_packages = ["ezpl"]
+# Note: import-linter 2.x ne supporte pas source_paths (feature pending PR #323).
+# Le package doit être installé en mode editable (pip install -e .)
+# ou lancer avec PYTHONPATH=src lint-imports
+
+[[tool.importlinter.contracts]]
+name = "layer dependency flow"
+type = "layers"
+layers = [
+    "ezpl.cli",
+    "ezpl.handlers",
+    "ezpl.config",
+    "ezpl.types",
+    "ezpl.utils",
+    "ezpl.core",
+]
+
+# ///////////////////////////////////////////////////////////////
+# �🧪 TESTING & COVERAGE TOOLS
 # Test execution, coverage analysis, and test configuration
 # ///////////////////////////////////////////////////////////////
 
@@ -297,7 +315,7 @@ minversion = "7.0"
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=ezpl",
+    "--cov=src/ezpl",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
@@ -309,6 +327,7 @@ addopts = [
     "--maxfail=5",
 ]
 testpaths = ["tests"]
+pythonpath = ["src"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -328,7 +347,7 @@ filterwarnings = [
 
 # Coverage: Code coverage measurement and reporting
 [tool.coverage.run]
-source = ["ezpl"]
+source = ["src/ezpl"]
 branch = true
 omit = [
     "*/tests/*",
@@ -351,6 +370,8 @@ omit = [
     "docs/*",
     "examples/*",
     "_temp/*",
+    # Module non testable unitairement (point d'entrée TTY/Rich interactif)
+    "*/cli/main.py",
 ]
 
 [tool.coverage.report]
