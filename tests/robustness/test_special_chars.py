@@ -55,7 +55,9 @@ def wait_for_file(path: Path, timeout: float = 2.0) -> None:
 class TestUnicodeCharacters:
     """Tests for Unicode character handling."""
 
-    def test_complex_unicode_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_complex_unicode_messages(
+        self,
+    ) -> None:
         """Test printer with complex Unicode characters."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -75,7 +77,9 @@ class TestUnicodeCharacters:
             printer.info(msg)
             # Verify no exception raised
 
-    def test_complex_unicode_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_complex_unicode_messages(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with complex Unicode characters."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -100,14 +104,16 @@ class TestUnicodeCharacters:
 class TestControlCharacters:
     """Tests for control character handling."""
 
-    def test_null_bytes_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_null_byte_message(self) -> None:
         """Test printer with null bytes."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.error("Message\x00with\x00nulls")
         # Should not crash
 
-    def test_null_bytes_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_null_byte_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with null bytes."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -115,14 +121,18 @@ class TestControlCharacters:
         wait_for_file(temp_log_file)
         # Should not crash, null bytes should be removed
 
-    def test_other_control_chars_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_control_character_message(
+        self,
+    ) -> None:
         """Test printer with other control characters."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.error("Message\x01\x02\x03")
         # Should not crash
 
-    def test_other_control_chars_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_control_character_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with other control characters."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -134,14 +144,18 @@ class TestControlCharacters:
 class TestANSIEscapeSequences:
     """Tests for ANSI escape sequence handling."""
 
-    def test_ansi_sequences_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_ansi_escape_sequence_message(
+        self,
+    ) -> None:
         """Test printer with ANSI escape sequences."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.error("Message\x1b[31mRed\x1b[0m")
         # Should not crash (Rich handles ANSI)
 
-    def test_ansi_sequences_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_ansi_escape_sequence_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with ANSI escape sequences."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -153,14 +167,16 @@ class TestANSIEscapeSequences:
 class TestHTMLXMLTags:
     """Tests for HTML/XML tag handling."""
 
-    def test_html_tags_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_html_tag_message(self) -> None:
         """Test printer with HTML tags."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.error("Message <tag>content</tag>")
         # Should not crash
 
-    def test_html_tags_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_html_tag_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with HTML tags."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -172,14 +188,16 @@ class TestHTMLXMLTags:
 class TestWindowsPaths:
     """Tests for Windows path handling."""
 
-    def test_windows_path_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_windows_path_message(self) -> None:
         """Test printer with Windows path."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.error("Path: C:\\Users\\Test\\file.txt")
         # Should not crash
 
-    def test_windows_path_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_windows_path_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with Windows path."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -191,7 +209,7 @@ class TestWindowsPaths:
 class TestLongMessages:
     """Tests for very long message handling."""
 
-    def test_very_long_message_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_very_long_message(self) -> None:
         """Test printer with very long message."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -199,7 +217,9 @@ class TestLongMessages:
         printer.info(long_message)
         # Should not crash
 
-    def test_very_long_message_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_very_long_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with very long message."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -208,7 +228,9 @@ class TestLongMessages:
         wait_for_file(temp_log_file)
         # Should not crash
 
-    def test_extremely_long_message(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_extremely_long_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test with extremely long message (>100KB)."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -221,14 +243,16 @@ class TestLongMessages:
 class TestEmptyNoneMessages:
     """Tests for empty or None message handling."""
 
-    def test_empty_string_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_empty_string_message(self) -> None:
         """Test printer with empty string."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.info("")
         # Should not crash
 
-    def test_empty_string_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_empty_string_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with empty string."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -236,14 +260,16 @@ class TestEmptyNoneMessages:
         wait_for_file(temp_log_file)
         # Should not crash
 
-    def test_none_message_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_none_as_message(self) -> None:
         """Test printer with None message."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.info(None)
         # Should not crash, should convert to "None"
 
-    def test_none_message_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_none_as_message(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with None message."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()
@@ -255,7 +281,9 @@ class TestEmptyNoneMessages:
 class TestMixedSpecialCharacters:
     """Tests for mixed special characters."""
 
-    def test_mixed_special_chars_printer(self) -> None:
+    def test_should_not_crash_when_printer_receives_mixed_special_characters(
+        self,
+    ) -> None:
         """Test printer with mixed special characters."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
@@ -263,7 +291,9 @@ class TestMixedSpecialCharacters:
         printer.error(mixed)
         # Should not crash
 
-    def test_mixed_special_chars_logger(self, temp_log_file: Path) -> None:
+    def test_should_not_crash_when_logger_receives_mixed_special_characters(
+        self, temp_log_file: Path
+    ) -> None:
         """Test logger with mixed special characters."""
         ezpl = Ezpl(log_file=temp_log_file)
         logger = ezpl.get_logger()

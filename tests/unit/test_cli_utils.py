@@ -32,7 +32,9 @@ from ezpl.cli.utils.log_stats import LogStatistics
 class TestUserEnvManager:
     """Tests for UserEnvManager."""
 
-    def test_set_get_remove_cycle(self, temp_dir: Path) -> None:
+    def test_should_set_get_and_remove_env_var_when_full_cycle_is_performed(
+        self, temp_dir: Path
+    ) -> None:
         """Set, read, then remove a managed environment variable."""
         manager = UserEnvManager()
         manager.env_file = temp_dir / ".env"
@@ -43,7 +45,9 @@ class TestUserEnvManager:
         assert manager.remove_user_env("log-level") is True
         assert manager.get_user_env("log-level") is None
 
-    def test_set_user_env_returns_false_on_save_error(self, temp_dir: Path) -> None:
+    def test_should_return_false_when_set_user_env_encounters_io_error(
+        self, temp_dir: Path
+    ) -> None:
         """set_user_env should return False on I/O errors."""
         manager = UserEnvManager()
         manager.env_file = temp_dir / ".env"
@@ -51,7 +55,9 @@ class TestUserEnvManager:
         with patch.object(manager, "_save_env_file", side_effect=OSError("write")):
             assert manager.set_user_env("log-level", "INFO") is False
 
-    def test_remove_all_user_env_returns_false_on_load_error(self) -> None:
+    def test_should_return_false_when_remove_all_user_env_encounters_load_error(
+        self,
+    ) -> None:
         """remove_all_user_env should return False when loading fails."""
         manager = UserEnvManager()
 
@@ -62,7 +68,9 @@ class TestUserEnvManager:
 class TestLogStatistics:
     """Tests for LogStatistics."""
 
-    def test_level_counts_and_file_info(self, temp_dir: Path) -> None:
+    def test_should_compute_level_counts_and_file_info_when_log_file_is_valid(
+        self, temp_dir: Path
+    ) -> None:
         """Compute counts and basic file information from a valid log file."""
         log_file = temp_dir / "stats.log"
         log_file.write_text(
@@ -81,7 +89,9 @@ class TestLogStatistics:
         assert file_info["line_count"] == 2
         assert file_info["size_bytes"] > 0
 
-    def test_get_file_info_fallback_on_internal_error(self, temp_dir: Path) -> None:
+    def test_should_return_fallback_file_info_when_get_entries_raises_error(
+        self, temp_dir: Path
+    ) -> None:
         """Return fallback file info structure when stats computation fails."""
         log_file = temp_dir / "stats_error.log"
         log_file.write_text(
