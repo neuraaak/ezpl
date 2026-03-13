@@ -28,6 +28,7 @@ from rich.progress import (
     BarColumn,
     DownloadColumn,
     Progress,
+    ProgressColumn,
     SpinnerColumn,
     TaskID,
     TaskProgressColumn,
@@ -197,7 +198,7 @@ class DynamicLayeredProgress:
     def _create_progress_bar(self) -> Progress:
         """Create the Rich Progress instance with proper columns."""
         # Build columns for the main progress bar
-        columns = [
+        columns: list[ProgressColumn] = [
             TextColumn(self._progress_prefix),  # Ezpl prefix
             SpinnerColumn(),
             TextColumn("[bold blue]{task.description}"),

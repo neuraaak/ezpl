@@ -338,21 +338,9 @@ class EzLogger(LoggingHandler):
             # Remove existing handler if any
             logger_id: int | None = self._logger_id
             if logger_id is not None:
-                # Remove the specific handler
+                # loguru.remove() synchronously flushes and closes the file handle
                 self._logger.remove(logger_id)
                 self._logger_id = None
-
-                # Force flush and close on Windows
-                import sys
-                import time
-
-                if sys.platform == "win32":
-                    # Force garbage collection to release file handles
-                    import gc
-
-                    gc.collect()
-                    # Give Windows time to release file locks
-                    time.sleep(0.1)
         except Exception as e:
             raise LoggingError("Failed to close logger", "file") from e
 

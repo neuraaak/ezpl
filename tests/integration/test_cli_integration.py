@@ -45,20 +45,24 @@ def cli_runner():
 class TestCLIWithEzpl:
     """Tests for CLI commands with real Ezpl instance."""
 
-    def test_version_command(self, cli_runner: CliRunner) -> None:
+    def test_should_display_version_when_version_flag_is_given(
+        self, cli_runner: CliRunner
+    ) -> None:
         """Test version command."""
         result = cli_runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
         assert "version" in result.output.lower() or "ezpl" in result.output.lower()
 
-    def test_info_command(self, cli_runner: CliRunner) -> None:
+    def test_should_display_info_when_info_command_is_invoked(
+        self, cli_runner: CliRunner
+    ) -> None:
         """Test info command."""
         result = cli_runner.invoke(cli, ["info"])
         assert result.exit_code == 0
         # Should display info about Ezpl
         assert "ezpl" in result.output.lower() or "info" in result.output.lower()
 
-    def test_logs_list_command(
+    def test_should_list_log_files_when_logs_list_command_is_invoked(
         self, cli_runner: CliRunner, temp_log_file: Path
     ) -> None:
         """Test logs list command."""
@@ -74,12 +78,14 @@ class TestCLIWithEzpl:
         )
         assert result.exit_code == 0
 
-    def test_config_get_command(self, cli_runner: CliRunner) -> None:
+    def test_should_return_config_value_when_config_get_command_is_invoked(
+        self, cli_runner: CliRunner
+    ) -> None:
         """Test config get command."""
         result = cli_runner.invoke(cli, ["config", "get", "log-level"])
         assert result.exit_code == 0
 
-    def test_config_set_command(
+    def test_should_set_config_value_when_config_set_command_is_invoked(
         self,
         cli_runner: CliRunner,
         clean_env: None,  # noqa: ARG002
@@ -88,7 +94,9 @@ class TestCLIWithEzpl:
         result = cli_runner.invoke(cli, ["config", "set", "log-level", "DEBUG"])
         assert result.exit_code == 0
 
-    def test_config_reset_command(self, cli_runner: CliRunner) -> None:
+    def test_should_reset_config_when_reset_command_is_confirmed(
+        self, cli_runner: CliRunner
+    ) -> None:
         """Test config reset command."""
         result = cli_runner.invoke(cli, ["config", "reset", "--confirm"])
         assert result.exit_code == 0
@@ -97,7 +105,7 @@ class TestCLIWithEzpl:
 class TestCLILogParsing:
     """Tests for CLI log parsing with real logs."""
 
-    def test_logs_view_with_real_log(
+    def test_should_view_log_entries_when_log_file_contains_real_logs(
         self, cli_runner: CliRunner, temp_log_file: Path
     ) -> None:
         """Test logs view command with real log file."""
@@ -114,7 +122,7 @@ class TestCLILogParsing:
         )
         assert result.exit_code == 0
 
-    def test_logs_search_with_real_log(
+    def test_should_search_log_entries_when_keyword_pattern_is_given(
         self, cli_runner: CliRunner, temp_log_file: Path
     ) -> None:
         """Test logs search command with real log file."""
@@ -137,7 +145,7 @@ class TestCLILogParsing:
         )
         assert result.exit_code == 0
 
-    def test_logs_stats_with_real_log(
+    def test_should_display_log_statistics_when_log_file_contains_real_logs(
         self, cli_runner: CliRunner, temp_log_file: Path
     ) -> None:
         """Test logs stats command with real log file."""
@@ -158,12 +166,14 @@ class TestCLILogParsing:
 class TestCLIConfigManagement:
     """Tests for CLI config management."""
 
-    def test_config_get_all(self, cli_runner: CliRunner) -> None:
+    def test_should_display_all_config_when_no_key_is_specified(
+        self, cli_runner: CliRunner
+    ) -> None:
         """Test config get all."""
         result = cli_runner.invoke(cli, ["config", "get"])
         assert result.exit_code == 0
 
-    def test_config_set_multiple(
+    def test_should_reject_extra_arguments_when_config_set_receives_too_many_args(
         self,
         cli_runner: CliRunner,
         clean_env: None,  # noqa: ARG002

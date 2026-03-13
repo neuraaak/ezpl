@@ -23,8 +23,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 # Local imports
-import ezpl
-
+from ..version import __version__
 from ._console import console
 from .commands import config, info, logs, version
 
@@ -39,7 +38,7 @@ from .commands import config, info, logs, version
     context_settings={"help_option_names": ["-h", "--help"]},
 )
 @click.version_option(
-    version=ezpl.__version__,
+    version=__version__,
     prog_name="Ezpl CLI",
     message="%(prog)s version %(version)s",
 )

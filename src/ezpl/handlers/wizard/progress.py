@@ -26,6 +26,7 @@ from rich.progress import (
     BarColumn,
     DownloadColumn,
     Progress,
+    ProgressColumn,
     SpinnerColumn,
     TaskID,
     TaskProgressColumn,
@@ -359,7 +360,7 @@ class ProgressMixin:
             ...         progress.advance(task)
         """
         # Build columns based on options
-        columns = [
+        columns: list[ProgressColumn] = [
             TextColumn(self._progress_prefix),
             SpinnerColumn(),
             TextColumn("[bold blue]{task.description}"),
@@ -614,7 +615,7 @@ class ProgressMixin:
             ...     progress.update(task_ids["layer1"], advance=1)
         """
         # Build columns for the main progress bar
-        columns = [
+        columns: list[ProgressColumn] = [
             TextColumn(self._progress_prefix),
             SpinnerColumn(),
             TextColumn("[bold blue]{task.description}"),

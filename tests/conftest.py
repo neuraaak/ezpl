@@ -22,26 +22,20 @@ from __future__ import annotations
 # Standard library imports
 import gc
 import os
+import shutil
 import sys
 import tempfile
-import time
 from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import Mock
 
-# Ensure src layout is importable for tests
-project_root = Path(__file__).resolve().parents[1]
-src_path = project_root / "src"
-if src_path.exists() and str(src_path) not in sys.path:
-    sys.path.insert(0, str(src_path))
-
 # Third-party imports
-import pytest  # noqa: E402
-from rich.console import Console  # noqa: E402
+import pytest
+from rich.console import Console
 
 # Local imports
-from ezpl import Ezpl  # noqa: E402
-from ezpl.config import ConfigurationManager  # noqa: E402
+from ezpl import Ezpl
+from ezpl.config import ConfigurationManager
 
 # ///////////////////////////////////////////////////////////////
 # FIXTURES
@@ -58,12 +52,10 @@ def reset_ezpl() -> Generator[None, None, None]:
     # Reset before test
     Ezpl.reset()
     yield
-    # Reset after test
+    # Reset after test — loguru.remove() in Ezpl.reset() is synchronous,
+    # so no sleep is needed; gc.collect() releases remaining Python references.
     Ezpl.reset()
-    # Force cleanup on Windows to release file handles
-    if sys.platform == "win32":
-        gc.collect()  # Force garbage collection
-        time.sleep(0.15)  # Allow time for Windows to release file locks
+    gc.collect()
 
 
 @pytest.fixture
@@ -74,12 +66,13 @@ def temp_dir() -> Generator[Path, None, None]:
     Yields:
         Path to temporary directory
     """
-    with tempfile.TemporaryDirectory() as tmpdir:
-        yield Path(tmpdir)
-        # On Windows, give time for file handles to be released
-        if sys.platform == "win32":
-            gc.collect()
-            time.sleep(0.1)
+    tmpdir = Path(tempfile.mkdtemp())
+    yield tmpdir
+    # gc.collect() ensures Python-level references are released before rmtree.
+    # ignore_errors=True handles the rare case where a file handle is still
+    # open (e.g. tests that create Ezpl directly without ezpl_instance fixture).
+    gc.collect()
+    shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 @pytest.fixture
@@ -127,18 +120,22 @@ def mock_console() -> Mock:
 
 
 @pytest.fixture
-def ezpl_instance(temp_log_file: Path) -> Ezpl:
+def ezpl_instance(temp_log_file: Path) -> Generator[Ezpl, None, None]:
     """
     Create a fresh Ezpl instance with temporary log file.
 
     Args:
         temp_log_file: Temporary log file path
 
-    Returns:
+    Yields:
         Ezpl instance
     """
     Ezpl.reset()
-    return Ezpl(log_file=temp_log_file)
+    yield Ezpl(log_file=temp_log_file)
+    # Close the file handle HERE (before temp_dir teardown runs),
+    # so that shutil.rmtree in temp_dir can delete the log file immediately.
+    Ezpl.reset()
+    gc.collect()
 
 
 @pytest.fixture
@@ -216,12 +213,12 @@ def pytest_runtest_teardown(item, nextitem) -> None:  # noqa: ARG001
     """
     Hook to handle teardown errors on Windows.
 
-    On Windows, loguru can keep file handles open, causing PermissionError
-    during teardown. These errors are non-critical and don't affect test results.
+    gc.collect() ensures Python-level file handle references are released
+    immediately after each test teardown. No sleep is needed since
+    loguru.remove() closes file handles synchronously.
     """
     if sys.platform == "win32":
-        gc.collect()  # Force garbage collection to release file handles
-        time.sleep(0.15)  # Allow time for Windows to release file locks
+        gc.collect()
 
 
 @pytest.hookimpl(tryfirst=True)
