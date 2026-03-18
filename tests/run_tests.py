@@ -132,7 +132,7 @@ def main() -> None:
     if args.coverage:
         cmd_parts.extend(
             [
-                "--cov=src/ezpl",
+                "--cov=src/ezplog",
                 "--cov-report=term-missing",
                 "--cov-report=html:htmlcov",
             ]

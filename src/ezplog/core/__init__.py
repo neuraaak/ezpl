@@ -26,7 +26,7 @@ from .exceptions import (
     ValidationError,
 )
 from .interfaces import (
-    ConfigurationManager,
+    ConfigurationManagerProtocol,
     IndentationManager,
     LoggingHandler,
 )
@@ -39,7 +39,7 @@ __all__ = [
     # Protocols (structural typing interfaces)
     "LoggingHandler",
     "IndentationManager",
-    "ConfigurationManager",
+    "ConfigurationManagerProtocol",
     # Custom exceptions
     "EzplError",
     "ConfigurationError",

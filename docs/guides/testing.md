@@ -214,7 +214,7 @@ pytest tests/ --tb=long
 
 ```python
 import pytest
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 def test_should_initialize_ezpl_when_called():
     """Test Ezpl initialization."""
@@ -249,7 +249,7 @@ def test_should_log_message_when_info_called(ezpl_instance):
 
 ```python
 import pytest
-from ezpl import Ezpl, ValidationError
+from ezplog import Ezpl, ValidationError
 
 def test_should_raise_validation_error_when_invalid_level():
     """Test that invalid level raises ValidationError."""

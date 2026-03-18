@@ -1,117 +1,65 @@
-# Welcome to Ezpl Documentation
+# ezplog
 
 [![PyPI](https://img.shields.io/badge/PyPI-ezplog-orange.svg)](https://pypi.org/project/ezplog/)
 [![Python versions](https://img.shields.io/pypi/pyversions/ezplog)](https://pypi.org/project/ezplog/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgray.svg)](https://www.python.org/)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgray.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/neuraaak/ezplog/blob/main/LICENSE)
 
 ![Ezpl Logo](https://raw.githubusercontent.com/neuraaak/ezplog/refs/heads/main/docs/assets/logo-min.png)
 
-**Ezpl** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
-
-## ✨ Key Features
-
-- **✅ Singleton Pattern**: One global instance for the whole application
-- **✅ Rich Console Output**: Beautiful formatting with colors, panels, tables, and progress bars
-- **✅ File Logging**: Structured logs with rotation, retention, and compression
-- **✅ RichWizard**: Advanced display capabilities (panels, tables, JSON, dynamic progress bars)
-- **✅ Configuration Management**: JSON config, environment variables, and runtime configuration
-- **✅ CLI Tools**: Command-line interface for logs, config, and statistics
-- **✅ Full Type Hints**: Complete typing support for IDEs and linters
-- **✅ Robust Error Handling**: Never crashes, even with problematic input
-
-## 🚀 Quick Start
-
-### Installation
+**ezplog** is a modern Python logging framework combining **Rich** console output with **loguru** file logging. It provides a single, thread-safe entry point for both console and file logging, with advanced display features and a simple typed API.
 
 ```bash
 pip install ezplog
 ```
 
-Or from source:
-
-```bash
-git clone https://github.com/neuraaak/ezplog.git
-cd ezplog && pip install .
-```
-
-### Basic Usage
-
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
-# Initialize
 ezpl = Ezpl(log_file="app.log")
-printer = ezpl.get_printer()
-logger = ezpl.get_logger()
-
-# Console output (Rich formatting)
-printer.info("Information message")
-printer.success("Operation completed!")
-printer.warning("Warning message")
-
-# File logging (loguru)
-logger.info("Logged to file")
-
-# Advanced features
-printer.wizard.success_panel("Success", "Operation completed")
-printer.wizard.table([{"Name": "Alice", "Age": 30}], title="Users")
+ezpl.info("Application started")
+ezpl.get_printer().success("Ready")
+ezpl.get_logger().info("Saved to file")
 ```
 
-## 📚 Documentation Structure
+## Key Features
 
-| Section                               | Description                                |
-| ------------------------------------- | ------------------------------------------ |
-| [Getting Started](getting-started.md) | Installation, basic usage, and first steps |
-| [API Reference](api/index.md)         | Complete API documentation with examples   |
-| [CLI Reference](cli/index.md)         | Command-line interface documentation       |
-| [User Guides](guides/index.md)        | In-depth guides and tutorials              |
-| [Examples](examples/index.md)         | Practical examples and use cases           |
+- **Singleton pattern**: one `Ezpl` instance manages both console and file output across your entire app
+- **Rich console output**: color-coded messages, panels, tables, JSON, and progress bars via `EzPrinter`
+- **loguru file logging**: structured logs with rotation, retention, and compression via `EzLogger`
+- **Dual-mode support**: app mode for applications, lib mode for library authors (silent by default)
+- **Configuration cascade**: constructor arguments > environment variables > config file > defaults
+- **Config lock**: prevent libraries from reconfiguring your logging after startup
+- **Full type hints**: PEP 561 compliant (`py.typed` marker included)
+- **Robust by design**: never raises on logging failures, safe fallbacks for all edge cases
 
-## 🎯 Main Components
+## Documentation
 
-- **`Ezpl`**: Singleton main class for centralized logging management
-- **`EzPrinter`** (alias: `Printer`): Rich-based console output with pattern format
-- **`EzLogger`** (alias: `Logger`): loguru-based file logging with rotation support
-- **`RichWizard`**: Advanced Rich display (panels, tables, JSON, progress bars)
-- **`ConfigurationManager`**: Centralized configuration management
+| Section                                   | Description                                               |
+| ----------------------------------------- | --------------------------------------------------------- |
+| [Getting Started](getting-started.md)     | Install, first steps, and quickstart in under 5 minutes   |
+| [API Reference](api/index.md)             | Complete class and method reference generated from source |
+| [CLI Reference](cli/index.md)             | Command-line interface for logs and configuration         |
+| [User Guides](guides/index.md)            | Task-oriented guides for common scenarios                 |
+| [Explanations](explanations/dual-mode.md) | Concepts: app mode vs lib mode                            |
 
-## 📦 Core Dependencies
+## Main Components
 
-- **rich>=13.0.0** – Beautiful console output and formatting
-- **loguru>=0.7.2** – Modern and powerful file logging
-- **click>=8.0.0** – CLI framework
+| Class                  | Alias     | Purpose                                               |
+| ---------------------- | --------- | ----------------------------------------------------- |
+| `Ezpl`                 | —         | Singleton facade — the single entry point             |
+| `EzPrinter`            | `Printer` | Rich console output with pattern formatting           |
+| `EzLogger`             | `Logger`  | loguru file logging with rotation support             |
+| `RichWizard`           | —         | Advanced Rich display: panels, tables, JSON, progress |
+| `ConfigurationManager` | —         | Configuration from args, env vars, file, or defaults  |
 
-## 🧪 Testing
+## Requirements
 
-Comprehensive test suite with **377 tests** covering unit, integration, and robustness scenarios — **65% code coverage**.
+- Python >= 3.11
+- `rich >= 13.0.0`
+- `loguru >= 0.7.2`
+- `click >= 8.0.0`
 
-| Metric      | Value                         |
-| ----------- | ----------------------------- |
-| Total tests | 377                           |
-| Passing     | 377 (100%)                    |
-| Coverage    | 65%                           |
-| Test types  | Unit, Integration, Robustness |
+## License
 
-## 🛡️ Robustness
-
-Ezpl is designed to never crash, even with problematic input:
-
-- Automatic string conversion for non-string messages
-- Robust error handling in formatters
-- Safe handling of special characters and Unicode
-- Graceful fallbacks for all error cases
-
-## 📝 License
-
-MIT License – See [LICENSE](https://github.com/neuraaak/ezplog/blob/main/LICENSE) file for details.
-
-## 🔗 Links
-
-- **Repository**: [https://github.com/neuraaak/ezplog](https://github.com/neuraaak/ezplog)
-- **PyPI**: [https://pypi.org/project/ezplog/](https://pypi.org/project/ezplog/)
-- **Issues**: [https://github.com/neuraaak/ezplog/issues](https://github.com/neuraaak/ezplog/issues)
-
----
-
-**Ezpl** – Modern, typed, robust and beautiful logging for Python. 🚀
+MIT — see [LICENSE](https://github.com/neuraaak/ezplog/blob/main/LICENSE)

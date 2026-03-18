@@ -27,7 +27,7 @@ from pathlib import Path
 import pytest
 
 # Local imports
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -184,7 +184,8 @@ class TestConfigurationIntegration:
         # Mock config file path
         with pytest.MonkeyPatch().context() as m:
             m.setattr(
-                "ezpl.config.manager.DefaultConfiguration.CONFIG_FILE", temp_config_file
+                "ezplog.config.manager.DefaultConfiguration.CONFIG_FILE",
+                temp_config_file,
             )
             ezpl = Ezpl(log_file=temp_log_file)
             ezpl.reload_config()

@@ -92,13 +92,16 @@ class IndentationManager(ABC):
 # ///////////////////////////////////////////////////////////////
 
 
-class ConfigurationManager(Protocol):
+class ConfigurationManagerProtocol(Protocol):
     """
     Protocol for configuration management.
 
     This structural typing protocol defines the interface for configuration
     managers. Implementations can support different configuration sources
     (files, environment, in-memory) without coupling to a specific backend.
+
+    Note: Named ConfigurationManagerProtocol (not ConfigurationManager) to avoid
+    collision with the concrete class ezpl.config.manager.ConfigurationManager.
     """
 
     def get(self, key: str, default: Any = None) -> Any:
