@@ -36,9 +36,9 @@ from unittest.mock import patch
 import pytest
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.core.exceptions import FileOperationError, ValidationError
-from ezpl.handlers import EzLogger
+from ezplog import Ezpl
+from ezplog.core.exceptions import FileOperationError, ValidationError
+from ezplog.handlers import EzLogger
 
 # ///////////////////////////////////////////////////////////////
 # HELPER FUNCTIONS

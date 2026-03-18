@@ -23,8 +23,8 @@ from __future__ import annotations
 import pytest
 
 # Local imports
-from ezpl.core.exceptions import ValidationError
-from ezpl.types import (
+from ezplog.core.exceptions import ValidationError
+from ezplog.types import (
     PATTERN_COLORS,
     LogLevel,
     Pattern,

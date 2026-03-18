@@ -18,7 +18,7 @@ from __future__ import annotations
 # Standard library imports
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 # Third-party imports
 from loguru import logger
@@ -302,7 +302,8 @@ class EzLogger(LoggingHandler):
         """
         if not self._logger:
             raise LoggingError("File logger not initialized", "file")
-        return self._logger  # type: ignore[return-value]
+        # logger.bind() returns a BoundLogger internally; cast to declared return type
+        return cast(LoguruLogger, self._logger)
 
     def get_log_file(self) -> Path:
         """

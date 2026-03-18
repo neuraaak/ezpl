@@ -22,8 +22,8 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Local imports
-from ezpl import Ezpl
-from ezpl.types import Pattern
+from ezplog import Ezpl
+from ezplog.types import Pattern
 
 # ///////////////////////////////////////////////////////////////
 # TESTS

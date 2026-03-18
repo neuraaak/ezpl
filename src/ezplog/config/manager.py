@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, cast
 
 # Local imports
-from ..core.exceptions import FileOperationError
+from ..core.exceptions import FileOperationError, ValidationError
 from .defaults import DefaultConfiguration
 
 # ///////////////////////////////////////////////////////////////
@@ -69,6 +69,7 @@ class ConfigurationManager:
         """
         self._config_file = config_file or DefaultConfiguration.CONFIG_FILE
         self._config: dict[str, Any] = {}
+        self._explicit_keys: set[str] = set()
         self._load_configuration()
 
     # ------------------------------------------------
@@ -84,15 +85,17 @@ class ConfigurationManager:
         2. Configuration file
         3. Default values (lowest priority)
         """
-        # Start with defaults
+        # Start with defaults — these are never considered "explicit"
         self._config = DefaultConfiguration.get_all_defaults().copy()
+        self._explicit_keys = set()
 
-        # Load from file if it exists
+        # Load from file if it exists — keys from file are explicit
         if self._config_file.exists():
             try:
                 with open(self._config_file, encoding="utf-8") as f:
                     file_config = json.load(f)
                     self._config.update(file_config)
+                    self._explicit_keys.update(file_config.keys())
             except (OSError, json.JSONDecodeError) as e:
                 # If file is corrupted, use defaults
                 warnings.warn(
@@ -101,7 +104,7 @@ class ConfigurationManager:
                     stacklevel=2,
                 )
 
-        # Override with environment variables
+        # Override with environment variables — env keys are explicit
         self._load_from_environment()
 
     def _load_from_environment(self) -> None:
@@ -123,11 +126,14 @@ class ConfigurationManager:
                     try:
                         self._config[config_key] = int(value)
                     except ValueError as e:
-                        raise ValueError(
-                            f"Failed to convert {value} to int: {e}"
+                        raise ValidationError(
+                            f"Environment variable {env_var} must be an integer, got: {value!r}",
+                            env_var,
+                            value,
                         ) from e
                 else:
                     self._config[config_key] = value
+                self._explicit_keys.add(config_key)
 
     def _load_user_env_file(self) -> dict[str, str]:
         """
@@ -181,18 +187,17 @@ class ConfigurationManager:
         """
         Check if a configuration key is explicitly set (not just a default).
 
+        A key is considered explicit when it comes from a config file, an
+        environment variable, or a direct call to configure()/set()/update().
+        Keys that are present only because of default values return False.
+
         Args:
             key: Configuration key to check
 
         Returns:
-            True if the key is explicitly set in config or environment, False otherwise
+            True if the key was explicitly set, False if it is only a default.
         """
-        # Check if key exists in config (from file or explicitly set)
-        if key in self._config:
-            return True
-        # Check if corresponding environment variable exists
-        env_key = f"EZPL_{key.replace('-', '_').upper()}"
-        return env_key in os.environ
+        return key in self._explicit_keys
 
     def get_log_level(self) -> str:
         """Get the current log level."""
@@ -281,6 +286,7 @@ class ConfigurationManager:
             value: Configuration value
         """
         self._config[key] = value
+        self._explicit_keys.add(key)
 
     def update(self, config_dict: dict[str, Any]) -> None:
         """
@@ -290,6 +296,7 @@ class ConfigurationManager:
             config_dict: Dictionary of configuration values to update
         """
         self._config.update(config_dict)
+        self._explicit_keys.update(config_dict.keys())
 
     # ///////////////////////////////////////////////////////////////
     # FILE OPERATIONS
@@ -319,6 +326,7 @@ class ConfigurationManager:
     def reset_to_defaults(self) -> None:
         """Reset configuration to default values."""
         self._config = DefaultConfiguration.get_all_defaults().copy()
+        self._explicit_keys = set()
 
     def reload(self) -> None:
         """

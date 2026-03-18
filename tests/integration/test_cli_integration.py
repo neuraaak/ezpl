@@ -26,8 +26,8 @@ import pytest
 from click.testing import CliRunner
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.cli.main import cli
+from ezplog import Ezpl
+from ezplog.cli.main import cli
 
 pytestmark = [pytest.mark.integration, pytest.mark.cli]
 
@@ -176,7 +176,7 @@ class TestCLIConfigManagement:
     def test_should_reject_extra_arguments_when_config_set_receives_too_many_args(
         self,
         cli_runner: CliRunner,
-        clean_env: None,  # noqa: ARG002
+        clean_env: None,  # noqa: ARG002  # pyright: ignore[reportUnusedVariable]
     ) -> None:
         """Test config set rejects unexpected extra arguments."""
         result = cli_runner.invoke(

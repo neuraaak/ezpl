@@ -2,13 +2,20 @@
 # MKDOCS CONFIGURATION
 # ///////////////////////////////////////////////////////////////
 
-site_name: Ezpl Documentation
+site_name: ezplog
 site_description: "Modern Python logging framework with Rich console output and loguru file logging"
 site_author: Neuraaak
 site_url: https://neuraaak.github.io/ezplog/
 repo_url: https://github.com/neuraaak/ezplog
 repo_name: neuraaak/ezplog
 edit_uri: edit/main/docs/
+
+strict: true
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
 
 # ///////////////////////////////////////////////////////////////
 # THEME
@@ -44,6 +51,7 @@ theme:
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
+    - content.tooltips
     - toc.follow
   icon:
     repo: fontawesome/brands/github
@@ -59,6 +67,9 @@ theme:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Explanations:
+      - explanations/index.md
+      - App Mode vs Lib Mode: explanations/dual-mode.md
   - User Guides:
       - guides/index.md
       - Configuration: guides/configuration.md
@@ -89,7 +100,6 @@ nav:
 
 plugins:
   - search
-  - section-index
   - coverage:
       page_path: coverage
       html_report_dir: htmlcov
@@ -100,8 +110,8 @@ plugins:
           paths: [src]
           options:
             docstring_style: google
-            docstring_section_style: spacy
-            show_source: true
+            docstring_section_style: table
+            show_source: false
             show_root_heading: true
             show_root_full_path: false
             show_symbol_type_heading: true
@@ -110,6 +120,7 @@ plugins:
             separate_signature: true
             signature_crossrefs: true
             members_order: source
+            group_by_category: true
             merge_init_into_class: true
             filters:
               - "!^_"
@@ -158,6 +169,8 @@ markdown_extensions:
 # ///////////////////////////////////////////////////////////////
 
 extra:
+  version:
+    provider: mike
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/neuraaak/ezplog
@@ -165,6 +178,7 @@ extra:
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/ezplog/
       name: PyPI Package
+
 extra_css:
   - stylesheets/extra.css
 
