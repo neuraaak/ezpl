@@ -27,8 +27,8 @@ from pathlib import Path
 import pytest
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.config import ConfigurationManager
+from ezplog import Ezpl
+from ezplog.config import ConfigurationManager
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -84,7 +84,8 @@ class TestConfigManagerEzplIntegration:
         # Mock config file path
         with pytest.MonkeyPatch().context() as m:
             m.setattr(
-                "ezpl.config.manager.DefaultConfiguration.CONFIG_FILE", temp_config_file
+                "ezplog.config.manager.DefaultConfiguration.CONFIG_FILE",
+                temp_config_file,
             )
             _ = Ezpl(log_file=temp_log_file)
             # Environment should override file

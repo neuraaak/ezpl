@@ -32,8 +32,8 @@ Priority order when multiple instructions exist:
 | Attribute            | Value                                |
 | -------------------- | ------------------------------------ |
 | Package name (PyPI)  | `ezplog`                             |
-| Module name (import) | `ezpl`                               |
-| Python               | `>=3.10`                             |
+| Module name (import) | `ezplog`                             |
+| Python               | `>=3.11`                             |
 | License              | MIT                                  |
 | Author               | Neuraaak                             |
 | Status               | Production/Stable                    |
@@ -64,6 +64,33 @@ Ezpl (Singleton)
 └── ConfigurationManager — Centralized configuration
 ```
 
+### Dual-Mode Usage
+
+The library supports two usage modes depending on whether the code is an **application** or a **library**.
+
+**App mode** — for end applications, configure once at startup:
+
+```python
+from ezplog import Ezpl
+
+ezpl = Ezpl(log_file="app.log", intercept_stdlib=True)
+ezpl.info("Application started")
+```
+
+**Lib mode** — for library authors, use passive proxies that stay silent until the host app configures `Ezpl`:
+
+```python
+from ezplog import get_logger, get_printer
+
+logger = get_logger(__name__)   # stdlib Logger with NullHandler (silent by default)
+printer = get_printer()         # _LazyPrinter: delegates to Ezpl when initialized
+```
+
+Key files:
+
+- `app_mode.py` — `InterceptHandler`: bridges stdlib `logging` calls into loguru (used when `intercept_stdlib=True`)
+- `lib_mode.py` — `get_logger()`, `get_printer()`, `_LazyPrinter`, `_LazyWizard`
+
 ### Configuration Priority
 
 Resolution order (highest to lowest):
@@ -93,11 +120,15 @@ Resolution order (highest to lowest):
 ## Module Structure
 
 ```text
-ezpl/
+ezplog/
 ├── __init__.py              # Public API, exports, version
 ├── ezpl.py                  # Singleton class (core)
+├── app_mode.py              # InterceptHandler: bridge stdlib logging → loguru
+├── lib_mode.py              # Library mode: get_logger(), get_printer() lazy proxies
+├── py.typed                 # PEP 561 marker for type checker support
+├── version.py               # Version string (synced from pyproject.toml)
 ├── cli/                     # CLI (Click-based)
-│   ├── main.py              # Entry point: ezpl command
+│   ├── main.py              # Entry point: ezplog command
 │   ├── commands/            # Subcommands: config, info, logs, version
 │   └── utils/               # CLI utilities: env_manager, log_parser, log_stats
 ├── config/
@@ -110,7 +141,6 @@ ezpl/
 ├── handlers/
 │   ├── console.py           # EzPrinter (Rich console output)
 │   ├── file.py              # EzLogger (loguru file logging)
-│   ├── utils.py             # Handler utilities
 │   └── wizard/              # RichWizard advanced display
 │       ├── core.py          # Core wizard functionality
 │       ├── dynamic.py       # Dynamic progress bars

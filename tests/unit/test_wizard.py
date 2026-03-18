@@ -28,7 +28,7 @@ import time
 import pytest
 
 # Local imports
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -224,7 +224,7 @@ class TestProgressBars:
         self,
     ) -> None:
         """Progress context managers should type task IDs as TaskID."""
-        from ezpl.handlers.wizard.progress import ProgressMixin
+        from ezplog.handlers.wizard.progress import ProgressMixin
 
         methods = [
             "progress",

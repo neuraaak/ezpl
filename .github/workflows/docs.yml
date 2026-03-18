@@ -53,7 +53,7 @@ jobs:
       - name: Generate coverage report
         run: |
           echo "🧪 Running tests and generating coverage report..."
-          pytest --cov=ezpl --cov-report=html --cov-report=xml -q || true
+          pytest --cov=ezplog --cov-report=html --cov-report=xml -q || true
           echo "✅ Coverage report generated!"
 
       - name: Enforce import contracts

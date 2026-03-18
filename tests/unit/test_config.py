@@ -32,8 +32,8 @@ from unittest.mock import patch
 import pytest
 
 # Local imports
-from ezpl.config import ConfigurationManager
-from ezpl.core.exceptions import FileOperationError
+from ezplog.config import ConfigurationManager
+from ezplog.core.exceptions import FileOperationError
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -107,7 +107,7 @@ class TestInitialization:
         )
 
         with pytest.MonkeyPatch().context() as m:
-            m.setattr("ezpl.config.manager.DefaultConfiguration.CONFIG_DIR", temp_dir)
+            m.setattr("ezplog.config.manager.DefaultConfiguration.CONFIG_DIR", temp_dir)
             config = ConfigurationManager(config_file=temp_config_file)
 
         assert config.get("log-level") == "CRITICAL"

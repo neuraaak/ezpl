@@ -24,9 +24,9 @@ import inspect
 from contextlib import AbstractContextManager
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.handlers.file import EzLogger
-from ezpl.types.protocols import LoggerProtocol, PrinterProtocol
+from ezplog import Ezpl
+from ezplog.handlers.file import EzLogger
+from ezplog.types.protocols import LoggerProtocol, PrinterProtocol
 
 # ///////////////////////////////////////////////////////////////
 # TESTS

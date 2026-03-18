@@ -34,8 +34,8 @@ import pytest
 from rich.console import Console
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.config import ConfigurationManager
+from ezplog import Ezpl
+from ezplog.config import ConfigurationManager
 
 # ///////////////////////////////////////////////////////////////
 # FIXTURES

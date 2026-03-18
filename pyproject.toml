@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ezplog"
-version = "1.6.2"
+version = "2.0.0"
 description = "Modern Python logging framework with Rich console output and loguru file logging, featuring advanced display capabilities, configuration management, and a simple typed API."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -85,8 +85,9 @@ docs = [
     "mkdocs>=1.6.0,<2.0.0",
     "mkdocs-material>=9.5.0",
     "mkdocstrings[python]>=0.27.0",
-    "mkdocs-section-index>=0.3.0",
     "mkdocs-coverage>=1.1.0",
+    "mike>=2.0.0",
+    "pymdown-extensions>=10.7",
     "git-cliff>=2.7.0",
 ]
 
@@ -107,7 +108,7 @@ PyPI = "https://pypi.org/project/ezplog/"
 # ///////////////////////////////////////////////////////////////
 
 [project.scripts]
-ezpl = "ezpl.cli.main:cli"
+ezpl = "ezplog.cli.main:cli"
 
 # ///////////////////////////////////////////////////////////////
 # 📦 SETUPTOOLS CONFIGURATION
@@ -119,7 +120,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["ezpl*"]
+include = ["ezpl*", "ezplog*"]
 exclude = [
     "tests*",
     "build*",
@@ -151,6 +152,7 @@ exclude = [
 ]
 
 [tool.setuptools.package-data]
+ezplog = ["py.typed"]
 ezpl = ["py.typed"]
 
 # ///////////////////////////////////////////////////////////////
@@ -190,7 +192,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["S101", "S311", "E501", "ARG002"]
 "examples/**/*" = ["T201", "E501"]
-"src/ezpl/cli/**/*" = ["T201", "E501"]
+"src/ezplog/cli/**/*" = ["T201", "E501"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
@@ -209,10 +211,10 @@ line-ending = "auto"
 # ty: Type checking with minimal configuration
 [tool.ty.environment]
 python-version = "3.11"
-root = ["src", "src/ezpl"]
+root = ["src", "src/ezplog"]
 
 [tool.ty.src]
-include = ["src/ezpl/**/*.py"]
+include = ["src/ezplog/**/*.py"]
 exclude = [
     "**/__pycache__",
     ".venv",
@@ -237,7 +239,7 @@ pythonVersion = "3.11"
 typeCheckingMode = "basic"
 
 # Include/exclude paths
-include = ["src/ezpl"]
+include = ["src/ezplog"]
 exclude = [
     "**/__pycache__",
     ".venv",
@@ -287,7 +289,7 @@ reportInconsistentConstructor = true
 # ///////////////////////////////////////////////////////////////
 
 [tool.importlinter]
-root_packages = ["ezpl"]
+root_packages = ["ezplog"]
 # Note: import-linter 2.x ne supporte pas source_paths (feature pending PR #323).
 # Le package doit être installé en mode editable (pip install -e .)
 # ou lancer avec PYTHONPATH=src lint-imports
@@ -296,12 +298,12 @@ root_packages = ["ezpl"]
 name = "layer dependency flow"
 type = "layers"
 layers = [
-    "ezpl.cli",
-    "ezpl.handlers",
-    "ezpl.config",
-    "ezpl.types",
-    "ezpl.utils",
-    "ezpl.core",
+    "ezplog.cli",
+    "ezplog.handlers",
+    "ezplog.config",
+    "ezplog.types",
+    "ezplog.utils",
+    "ezplog.core",
 ]
 
 # ///////////////////////////////////////////////////////////////
@@ -315,7 +317,7 @@ minversion = "7.0"
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=src/ezpl",
+    "--cov=src/ezplog",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
@@ -347,7 +349,7 @@ filterwarnings = [
 
 # Coverage: Code coverage measurement and reporting
 [tool.coverage.run]
-source = ["src/ezpl"]
+source = ["src/ezplog"]
 branch = true
 omit = [
     "*/tests/*",

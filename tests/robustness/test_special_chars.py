@@ -29,7 +29,7 @@ from pathlib import Path
 import pytest
 
 # Local imports
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 pytestmark = pytest.mark.robustness
 
