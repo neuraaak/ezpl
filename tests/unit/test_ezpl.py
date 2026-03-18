@@ -36,8 +36,8 @@ from unittest.mock import patch
 import pytest
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.core.exceptions import FileOperationError, ValidationError
+from ezplog import Ezpl
+from ezplog.core.exceptions import FileOperationError, ValidationError
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -158,7 +158,7 @@ class TestConfigurationPriority:
 
         # Mock the config file path
         with patch(
-            "ezpl.config.manager.DefaultConfiguration.CONFIG_FILE", temp_config_file
+            "ezplog.config.manager.DefaultConfiguration.CONFIG_FILE", temp_config_file
         ):
             ezpl = Ezpl()
             # Config file should be loaded
@@ -357,7 +357,7 @@ class TestConfiguration:
 
         # Mock config file path
         with patch(
-            "ezpl.config.manager.DefaultConfiguration.CONFIG_FILE", temp_config_file
+            "ezplog.config.manager.DefaultConfiguration.CONFIG_FILE", temp_config_file
         ):
             ezpl = Ezpl()
             # Change config file
@@ -424,7 +424,7 @@ class TestErrorHandling:
         ezpl = Ezpl()
         with (
             patch(
-                "ezpl.ezpl.EzLogger",
+                "ezplog.ezpl.EzLogger",
                 side_effect=FileOperationError("boom", "x.log", "write"),
             ),
             pytest.raises(FileOperationError),
@@ -433,74 +433,75 @@ class TestErrorHandling:
 
 
 class TestConfigLockV2:
-    """Tests for safer lock behavior with owner/token controls."""
+    """Tests for lock/unlock behavior via token-based controls."""
 
-    def test_should_expose_lock_state_and_owner_metadata_when_lock_config_is_called(
+    def test_should_return_token_and_set_locked_state_when_lock_config_is_called(
         self,
     ) -> None:
-        """lock_config() should expose lock state with owner metadata."""
+        """lock_config() should return a non-None token and mark config as locked."""
         Ezpl()
-        token = Ezpl.lock_config(owner="CustomA")
-        info = Ezpl.config_lock_info()
+        token = Ezpl.lock_config()
 
         assert token is not None
-        assert info["locked"] is True
-        assert info["owner"] == "CustomA"
-        assert info["has_token"] is True
+        assert isinstance(token, str)
+        assert Ezpl.is_locked() is True
 
-    def test_should_deny_new_lock_and_warn_when_config_is_already_locked_by_different_owner(
+    def test_should_return_same_token_when_lock_config_is_called_while_already_locked(
         self,
     ) -> None:
-        """A different owner should not be able to replace an active lock."""
+        """Calling lock_config() a second time while locked returns the existing token."""
         Ezpl()
-        first_token = Ezpl.lock_config(owner="CustomA")
-
-        with pytest.warns(UserWarning, match="already locked"):
-            second_token = Ezpl.lock_config(owner="CustomB")
+        first_token = Ezpl.lock_config()
+        second_token = Ezpl.lock_config()
 
         assert first_token is not None
-        assert second_token is None
-        assert Ezpl.config_lock_info()["owner"] == "CustomA"
+        assert first_token == second_token
+        assert Ezpl.is_locked() is True
 
-    def test_should_deny_force_configure_and_warn_when_locked_and_no_owner_or_token_is_given(
+    def test_should_deny_configure_and_warn_when_config_is_locked(
         self,
     ) -> None:
-        """force=True alone should not bypass a lock with owner/token metadata."""
+        """configure() should be blocked and emit a warning when config is locked."""
         ezpl = Ezpl()
-        Ezpl.lock_config(owner="CustomA")
+        Ezpl.lock_config()
 
         with pytest.warns(UserWarning, match="configuration is locked"):
-            applied = ezpl.configure(level="DEBUG", force=True)
+            applied = ezpl.configure(level="DEBUG")
 
         assert applied is False
 
-    def test_should_allow_force_configure_when_matching_owner_or_token_is_given(
+    def test_should_block_configure_when_locked_and_allow_after_unlock(
         self,
     ) -> None:
-        """A matching owner or token should authorize forced configure()."""
+        """configure() succeeds after a valid unlock_config(token) call."""
         ezpl = Ezpl()
-        token = Ezpl.lock_config(owner="CustomA")
+        token = Ezpl.lock_config()
         assert token is not None
 
-        by_owner = ezpl.configure(level="DEBUG", force=True, owner="CustomA")
-        assert by_owner is True
+        # While locked, configure is blocked
+        with pytest.warns(UserWarning):
+            blocked = ezpl.configure(level="DEBUG")
+        assert blocked is False
 
-        by_token = ezpl.configure(level="INFO", force=True, token=token)
-        assert by_token is True
+        # After unlocking with the correct token, configure succeeds
+        assert Ezpl.unlock_config(token) is True
+        assert Ezpl.is_locked() is False
+        applied = ezpl.configure(level="DEBUG")
+        assert applied is True
 
-    def test_should_deny_unlock_and_warn_when_different_owner_tries_to_unlock(
+    def test_should_deny_unlock_and_warn_when_wrong_token_is_given(
         self,
     ) -> None:
-        """unlock_config() should deny unknown callers when lock is active."""
+        """unlock_config() should reject wrong tokens and leave config locked."""
         Ezpl()
-        token = Ezpl.lock_config(owner="CustomA")
+        token = Ezpl.lock_config()
         assert token is not None
 
         with pytest.warns(UserWarning, match="Unlock denied"):
-            unlocked = Ezpl.unlock_config(owner="CustomB")
+            unlocked = Ezpl.unlock_config("wrong-token")
 
         assert unlocked is False
-        assert Ezpl.config_lock_info()["locked"] is True
+        assert Ezpl.is_locked() is True
 
-        assert Ezpl.unlock_config(token=token) is True
-        assert Ezpl.config_lock_info()["locked"] is False
+        assert Ezpl.unlock_config(token) is True
+        assert Ezpl.is_locked() is False

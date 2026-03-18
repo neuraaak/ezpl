@@ -545,16 +545,16 @@ Configuration is stored in `~/.ezpl/config.json`:
 
 ```json
 {
-  "log_level": "INFO",
-  "log_file": "ezpl.log",
-  "printer_level": "INFO",
-  "file_logger_level": "DEBUG",
-  "log_rotation": "10 MB",
-  "log_retention": "7 days",
-  "log_compression": "zip",
-  "indent_step": 3,
-  "indent_symbol": ">",
-  "base_indent_symbol": "~"
+  "log-level": "INFO",
+  "log-file": "ezpl.log",
+  "printer-level": "INFO",
+  "file-logger-level": "DEBUG",
+  "log-rotation": "10 MB",
+  "log-retention": "7 days",
+  "log-compression": "zip",
+  "indent-step": 3,
+  "indent-symbol": ">",
+  "base-indent-symbol": "~"
 }
 ```
 

@@ -1,23 +1,35 @@
 # API Reference (Auto-Generated)
 
-Complete API reference generated from source code docstrings.
+Complete API reference generated from source code docstrings using [mkdocstrings](https://mkdocstrings.github.io/).
 
-## Available Modules
+## Classes
 
-| Module                            | Description                                 |
-| --------------------------------- | ------------------------------------------- |
-| [Ezpl](ezpl.md)                   | Main singleton class for logging management |
-| [EzPrinter](printer.md)           | Rich-based console output handler           |
-| [EzLogger](logger.md)             | Loguru-based file logging handler           |
-| [RichWizard](wizard.md)           | Advanced Rich display capabilities          |
-| [Configuration](configuration.md) | Configuration management                    |
-| [Types](types.md)                 | Type definitions and enums                  |
-| [Exceptions](exceptions.md)       | Exception hierarchy                         |
+| Class                                    | Description                                                |
+| ---------------------------------------- | ---------------------------------------------------------- |
+| [Ezpl](ezpl.md)                          | Thread-safe singleton — the single entry point for logging |
+| [EzPrinter](printer.md)                  | Rich-based console output with pattern formatting          |
+| [EzLogger](logger.md)                    | loguru-based file logging with rotation support            |
+| [RichWizard](wizard.md)                  | Advanced Rich display: panels, tables, JSON, progress bars |
+| [ConfigurationManager](configuration.md) | Configuration from args, env vars, file, and defaults      |
 
-## Navigation
+## Types and Exceptions
 
-Select a module from the list above or use the navigation menu to explore the auto-generated API documentation.
+| Page                        | Description                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| [Types and Enums](types.md) | `LogLevel`, `Pattern`, `PATTERN_COLORS`, `PrinterProtocol`, `LoggerProtocol`, type aliases |
+| [Exceptions](exceptions.md) | Full exception hierarchy rooted at `EzplError`                                             |
 
-## Source Code
+## Lib Mode Functions
 
-All documentation is automatically generated from the source code docstrings using [mkdocstrings](https://mkdocstrings.github.io/).
+For library authors — passive proxies that stay silent until the host application initializes `Ezpl`:
+
+```python
+from ezplog.lib_mode import get_logger, get_printer
+# or equivalently:
+from ezplog import get_logger, get_printer
+
+log = get_logger(__name__)   # stdlib Logger with NullHandler
+printer = get_printer()      # _LazyPrinter proxy
+```
+
+See [App Mode vs Lib Mode](../../explanations/dual-mode.md) for the full explanation.

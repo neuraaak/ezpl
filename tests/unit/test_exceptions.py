@@ -23,7 +23,7 @@ from __future__ import annotations
 import pytest
 
 # Local imports
-from ezpl.core.exceptions import (
+from ezplog.core.exceptions import (
     ConfigurationError,
     EzplError,
     FileOperationError,

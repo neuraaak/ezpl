@@ -1,386 +1,290 @@
 # Getting Started
 
-This guide will help you get started with **Ezpl** quickly and easily.
+Install ezplog and get your first log messages in under 5 minutes.
 
 ## Installation
 
-### From PyPI (Recommended)
+=== "pip"
+`bash
+    pip install ezplog
+    `
 
-```bash
-pip install ezplog
-```
+=== "uv"
+`bash
+    uv add ezplog
+    `
 
-### From Source
+=== "From source"
+`bash
+    git clone https://github.com/neuraaak/ezplog.git
+    cd ezplog
+    pip install .
+    `
 
-```bash
-git clone https://github.com/neuraaak/ezplog.git
-cd ezplog
-pip install .
-```
+**Requirements**: Python 3.11 or higher.
 
-### Development Installation
+## Quickstart — App Mode
 
-For contributors and developers:
-
-```bash
-pip install -e ".[dev]"
-```
-
-This installs Ezpl in editable mode with all development dependencies (testing, linting, formatting tools).
-
-Note: The project uses a `src/` layout (`src/ezpl`).
-
-## First Steps
-
-### Basic Console Logging
+Use app mode when you are writing an **application** (script, service, CLI tool). Initialize `Ezpl` once at startup.
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
-# Create the singleton instance
-ezpl = Ezpl()
+# Initialize once. Subsequent Ezpl() calls return the same instance.
+ezpl = Ezpl(log_file="app.log")
 
-# Get the printer (console output)
+# Facade shortcuts — delegates to EzPrinter
+ezpl.info("Application started")
+ezpl.success("Ready")
+ezpl.warning("Low memory")
+ezpl.error("Connection refused")
+
+# Access the console printer directly for more options
 printer = ezpl.get_printer()
+printer.tip("Use --debug for verbose output")
+printer.system("Detected platform: Linux")
 
-# Log messages with different levels
-printer.debug("Debug message")
-printer.info("Information message")
-printer.success("Success message")
-printer.warning("Warning message")
-printer.error("Error message")
-printer.critical("Critical message")
-```
-
-### File Logging
-
-```python
-from ezpl import Ezpl
-
-# Initialize with a log file
-ezpl = Ezpl(log_file="app.log")
-
-# Get the logger (file output)
+# Access the file logger
 logger = ezpl.get_logger()
-
-# Log to file
-logger.info("This goes to the file")
-logger.debug("Debug information")
-logger.error("Error logged to file")
+logger.info("Saved to file")
+logger.debug("Detailed trace")
 ```
 
-### Combined Console and File Logging
+The console output uses the format `• PATTERN :: message`. The file uses structured lines:
+`2026-03-18 10:00:00 | INFO       | module:function:42 - message`.
+
+## Quickstart — Lib Mode
+
+Use lib mode when you are writing a **library** that will be consumed by other applications. Your logger and printer stay silent until the host app initializes `Ezpl`.
 
 ```python
-from ezpl import Ezpl, Printer, Logger
+# my_library/core.py
+from ezplog.lib_mode import get_logger, get_printer
 
-# Initialize with log file
-ezpl = Ezpl(log_file="app.log")
+log = get_logger(__name__)       # stdlib Logger with NullHandler
+printer = get_printer()          # lazy proxy, silent by default
 
-# Get both handlers with type hints
-printer: Printer = ezpl.get_printer()
-logger: Logger = ezpl.get_logger()
-
-# Log to console
-printer.info("Visible in console")
-
-# Log to file
-logger.info("Saved in file")
-
-# Log to both
-printer.info("Console message")
-logger.info("File message with same content")
+def process(items: list[str]) -> None:
+    log.info("Processing %d items", len(items))       # silent without host config
+    printer.success("Processing complete")             # silent without host config
 ```
+
+When the host application calls `Ezpl(intercept_stdlib=True)`, all `log.*` calls are forwarded automatically. See [App Mode vs Lib Mode](explanations/dual-mode.md) for the full explanation.
 
 ## Configuration
 
-### Direct Configuration
+### Constructor Arguments
+
+All parameters are optional. Any parameter you omit is resolved from environment variables, the config file, or built-in defaults.
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl(
     log_file="app.log",
-    log_level="DEBUG",              # Global level
-    printer_level="INFO",            # Console level
-    file_logger_level="DEBUG",       # File level
-    log_rotation="10 MB",            # Rotate at 10 MB
-    log_retention="7 days",          # Keep 7 days
-    log_compression="zip"            # Compress old logs
+    log_level="DEBUG",              # applies to both printer and logger
+    printer_level="INFO",           # console only — overrides log_level
+    file_logger_level="DEBUG",      # file only — overrides log_level
+    log_rotation="10 MB",           # rotate when file reaches 10 MB
+    log_retention="7 days",         # keep rotated files for 7 days
+    log_compression="zip",          # compress rotated files
+    indent_step=4,
+    indent_symbol=">",
+    base_indent_symbol="~",
+    lock_config=True,               # prevent libraries from reconfiguring
+    intercept_stdlib=True,          # capture stdlib logging.getLogger() calls
 )
 ```
 
 ### Environment Variables
 
-Set environment variables with the `EZPL_` prefix:
+Set `EZPL_*` variables before your process starts.
 
-```bash
-# Linux/macOS
-export EZPL_LOG_LEVEL=DEBUG
-export EZPL_LOG_FILE=app.log
-export EZPL_LOG_ROTATION="10 MB"
+| Variable                  | Purpose               | Default    |
+| ------------------------- | --------------------- | ---------- |
+| `EZPL_LOG_LEVEL`          | Global log level      | `INFO`     |
+| `EZPL_LOG_FILE`           | Log file path         | `ezpl.log` |
+| `EZPL_PRINTER_LEVEL`      | Console output level  | `INFO`     |
+| `EZPL_FILE_LOGGER_LEVEL`  | File logger level     | `INFO`     |
+| `EZPL_LOG_ROTATION`       | Rotation setting      | none       |
+| `EZPL_LOG_RETENTION`      | Retention period      | none       |
+| `EZPL_LOG_COMPRESSION`    | Compression format    | none       |
+| `EZPL_INDENT_STEP`        | Indentation step size | `3`        |
+| `EZPL_INDENT_SYMBOL`      | Indentation symbol    | `>`        |
+| `EZPL_BASE_INDENT_SYMBOL` | Base indent symbol    | `~`        |
 
-# Windows
-set EZPL_LOG_LEVEL=DEBUG
-set EZPL_LOG_FILE=app.log
-set EZPL_LOG_ROTATION=10 MB
-```
+=== "Linux / macOS"
+`bash
+    export EZPL_LOG_LEVEL=DEBUG
+    export EZPL_LOG_FILE=app.log
+    export EZPL_LOG_ROTATION="10 MB"
+    `
+
+=== "Windows"
+`bat
+    set EZPL_LOG_LEVEL=DEBUG
+    set EZPL_LOG_FILE=app.log
+    set EZPL_LOG_ROTATION=10 MB
+    `
 
 ### Configuration File
 
-Create `~/.ezpl/config.json`:
+Create `~/.ezpl/config.json` with hyphenated keys:
 
 ```json
 {
-  "log_level": "INFO",
-  "log_file": "app.log",
-  "printer_level": "INFO",
-  "file_logger_level": "DEBUG",
-  "log_rotation": "10 MB",
-  "log_retention": "7 days",
-  "log_compression": "zip",
-  "indent_step": 3,
-  "indent_symbol": ">",
-  "base_indent_symbol": "~"
+  "log-level": "INFO",
+  "log-file": "app.log",
+  "printer-level": "INFO",
+  "file-logger-level": "DEBUG",
+  "log-rotation": "10 MB",
+  "log-retention": "7 days",
+  "log-compression": "zip",
+  "indent-step": 3,
+  "indent-symbol": ">",
+  "base-indent-symbol": "~"
 }
 ```
 
-### Configuration Priority
+!!! warning "Key format"
+Configuration file keys use hyphens (`log-level`), not underscores. Environment variables use underscores with the `EZPL_` prefix (`EZPL_LOG_LEVEL`).
 
-When multiple configuration sources exist, Ezpl follows this priority order (highest to lowest):
+### Priority Order
 
-1. **Direct arguments** passed to `Ezpl()`
-2. **Environment variables** (`EZPL_*`)
-3. **Configuration file** (`~/.ezpl/config.json`)
-4. **Default values**
+When the same setting is defined in multiple places, the resolution order is:
+
+1. Constructor argument (highest priority)
+2. Environment variable (`EZPL_*`)
+3. Configuration file (`~/.ezpl/config.json`)
+4. Built-in default (lowest priority)
 
 ## Pattern-Based Logging
 
-Ezpl provides contextual patterns for common scenarios:
+`EzPrinter` supports semantic patterns beyond standard log levels. Each pattern maps to a fixed color in the console.
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
 
-# Different patterns
-printer.success("Operation completed")
-printer.error("Something went wrong")
-printer.warn("Warning message")
-printer.tip("Pro tip: Use type hints!")
-printer.system("System message")
-printer.install("Installing package...")
+printer.success("Operation completed")      # bright_green
+printer.error("Connection failed")          # bright_red
+printer.warning("Disk almost full")         # bright_yellow
+printer.tip("Pass --verbose for details")   # bright_magenta
+printer.system("Restarting service")        # bright_blue
+printer.install("Installing dependency")    # bright_green
+printer.detect("Found config at /etc/app")  # bright_blue
+printer.config("Applied user settings")     # bright_green
+printer.deps("Checking requirements")       # bright_cyan
 ```
 
-## Indentation Management
+## Indentation
 
-Ezpl supports contextual indentation for better log readability:
+Use indentation to visually group related log messages.
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
 
-printer.info("Starting process")
-
-# Increase indentation
-printer.add_indent()
-printer.info("Step 1")
-printer.info("Step 2")
-
-# Further indentation
-printer.add_indent()
-printer.info("Substep 2.1")
-printer.info("Substep 2.2")
-
-# Decrease indentation
-printer.del_indent()
-printer.info("Step 3")
-
-# Reset indentation
-printer.reset_indent()
-printer.info("Process complete")
-```
-
-### Context Manager for Indentation
-
-```python
-from ezpl import Ezpl
-
-ezpl = Ezpl()
-printer = ezpl.get_printer()
-
-printer.info("Main process")
+printer.info("Starting deployment")
 
 with ezpl.manage_indent():
-    printer.info("Indented step 1")
-    printer.info("Indented step 2")
-
+    printer.info("Building image")
     with ezpl.manage_indent():
-        printer.info("Double indented")
+        printer.success("Layers cached")
+    printer.info("Pushing to registry")
 
-printer.info("Back to normal")
+printer.success("Deployment complete")
 ```
 
-## Advanced Features
+The `manage_indent()` context manager increments the indentation level on entry and restores it on exit, even if an exception is raised.
 
-### RichWizard - Panels
+## Advanced Display
+
+### Panels
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
 
-# Display panels
-printer.wizard.success_panel("Success", "Operation completed successfully!")
-printer.wizard.error_panel("Error", "Something went wrong")
-printer.wizard.info_panel("Information", "This is an info message")
+printer.wizard.success_panel("Deployment complete", "All 3 services are healthy.")
+printer.wizard.error_panel("Build failed", "Step 4 returned exit code 1.")
+printer.wizard.info_panel("Release notes", "Version 2.0 — see changelog for details.")
 ```
 
-### RichWizard - Tables
+### Tables
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
 
-# Display table
-data = [
-    {"Name": "Alice", "Age": 30, "City": "Paris"},
-    {"Name": "Bob", "Age": 25, "City": "London"},
-    {"Name": "Charlie", "Age": 35, "City": "Berlin"}
+services = [
+    {"Service": "api-gateway", "Status": "healthy", "Uptime": "14d"},
+    {"Service": "auth-service", "Status": "healthy", "Uptime": "14d"},
+    {"Service": "worker", "Status": "degraded", "Uptime": "2h"},
 ]
-
-printer.wizard.table(data, title="Users")
+printer.wizard.table(services, title="Service Status")
 ```
 
-### RichWizard - JSON Display
+### JSON
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
 
-# Display JSON
-data = {
-    "name": "Ezpl",
-    "version": "1.5.1",
-    "features": ["rich", "loguru", "typed"]
+config = {
+    "database": {"host": "localhost", "port": 5432},
+    "cache": {"ttl": 300},
 }
-
-printer.wizard.json(data)
+printer.print_json(config, title="Active configuration")
 ```
 
 ### Progress Bars
 
 ```python
-from ezpl import Ezpl
 import time
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
 
-# Simple progress bar
-with printer.wizard.progress("[cyan]Processing...", total=100) as (progress, task):
+with printer.wizard.progress("Uploading artifacts", total=100) as (progress, task):
     for _ in range(100):
-        time.sleep(0.05)
+        time.sleep(0.02)
         progress.update(task, advance=1)
 ```
 
-## Type Hints Support
+## Config Lock
 
-Ezpl provides full type hints for better IDE support:
+To prevent any library from reconfiguring `Ezpl` after your application has initialized it:
 
 ```python
-from ezpl import Ezpl, Printer, Logger, LogLevel, Pattern
+from ezplog import Ezpl
 
-# Type-annotated code
-ezpl: Ezpl = Ezpl()
-printer: Printer = ezpl.get_printer()
-logger: Logger = ezpl.get_logger()
+# lock_config=True locks configuration immediately after init
+ezpl = Ezpl(log_file="app.log", lock_config=True)
 
-# Using enums
-level: LogLevel = LogLevel.INFO
-pattern: Pattern = Pattern.SUCCESS
+# The token is stored on the class if you need to unlock later
+token = Ezpl._config_lock_token
+
+# To unlock (e.g., for testing or controlled reconfiguration)
+Ezpl.unlock_config(token)
 ```
 
-## CLI Tools
-
-Ezpl includes a command-line interface:
-
-```bash
-# View logs
-ezpl logs view --lines 50
-
-# Show configuration
-ezpl config show
-
-# Set configuration
-ezpl config set log_level DEBUG
-
-# Show statistics
-ezpl logs stats
-
-# Display version
-ezpl version
-```
-
-For more details, see the [CLI Reference](cli/index.md).
+Any call to `configure()`, `set_level()`, or similar methods while locked produces a `UserWarning` and is silently ignored.
 
 ## Next Steps
 
-- Explore the [API Reference](api/index.md) for detailed documentation
-- Check out [Examples](examples/index.md) for practical use cases
-- Read the [User Guides](guides/index.md) for in-depth tutorials
-- Learn about [Testing](guides/testing.md) best practices
-
-## Troubleshooting
-
-### Import Error
-
-If you get an import error:
-
-```python
-# Make sure you're importing from 'ezpl', not 'ezplog'
-from ezpl import Ezpl  # Correct
-# from ezplog import Ezpl  # Wrong
-```
-
-### Log File Not Created
-
-Check file permissions and path:
-
-```python
-from pathlib import Path
-
-log_path = Path("logs/app.log")
-log_path.parent.mkdir(parents=True, exist_ok=True)
-
-ezpl = Ezpl(log_file=str(log_path))
-```
-
-### Version Mismatch
-
-Check your installed version:
-
-```python
-import ezpl
-print(ezpl.__version__)
-```
-
-Or from command line:
-
-```bash
-ezpl version
-```
-
-## Need Help?
-
-- **Documentation**: [Full API Reference](api/index.md)
-- **Issues**: [GitHub Issues](https://github.com/neuraaak/ezplog/issues)
-- **Repository**: [https://github.com/neuraaak/ezplog](https://github.com/neuraaak/ezplog)
+- [App Mode vs Lib Mode](explanations/dual-mode.md) — understand when to use each
+- [API Reference](api/index.md) — complete method reference for all classes
+- [CLI Reference](cli/index.md) — use the `ezplog` command-line tool
+- [Configuration Guide](guides/configuration.md) — full configuration reference

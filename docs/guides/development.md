@@ -1,10 +1,10 @@
 # Development Guide
 
-Comprehensive guide for developing and contributing to **Ezpl**.
+Comprehensive guide for developing and contributing to **ezplog**.
 
 ## Prerequisites
 
-- Python 3.10 or higher
+- Python 3.11 or higher
 - Git
 - Understanding of Python logging, Rich, and loguru
 
@@ -253,7 +253,7 @@ tests/
 
 ```python
 import pytest
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 def test_should_create_singleton_when_first_call():
     """Test that Ezpl creates singleton on first call."""
@@ -329,7 +329,7 @@ twine check dist/*
 pip install dist/*.whl --force-reinstall
 
 # Test import
-python -c "import ezpl; print(ezpl.__version__)"
+python -c "import ezplog; print(ezplog.__version__)"
 ```
 
 ## Documentation

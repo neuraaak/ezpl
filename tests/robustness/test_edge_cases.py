@@ -34,8 +34,8 @@ from pathlib import Path
 import pytest
 
 # Local imports
-from ezpl import Ezpl
-from ezpl.core.exceptions import FileOperationError, LoggingError, ValidationError
+from ezplog import Ezpl
+from ezplog.core.exceptions import FileOperationError, LoggingError, ValidationError
 
 pytestmark = pytest.mark.robustness
 

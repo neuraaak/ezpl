@@ -22,7 +22,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 # Local imports
-import ezpl
+import ezplog as ezpl
 
 from .._console import console
 
@@ -61,9 +61,10 @@ def version_command(full: bool) -> None:
         text.append("License: ", style="dim")
         text.append(f"{license_type}\n", style="white")
 
-        if hasattr(ezpl, "__url__"):
+        url = getattr(ezpl, "__url__", None)
+        if url:
             text.append("URL: ", style="dim")
-            text.append(f"{ezpl.__url__}\n", style="white")
+            text.append(f"{url}\n", style="white")
 
         panel = Panel(
             text,

@@ -22,6 +22,7 @@ from uuid import uuid4
 from loguru import logger
 
 # Local imports
+from .app_mode import InterceptHandler
 from .config import ConfigurationManager
 from .core.exceptions import EzplError, InitializationError
 from .handlers import EzLogger, EzPrinter
@@ -68,7 +69,6 @@ class Ezpl:
     _instance: Ezpl | None = None
     _lock: threading.RLock = threading.RLock()
     _config_locked: bool = False
-    _config_lock_owner: str | None = None
     _config_lock_token: str | None = None
     _log_file: Path
     _printer: EzPrinter
@@ -101,6 +101,9 @@ class Ezpl:
         indent_step: int | None = None,
         indent_symbol: str | None = None,
         base_indent_symbol: str | None = None,
+        *,
+        lock_config: bool = False,
+        intercept_stdlib: bool = False,
     ) -> Ezpl:
         """
         Creates and returns a new instance of Ezpl if none exists.
@@ -126,6 +129,12 @@ class Ezpl:
             * `indent_step` (int, optional): Indentation step size
             * `indent_symbol` (str, optional): Symbol for indentation
             * `base_indent_symbol` (str, optional): Base indentation symbol
+            * `lock_config` (bool): If True, lock configuration immediately after init.
+                Subsequent configure() calls will be blocked unless a valid token is used.
+                The lock token is stored in Ezpl._config_lock_token.
+            * `intercept_stdlib` (bool): If True, install an InterceptHandler on the root
+                stdlib logger so that all library loggers using logging.getLogger(__name__)
+                are automatically forwarded to the loguru pipeline.
 
         **Returns:**
 
@@ -142,8 +151,6 @@ class Ezpl:
             with cls._lock:
                 # Check again after acquiring lock (double-checked locking)
                 if cls._instance is None:
-                    logger.remove()
-
                     # Initialize configuration manager
                     cls._config_manager = ConfigurationManager()
 
@@ -265,6 +272,14 @@ class Ezpl:
                         global_level=final_log_level,
                     )
 
+                    # Apply post-init options — inside the critical section,
+                    # first construction only (double-checked locking guarantees this)
+                    if lock_config:
+                        cls._config_lock_token = cls.lock_config()
+
+                    if intercept_stdlib:
+                        cls._install_intercept_handler()
+
         # Type narrowing: _instance is guaranteed to be set at this point
         if cls._instance is None:
             raise InitializationError("Singleton initialization failed unexpectedly")
@@ -280,9 +295,6 @@ class Ezpl:
         printer_level: str | None = None,
         file_logger_level: str | None = None,
         global_level: str | None = None,
-        force: bool = True,
-        owner: str | None = None,
-        token: str | None = None,
     ) -> None:
         """
         Apply log levels with priority: specific level > global level.
@@ -290,32 +302,16 @@ class Ezpl:
         Only sets levels when a non-None value can be resolved.
         If a specific level is not provided, global_level is used as fallback.
         """
-        effective_printer = printer_level or global_level
-        effective_logger = file_logger_level or global_level
+        effective_printer = printer_level if printer_level is not None else global_level
+        effective_logger = (
+            file_logger_level if file_logger_level is not None else global_level
+        )
 
         if effective_printer:
-            if printer_level and global_level and printer_level != global_level:
-                logger.debug(
-                    f"Ezpl: printer_level='{printer_level}' overrides global_level='{global_level}'"
-                )
-            self.set_printer_level(
-                effective_printer,
-                force=force,
-                owner=owner,
-                token=token,
-            )
+            self.set_printer_level(effective_printer)
 
         if effective_logger:
-            if file_logger_level and global_level and file_logger_level != global_level:
-                logger.debug(
-                    f"Ezpl: file_logger_level='{file_logger_level}' overrides global_level='{global_level}'"
-                )
-            self.set_logger_level(
-                effective_logger,
-                force=force,
-                owner=owner,
-                token=token,
-            )
+            self.set_logger_level(effective_logger)
 
     def _rebuild_logger(
         self,
@@ -421,96 +417,97 @@ class Ezpl:
         """Return the current file logger logging level."""
         return self._logger.level
 
-    def set_level(
-        self,
-        level: str,
-        *,
-        force: bool = False,
-        owner: str | None = None,
-        token: str | None = None,
-    ) -> None:
+    def set_level(self, level: str) -> None:
         """
-        Set the log level for both the printer and the logger simultaneously (compatibility method).
+        Set the log level for both the printer and the logger simultaneously.
 
         **Args:**
 
             * `level` (str): The desired log level (e.g., "INFO", "WARNING").
-            * `force` (bool): If True, bypasses the configuration lock.
 
         **Returns:**
 
             * `None`.
         """
-        if not self._can_write_config(force=force, owner=owner, token=token):
+        if not self._can_write_config():
             warnings.warn(
-                "Ezpl configuration is locked. Call Ezpl.unlock_config() or pass a "
-                "valid owner/token with force=True to override.",
+                "Ezpl configuration is locked. Call Ezpl.unlock_config(token) to unlock.",
                 UserWarning,
                 stacklevel=2,
             )
             return
-        self.set_logger_level(level, force=force, owner=owner, token=token)
-        self.set_printer_level(level, force=force, owner=owner, token=token)
+        self.set_logger_level(level)
+        self.set_printer_level(level)
 
-    def set_printer_level(
-        self,
-        level: str,
-        *,
-        force: bool = False,
-        owner: str | None = None,
-        token: str | None = None,
-    ) -> None:
+    def set_printer_level(self, level: str) -> None:
         """
         Set the log level for the printer only.
 
         **Args:**
 
             * `level` (str): The desired log level for the printer.
-            * `force` (bool): If True, bypasses the configuration lock.
 
         **Returns:**
 
             * `None`.
         """
-        if not self._can_write_config(force=force, owner=owner, token=token):
+        if not self._can_write_config():
             warnings.warn(
-                "Ezpl configuration is locked. Call Ezpl.unlock_config() or pass a "
-                "valid owner/token with force=True to override.",
+                "Ezpl configuration is locked. Call Ezpl.unlock_config(token) to unlock.",
                 UserWarning,
                 stacklevel=2,
             )
             return
         self._printer.set_level(level)
 
-    def set_logger_level(
-        self,
-        level: str,
-        *,
-        force: bool = False,
-        owner: str | None = None,
-        token: str | None = None,
-    ) -> None:
+    def set_logger_level(self, level: str) -> None:
         """
         Set the log level for the file logger only.
 
         **Args:**
 
             * `level` (str): The desired log level for the file logger.
-            * `force` (bool): If True, bypasses the configuration lock.
 
         **Returns:**
 
             * `None`.
         """
-        if not self._can_write_config(force=force, owner=owner, token=token):
+        if not self._can_write_config():
             warnings.warn(
-                "Ezpl configuration is locked. Call Ezpl.unlock_config() or pass a "
-                "valid owner/token with force=True to override.",
+                "Ezpl configuration is locked. Call Ezpl.unlock_config(token) to unlock.",
                 UserWarning,
                 stacklevel=2,
             )
             return
         self._logger.set_level(level)
+
+    # ///////////////////////////////////////////////////////////////
+    # FACADE METHODS
+    # ///////////////////////////////////////////////////////////////
+
+    def debug(self, message: Any) -> None:
+        """Log a debug message to the console printer."""
+        self._printer.debug(message)
+
+    def info(self, message: Any) -> None:
+        """Log an info message to the console printer."""
+        self._printer.info(message)
+
+    def success(self, message: Any) -> None:
+        """Log a success message to the console printer."""
+        self._printer.success(message)
+
+    def warning(self, message: Any) -> None:
+        """Log a warning message to the console printer."""
+        self._printer.warning(message)
+
+    def error(self, message: Any) -> None:
+        """Log an error message to the console printer."""
+        self._printer.error(message)
+
+    def critical(self, message: Any) -> None:
+        """Log a critical message to the console printer."""
+        self._printer.critical(message)
 
     # ///////////////////////////////////////////////////////////////
 
@@ -559,7 +556,6 @@ class Ezpl:
             cls._instance = None
         # Also reset configuration lock
         cls._config_locked = False
-        cls._config_lock_owner = None
         cls._config_lock_token = None
 
     # ------------------------------------------------
@@ -567,100 +563,86 @@ class Ezpl:
     # ------------------------------------------------
 
     @classmethod
-    def lock_config(cls, owner: str = "app") -> str | None:
+    def lock_config(cls) -> str:
         """
-        Lock Ezpl configuration so that future configure() calls are ignored
-        unless explicitly forced.
+        Lock Ezpl configuration so that future configure() and set_level() calls
+        are blocked until unlock_config(token) is called.
 
         Intended usage:
             1. Root application configures Ezpl once
-            2. Calls Ezpl.lock_config()
-            3. Libraries calling configure() later will not override settings
+            2. Calls token = Ezpl.lock_config()
+            3. Stores the token; libraries cannot reconfigure Ezpl without it
+
+        Returns:
+            str: A token required to unlock the configuration later.
         """
         with cls._lock:
-            normalized_owner = owner.strip() if owner.strip() else "app"
-
-            if cls._config_locked and cls._config_lock_owner not in (
-                None,
-                normalized_owner,
-            ):
-                warnings.warn(
-                    f"Ezpl configuration is already locked by '{cls._config_lock_owner}'.",
-                    UserWarning,
-                    stacklevel=2,
+            if not cls._config_locked:
+                cls._config_locked = True
+                cls._config_lock_token = uuid4().hex
+            token = cls._config_lock_token
+            if token is None:
+                # Should never happen: token is set whenever _config_locked is True
+                raise RuntimeError(
+                    "Configuration lock token is None despite lock being active"
                 )
-                return None
-
-            cls._config_locked = True
-            cls._config_lock_owner = normalized_owner
-            cls._config_lock_token = uuid4().hex
-            return cls._config_lock_token
+            return token
 
     @classmethod
-    def unlock_config(
-        cls,
-        *,
-        owner: str | None = None,
-        token: str | None = None,
-        force: bool = False,
-    ) -> bool:
+    def unlock_config(cls, token: str) -> bool:
         """
         Unlock Ezpl configuration.
 
-        Use with care: this allows configure() to change global logging
-        configuration again.
+        Args:
+            token: The token returned by lock_config(). Must match exactly.
+
+        Returns:
+            True if unlocked successfully, False if the token is wrong.
         """
         with cls._lock:
             if not cls._config_locked:
                 return True
 
-            owner_match = owner is not None and owner == cls._config_lock_owner
-            token_match = token is not None and token == cls._config_lock_token
-
-            if not force and not owner_match and not token_match:
+            if token != cls._config_lock_token:
                 warnings.warn(
-                    "Unlock denied: provide matching owner or token, or use force=True.",
+                    "Unlock denied: invalid token.",
                     UserWarning,
                     stacklevel=2,
                 )
                 return False
 
             cls._config_locked = False
-            cls._config_lock_owner = None
             cls._config_lock_token = None
             return True
 
     @classmethod
-    def config_lock_info(cls) -> dict[str, Any]:
-        """Return current configuration lock state for diagnostics."""
-        return {
-            "locked": cls._config_locked,
-            "owner": cls._config_lock_owner,
-            "has_token": cls._config_lock_token is not None,
-        }
+    def is_locked(cls) -> bool:
+        """Return True if the configuration is currently locked."""
+        return cls._config_locked
 
     @classmethod
-    def _can_write_config(
-        cls,
-        *,
-        force: bool = False,
-        owner: str | None = None,
-        token: str | None = None,
-    ) -> bool:
-        """Return True when a configuration write is authorized under lock rules."""
-        if not cls._config_locked:
-            return True
+    def _can_write_config(cls) -> bool:
+        """Return True when configuration writes are allowed."""
+        return not cls._config_locked
 
-        if not force:
-            return False
+    @classmethod
+    def _install_intercept_handler(cls) -> None:
+        """
+        Install InterceptHandler on the root stdlib logger.
 
-        # Backward compatibility: if no owner/token metadata exists, force still works.
-        if cls._config_lock_owner is None and cls._config_lock_token is None:
-            return True
+        After this call, all records emitted via logging.getLogger(__name__)
+        — including those from ezpl.lib_mode.get_logger() — are forwarded
+        to the loguru pipeline.
 
-        owner_match = owner is not None and owner == cls._config_lock_owner
-        token_match = token is not None and token == cls._config_lock_token
-        return owner_match or token_match
+        This method is idempotent: calling it multiple times installs the
+        handler only once.
+        """
+        import logging as _logging
+
+        root = _logging.getLogger()
+        if not any(isinstance(h, InterceptHandler) for h in root.handlers):
+            root.addHandler(InterceptHandler())
+            root.setLevel(0)
 
     def set_log_file(self, log_file: Path | str) -> None:
         """
@@ -956,8 +938,7 @@ class Ezpl:
                 if global_log_level_explicit
                 else printer_level
             )
-            self.set_printer_level(effective_printer, force=True)
-            self._printer.mark_level_as_configured()
+            self.set_printer_level(effective_printer)
 
         if not logger_manually_set:
             effective_logger = (
@@ -967,31 +948,31 @@ class Ezpl:
                     global_log_level if global_log_level_explicit else file_logger_level
                 )
             )
-            self.set_logger_level(effective_logger, force=True)
-            self._logger.mark_level_as_configured()
+            self.set_logger_level(effective_logger)
 
-        # Reinitialize logger with new rotation / retention / compression settings
+        # Reinitialize handlers — new instances have _level_manually_set = False by default
         self._rebuild_logger()
-        if not logger_manually_set:
-            self._logger.mark_level_as_configured()
-
-        # Reinitialize printer with new indent settings
         self._rebuild_printer()
-        if not printer_manually_set:
-            self._printer.mark_level_as_configured()
 
     def configure(
-        self, config_dict: dict[str, Any] | None = None, **kwargs: Any
+        self,
+        config_dict: dict[str, Any] | None = None,
+        *,
+        persist: bool = False,
+        **kwargs: Any,
     ) -> bool:
         """
         Configure Ezpl dynamically.
 
         Args:
             config_dict: Dictionary of configuration values to update
+            persist: If True, write changes to ~/.ezpl/config.json so they
+                survive future runs. Defaults to False (in-memory only).
             **kwargs: Configuration options (alternative to config_dict):
                 - log_file or log-file: Path to log file
                 - printer_level or printer-level: Printer log level
                 - logger_level or file-logger-level: File logger level
+                - file_logger_level or file-logger-level: File logger level
                 - level or log-level: Set both printer and logger level
                 - log_rotation or log-rotation: Rotation setting (e.g., "10 MB", "1 day")
                 - log_retention or log-retention: Retention period (e.g., "7 days")
@@ -1002,24 +983,16 @@ class Ezpl:
 
         Returns:
             True if configuration was applied, False if it was blocked by lock.
-
-        Note: Changes are persisted to the configuration file.
         """
         # Merge config_dict and kwargs
         if config_dict:
             kwargs.update(config_dict)
 
-        # Special control flag (not stored in configuration):
-        # - force=True allows configure() even when configuration is locked
-        force = kwargs.pop("force", False)
-        owner = kwargs.pop("owner", None)
-        token = kwargs.pop("token", None)
-
-        # If configuration is locked and not forced, warn and return False
-        if not self._can_write_config(force=force, owner=owner, token=token):
+        # If configuration is locked, warn and return False
+        if not self._can_write_config():
             warnings.warn(
-                "Ezpl configuration is locked. Call Ezpl.unlock_config() or pass a "
-                "valid owner/token with force=True to override.",
+                "Ezpl configuration is locked. Call Ezpl.unlock_config(token) "
+                "to unlock before reconfiguring.",
                 UserWarning,
                 stacklevel=2,
             )
@@ -1031,6 +1004,7 @@ class Ezpl:
             "log_file": "log-file",
             "printer_level": "printer-level",
             "logger_level": "file-logger-level",
+            "file_logger_level": "file-logger-level",
             "level": "log-level",
             "log_rotation": "log-rotation",
             "log_retention": "log-retention",
@@ -1045,22 +1019,23 @@ class Ezpl:
             normalized_key = key_mapping.get(key, key)
             normalized_config[normalized_key] = value
 
+        # Extract log-file before update — set_log_file() owns that write
+        new_log_file = normalized_config.pop("log-file", None)
+
         # Update configuration manager
         self._config_manager.update(normalized_config)
-        self._config_manager.save()
+        if persist:
+            self._config_manager.save()
 
         # Apply changes to handlers
-        if "log-file" in normalized_config:
-            self.set_log_file(normalized_config["log-file"])
+        if new_log_file is not None:
+            self.set_log_file(new_log_file)
 
         # Handle log level changes with priority: specific > global
         self._apply_level_priority(
             printer_level=normalized_config.get("printer-level"),
             file_logger_level=normalized_config.get("file-logger-level"),
             global_level=normalized_config.get("log-level"),
-            force=force,
-            owner=owner,
-            token=token,
         )
 
         # Reinitialize logger if rotation settings changed

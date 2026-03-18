@@ -42,7 +42,7 @@ The Ezpl API is organized into several key components, each serving a specific p
 Ezpl provides comprehensive type hints for better IDE support:
 
 ```python
-from ezpl import Ezpl, Printer, Logger, LogLevel, Pattern
+from ezplog import Ezpl, Printer, Logger, LogLevel, Pattern
 from typing import TYPE_CHECKING
 
 # Full type annotations
@@ -92,7 +92,7 @@ Configuration follows a clear priority order:
 ### Basic Usage
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Initialize
 ezpl = Ezpl(log_file="app.log")
@@ -111,7 +111,7 @@ logger.info("Logged to file")
 ### Advanced Features
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
@@ -130,7 +130,7 @@ printer.wizard.json({"config": "value"})
 ### Configuration
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Direct configuration
 ezpl = Ezpl(

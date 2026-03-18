@@ -28,7 +28,7 @@ from pathlib import Path
 # CONSTANTS
 # ///////////////////////////////////////////////////////////////
 
-PACKAGE = "ezpl"
+PACKAGE = "ezplog"
 OUTPUT_FILE = Path(__file__).resolve().parents[2] / "docs" / "architecture.md"
 
 # Ordered layers — defines graph node order and which layers to include

@@ -20,7 +20,7 @@ The `examples/` directory in the repository contains ready-to-run demonstration 
 ### Simple Console Logging
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Initialize
 ezpl = Ezpl()
@@ -45,7 +45,7 @@ printer.error("Failed to connect to database")
 ### File Logging
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Initialize with log file
 ezpl = Ezpl(log_file="app.log")
@@ -68,7 +68,7 @@ logger.error("Connection failed")
 ### Combined Console and File Logging
 
 ```python
-from ezpl import Ezpl, Printer, Logger
+from ezplog import Ezpl, Printer, Logger
 
 # Initialize with type hints
 ezpl = Ezpl(log_file="app.log", log_level="DEBUG")
@@ -88,7 +88,7 @@ logger.info("Data saved to database")
 ### Using Contextual Patterns
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
@@ -116,7 +116,7 @@ printer.deps("Dependencies: rich==13.7.0, loguru==0.7.2")
 ### Custom Patterns
 
 ```python
-from ezpl import Ezpl, Pattern
+from ezplog import Ezpl, Pattern
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
@@ -131,7 +131,7 @@ printer.print_pattern("CUSTOM", "Custom pattern message")
 ### Panels
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 wizard = ezpl.get_printer().wizard
@@ -159,7 +159,7 @@ wizard.installation_panel(
 ### Tables
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 wizard = ezpl.get_printer().wizard
@@ -200,7 +200,7 @@ wizard.command_table(commands)
 ### JSON Display
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 wizard = ezpl.get_printer().wizard
@@ -229,7 +229,7 @@ wizard.json(json_str)
 ### Simple Progress
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 import time
 
 ezpl = Ezpl()
@@ -245,7 +245,7 @@ with wizard.progress("[cyan]Processing...", total=100) as (progress, task):
 ### Spinner
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 import time
 
 ezpl = Ezpl()
@@ -268,7 +268,7 @@ with wizard.spinner_with_status("Processing") as (progress, task):
 ### Download Progress
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 import time
 
 ezpl = Ezpl()
@@ -289,7 +289,7 @@ with wizard.file_download_progress(
 ### Step Progress
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 import time
 
 ezpl = Ezpl()
@@ -315,7 +315,7 @@ with wizard.step_progress(steps, "Setup Process") as (progress, task, steps_list
 ### Installation Progress
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 import time
 
 ezpl = Ezpl()
@@ -341,7 +341,7 @@ with wizard.package_install_progress(
 ### Dynamic Layered Progress
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 import time
 
 ezpl = Ezpl()
@@ -392,7 +392,7 @@ with wizard.dynamic_layered_progress(stages) as dlp:
 ### Manual Indentation
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
@@ -433,7 +433,7 @@ printer.success("Process complete")
 ### Context Manager
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 printer = ezpl.get_printer()
@@ -456,7 +456,7 @@ printer.info("Back to normal")
 ### Runtime Configuration
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Initialize with configuration
 ezpl = Ezpl(
@@ -488,7 +488,7 @@ ezpl.reload_config()
 
 ```python
 import os
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Set environment variables
 os.environ["EZPL_LOG_LEVEL"] = "DEBUG"
@@ -510,21 +510,21 @@ Create `~/.ezpl/config.json`:
 
 ```json
 {
-  "log_level": "INFO",
-  "log_file": "ezpl.log",
-  "printer_level": "INFO",
-  "file_logger_level": "DEBUG",
-  "log_rotation": "10 MB",
-  "log_retention": "7 days",
-  "log_compression": "zip",
-  "indent_step": 3,
-  "indent_symbol": ">",
-  "base_indent_symbol": "~"
+  "log-level": "INFO",
+  "log-file": "ezpl.log",
+  "printer-level": "INFO",
+  "file-logger-level": "DEBUG",
+  "log-rotation": "10 MB",
+  "log-retention": "7 days",
+  "log-compression": "zip",
+  "indent-step": 3,
+  "indent-symbol": ">",
+  "base-indent-symbol": "~"
 }
 ```
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Initialize (will use config file)
 ezpl = Ezpl()
@@ -535,7 +535,7 @@ ezpl = Ezpl()
 ### Complete Application Example
 
 ```python
-from ezpl import Ezpl, Printer, Logger
+from ezplog import Ezpl, Printer, Logger
 from pathlib import Path
 import time
 
@@ -595,7 +595,7 @@ if __name__ == "__main__":
 ### Error Handling Example
 
 ```python
-from ezpl import Ezpl, ValidationError, LoggingError
+from ezplog import Ezpl, ValidationError, LoggingError
 import sys
 
 def main():

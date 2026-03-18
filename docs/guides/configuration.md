@@ -18,7 +18,7 @@ Ezpl provides flexible configuration management through multiple sources with a 
 Pass configuration directly to the `Ezpl()` constructor:
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl(
     log_file="app.log",
@@ -113,23 +113,23 @@ Create `~/.ezpl/config.json`:
 
 ```json
 {
-  "log_level": "INFO",
-  "log_file": "ezpl.log",
-  "printer_level": "INFO",
-  "file_logger_level": "DEBUG",
-  "log_rotation": "10 MB",
-  "log_retention": "7 days",
-  "log_compression": "zip",
-  "indent_step": 3,
-  "indent_symbol": ">",
-  "base_indent_symbol": "~"
+  "log-level": "INFO",
+  "log-file": "ezpl.log",
+  "printer-level": "INFO",
+  "file-logger-level": "DEBUG",
+  "log-rotation": "10 MB",
+  "log-retention": "7 days",
+  "log-compression": "zip",
+  "indent-step": 3,
+  "indent-symbol": ">",
+  "base-indent-symbol": "~"
 }
 ```
 
 **Creating Configuration:**
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Initialize with desired settings
 ezpl = Ezpl(
@@ -179,7 +179,7 @@ Available log levels (case-insensitive):
 **Setting Levels:**
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 
@@ -287,7 +287,7 @@ ezpl = Ezpl(log_compression="tar.gz")
 ## Complete Configuration Example
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Production configuration
 ezpl = Ezpl(
@@ -306,7 +306,7 @@ ezpl = Ezpl(
 ### Using configure()
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 
@@ -343,7 +343,7 @@ ezpl.reload_config()
 Access the configuration manager directly:
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl()
 config = ezpl.get_config()
@@ -353,8 +353,8 @@ log_level = config.get_log_level()
 log_file = config.get_log_file()
 
 # Set values
-config.set("log_level", "DEBUG")
-config.set("log_rotation", "10 MB")
+config.set("log-level", "DEBUG")
+config.set("log-rotation", "10 MB")
 
 # Save to file
 config.save()
@@ -371,7 +371,7 @@ config.reset_to_defaults()
 Prevent configuration changes (useful for libraries):
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl(log_level="INFO")
 
@@ -397,7 +397,7 @@ print(ezpl.config_lock_info())
 Use this simple layering approach when multiple libraries use Ezpl:
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # In a library (CustomA / CustomB)
 ezpl = Ezpl()
@@ -457,7 +457,7 @@ export EZPL_PRINTER_LEVEL=WARNING
 Export configuration as environment variables script:
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 ezpl = Ezpl(log_level="DEBUG", log_rotation="10 MB")
 config = ezpl.get_config()
@@ -538,20 +538,12 @@ ezpl.configure(level="DEBUG", force=True, token=token)
 
 ### 7. Document Your Configuration
 
-```python
-# config.json with comments (use JSON5 if available)
+```json
 {
-  // Global log level for both console and file
-  "log_level": "INFO",
-
-  // Rotate logs at 10 MB
-  "log_rotation": "10 MB",
-
-  // Keep logs for 30 days
-  "log_retention": "30 days",
-
-  // Compress old logs with GZIP
-  "log_compression": "gz"
+  "log-level": "INFO",
+  "log-rotation": "10 MB",
+  "log-retention": "30 days",
+  "log-compression": "gz"
 }
 ```
 
