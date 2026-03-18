@@ -2,82 +2,90 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://neuraaak.github.io/ezplog/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/architecture/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/changelog/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/getting-started/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/configuration/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/exceptions/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/ezpl/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/logger/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/printer/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/types/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/api/reference/wizard/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/cli/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/examples/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://neuraaak.github.io/ezplog/explanations/</loc>
+         <lastmod>2026-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://neuraaak.github.io/ezplog/explanations/dual-mode/</loc>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/guides/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/guides/configuration/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/guides/development/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/guides/testing/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
     <url>
          <loc>https://neuraaak.github.io/ezplog/coverage/</loc>
-         <lastmod>2026-03-13</lastmod>
+         <lastmod>2026-03-18</lastmod>
     </url>
 </urlset>
