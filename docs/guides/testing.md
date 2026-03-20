@@ -6,7 +6,7 @@ Comprehensive guide to the **Ezpl** test suite and testing practices.
 
 Ezpl includes a comprehensive test suite with **377 tests** covering unit, integration, and robustness scenarios with **65% code coverage**.
 
-The project uses a `src/` layout (`src/ezpl`). The test suite adds `src/` to the import path in `tests/conftest.py`, so tests can run without a separate install step.
+The project uses a `src/` layout (`src/ezplog`). The test suite adds `src/` to the import path in `tests/conftest.py`, so tests can run without a separate install step.
 
 ## Test Statistics
 
@@ -182,7 +182,7 @@ pytest tests/ -v
 pytest tests/unit/ -v
 
 # With coverage
-pytest tests/ --cov=ezpl --cov-report=html --cov-report=term
+pytest tests/ --cov=src/ezplog --cov-report=html --cov-report=term
 
 # Specific test file
 pytest tests/unit/test_ezpl.py -v
@@ -312,8 +312,9 @@ def test_should_create_log_file_when_logging(temp_log_file, ezpl_instance):
 ### Testing CLI Commands
 
 ```python
+import ezplog
 from click.testing import CliRunner
-from ezpl.cli.main import cli
+from ezplog.cli.main import cli
 
 def test_should_display_version_when_version_command_run():
     """Test version command."""
@@ -325,7 +326,7 @@ def test_should_display_version_when_version_command_run():
 
     # Assert
     assert result.exit_code == 0
-    assert "1.5.1" in result.output
+    assert ezplog.__version__ in result.output
 ```
 
 ## Test Categories
@@ -337,9 +338,9 @@ Test individual components in isolation:
 ```python
 def test_should_format_pattern_when_print_pattern_called():
     """Test pattern formatting."""
-    from ezpl.handlers.console import EzPrinter
+    from ezplog.handlers.console import EzPrinter
 
-    printer = EzPrinter(log_level="INFO")
+    printer = EzPrinter(level="INFO")
     # Test pattern formatting logic
 ```
 
@@ -418,16 +419,16 @@ def pytest_runtest_makereport(item, call):
 
 ```bash
 # HTML report
-pytest tests/ --cov=ezpl --cov-report=html
+pytest tests/ --cov=src/ezplog --cov-report=html
 
 # Terminal report
-pytest tests/ --cov=ezpl --cov-report=term-missing
+pytest tests/ --cov=src/ezplog --cov-report=term-missing
 
 # XML report (for CI)
-pytest tests/ --cov=ezpl --cov-report=xml
+pytest tests/ --cov=src/ezplog --cov-report=xml
 
 # All reports
-pytest tests/ --cov=ezpl --cov-report=html --cov-report=term-missing --cov-report=xml
+pytest tests/ --cov=src/ezplog --cov-report=html --cov-report=term-missing --cov-report=xml
 ```
 
 ### Coverage Configuration
@@ -435,7 +436,7 @@ pytest tests/ --cov=ezpl --cov-report=html --cov-report=term-missing --cov-repor
 ```toml
 # pyproject.toml
 [tool.coverage.run]
-source = ["ezpl"]
+source = ["src/ezplog"]
 branch = true
 omit = [
     "*/tests/*",
@@ -463,7 +464,7 @@ precision = 2
 
 ```bash
 # Generate HTML report
-pytest tests/ --cov=ezpl --cov-report=html
+pytest tests/ --cov=src/ezplog --cov-report=html
 
 # Open in browser
 # Windows
@@ -490,7 +491,7 @@ Tests run automatically on:
 # Example workflow
 - name: Run tests
   run: |
-    pytest tests/ -v --tb=short --cov=ezpl
+    pytest tests/ -v --tb=short --cov=src/ezplog
 ```
 
 ### Pre-commit Hooks
@@ -570,7 +571,7 @@ def reset():
 ```python
 # Use mocker fixture from pytest-mock
 def test_example(mocker):
-    mock = mocker.patch('ezpl.handlers.console.Console')
+    mock = mocker.patch('ezplog.handlers.console.Console')
     # ...
 ```
 
@@ -578,10 +579,10 @@ def test_example(mocker):
 
 ```bash
 # Check which lines are missing
-pytest tests/ --cov=ezpl --cov-report=term-missing
+pytest tests/ --cov=src/ezplog --cov-report=term-missing
 
 # View detailed HTML report
-pytest tests/ --cov=ezpl --cov-report=html
+pytest tests/ --cov=src/ezplog --cov-report=html
 ```
 
 ## Resources
