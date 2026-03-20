@@ -379,12 +379,12 @@ ezpl version [OPTIONS]
 ```bash
 # Simple version
 ezpl version
-# Output: 1.5.1
+# Output: 2.0.1
 
 # Full version info
 ezpl version --full
 # Output:
-# Ezpl version 1.5.1
+# ezplog version 2.0.1
 # Python 3.11.0
 # Platform: linux
 ```
@@ -408,10 +408,10 @@ Shows detailed information including:
 **Example output:**
 
 ```text
-Ezpl Package Information
-========================
-Version: 1.5.1
-Location: /usr/local/lib/python3.11/site-packages/ezpl
+ezplog Package Information
+==========================
+Version: 2.0.1
+Location: /usr/local/lib/python3.11/site-packages/ezplog
 Config Dir: /home/user/.ezpl
 Python: 3.11.0
 
@@ -429,7 +429,7 @@ Ezpl supports the following environment variables:
 | ------------------------- | ------------------ | ----------------- |
 | `EZPL_LOG_LEVEL`          | Global log level   | `INFO`            |
 | `EZPL_LOG_FILE`           | Log file name      | `ezpl.log`        |
-| `EZPL_LOG_DIR`            | Log directory      | Current directory |
+| `EZPL_LOG_DIR`            | Log directory      | Platform-specific |
 | `EZPL_PRINTER_LEVEL`      | Console level      | `INFO`            |
 | `EZPL_FILE_LOGGER_LEVEL`  | File level         | `INFO`            |
 | `EZPL_LOG_ROTATION`       | Rotation setting   | `None`            |

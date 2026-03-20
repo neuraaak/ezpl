@@ -3,7 +3,7 @@
 # UPDATE_VERSION - Sync version.py and README badge from pyproject.toml
 # ///////////////////////////////////////////////////////////////
 
-"""Update src/ezplog/version.py and README.md badge from the version defined in pyproject.toml.
+"""Update version.py and README.md badge from the version defined in pyproject.toml.
 
 pyproject.toml [project].version is the single source of truth.
 """
@@ -64,7 +64,9 @@ def read_version() -> str:
 def update_version_py(version: str) -> None:
     """Update __version__ in src/{project_name}/version.py."""
     project_root = Path(__file__).resolve().parents[2]
-    version_path = project_root / "src" / project_name.lower() / "version.py"
+    version_path = (
+        project_root / "src" / project_name.lower().replace("-", "_") / "version.py"
+    )
     content = version_path.read_text(encoding="utf-8")
 
     new_content = re.sub(
