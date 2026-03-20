@@ -64,14 +64,15 @@ ezplog/
 ├── .hooks/                # Custom Git hooks
 ├── docs/                  # Documentation (mkdocs)
 ├── src/                   # Source code
-│   └── ezpl/
-│       ├── cli/              # CLI commands
-│       ├── config/           # Configuration management
-│       ├── core/             # Core interfaces and exceptions
-│       ├── handlers/         # Printer and logger handlers
-│       │   └── wizard/       # RichWizard components
-│       ├── types/            # Type definitions and enums
-│       └── utils/            # Utilities
+│   ├── ezplog/            # Main package
+│   │   ├── cli/              # CLI commands
+│   │   ├── config/           # Configuration management
+│   │   ├── core/             # Core interfaces and exceptions
+│   │   ├── handlers/         # Printer and logger handlers
+│   │   │   └── wizard/       # RichWizard components
+│   │   ├── types/            # Type definitions and enums
+│   │   └── utils/            # Utilities
+│   └── ezpl/              # Retrocompat shim — do not modify
 ├── tests/                # Test suite
 │   ├── unit/            # Unit tests
 │   ├── integration/     # Integration tests
@@ -154,16 +155,16 @@ Follow the coding standards and add tests for new features.
 
 ```bash
 # Format code
-ruff format src/ezpl/
+ruff format src/ezplog/
 
 # Lint
-ruff check src/ezpl/ --fix
+ruff check src/ezplog/ --fix
 
 # Type check
-pyright src/ezpl/
+pyright src/ezplog/
 
 # Security scan
-bandit -r src/ezpl/
+bandit -r src/ezplog/
 ```
 
 ### 4. Run Tests
@@ -173,7 +174,7 @@ bandit -r src/ezpl/
 pytest tests/
 
 # With coverage
-pytest tests/ --cov=ezpl --cov-report=html
+pytest tests/ --cov=src/ezplog --cov-report=html
 
 # Specific test type
 pytest tests/unit/
@@ -359,7 +360,7 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
-    - "src/ezpl/**"
+    - "src/ezplog/**"
 ```
 
 ## CI/CD
@@ -394,7 +395,7 @@ version = "1.5.2"
 ```
 
 ```python
-# src/ezpl/__init__.py
+# src/ezplog/version.py
 __version__ = "1.5.2"
 ```
 
@@ -405,7 +406,7 @@ Document changes in CHANGELOG.md (if exists).
 ### 3. Commit and Push
 
 ```bash
-git add pyproject.toml src/ezpl/__init__.py
+git add pyproject.toml src/ezplog/version.py
 git commit -m "chore: bump version to 1.5.2"
 git push origin main
 ```
@@ -442,7 +443,7 @@ pip install -e ".[dev]"
 
 ```bash
 # Run pyright with verbose output
-pyright src/ezpl/ --verbose
+pyright src/ezplog/ --verbose
 ```
 
 #### Test Failures on Windows

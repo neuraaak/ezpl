@@ -421,13 +421,13 @@ printer.success("Process complete")
 **Output:**
 
 ```text
-• INFO :: Starting main process
->>> • INFO :: Step 1: Initialize
->>> • INFO :: Step 2: Load data
->>>>>> • INFO :: Substep 2.1: Validate
->>>>>> • INFO :: Substep 2.2: Process
->>> • INFO :: Step 3: Finalize
-• SUCCESS :: Process complete
+• INFO     :: ~ Starting main process
+• INFO     ::    > Step 1: Initialize
+• INFO     ::    > Step 2: Load data
+• INFO     ::       > Substep 2.1: Validate
+• INFO     ::       > Substep 2.2: Process
+• INFO     ::    > Step 3: Finalize
+• SUCCESS  :: ~ Process complete
 ```
 
 ### Context Manager

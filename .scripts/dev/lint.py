@@ -71,7 +71,7 @@ class CodeQualityChecker:
         self.project_root = Path(__file__).resolve().parents[2]
         # Directories to scan (relative to project root)
         self.scan_dirs = [
-            f"src/{project_name.lower()}",
+            f"src/{project_name.lower().replace('-', '_')}",
             "tests",
             ".scripts",
         ]

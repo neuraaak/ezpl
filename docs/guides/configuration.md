@@ -96,7 +96,7 @@ ezpl config set log_rotation "10 MB" --env
 | ------------------------- | ------------------ | ----------------- |
 | `EZPL_LOG_LEVEL`          | Global log level   | `INFO`            |
 | `EZPL_LOG_FILE`           | Log file name      | `ezpl.log`        |
-| `EZPL_LOG_DIR`            | Log directory      | Current directory |
+| `EZPL_LOG_DIR`            | Log directory      | Platform-specific |
 | `EZPL_PRINTER_LEVEL`      | Console level      | `INFO`            |
 | `EZPL_FILE_LOGGER_LEVEL`  | File level         | `INFO`            |
 | `EZPL_LOG_ROTATION`       | Rotation setting   | `None`            |
@@ -368,55 +368,64 @@ config.reset_to_defaults()
 
 ## Configuration Locking
 
-Prevent configuration changes (useful for libraries):
+Lock the configuration after initialization to prevent any library from reconfiguring Ezpl:
 
 ```python
 from ezplog import Ezpl
 
-ezpl = Ezpl(log_level="INFO")
+# Option 1: lock immediately at initialization (recommended)
+ezpl = Ezpl(log_file="app.log", lock_config=True)
+token = Ezpl._config_lock_token  # save if you need to unlock later
 
-# Lock configuration and keep lock token
-token = ezpl.lock_config(owner="library.CustomA")
+# Option 2: lock manually after initialization
+ezpl = Ezpl(log_file="app.log")
+token = Ezpl.lock_config()  # returns a token string
 
-# This will emit warning and have no effect
-ezpl.set_level("DEBUG")
+# Check lock state
+print(Ezpl.is_locked())  # True
 
-# Force change with matching owner or token
-ezpl.set_level("DEBUG", force=True, owner="library.CustomA")
-ezpl.configure(level="INFO", force=True, token=token)
+# Any configure() or set_level() call while locked emits a UserWarning
+# and has no effect.
+ezpl.set_level("DEBUG")       # UserWarning — silently ignored
+ezpl.configure(level="DEBUG")  # UserWarning — silently ignored
 
-# Unlock configuration (owner/token required unless force=True)
-ezpl.unlock_config(owner="library.CustomA")
-
-# Optional diagnostics
-print(ezpl.config_lock_info())
+# Unlock when needed (token must match exactly)
+success = Ezpl.unlock_config(token)  # True if token matches
 ```
 
 ### App vs Library Pattern
 
-Use this simple layering approach when multiple libraries use Ezpl:
+The recommended pattern is: the **application** configures and locks, **libraries** use lib mode passively.
 
 ```python
+# In the application entrypoint — configure once, lock immediately
 from ezplog import Ezpl
 
-# In a library (CustomA / CustomB)
-ezpl = Ezpl()
-token = ezpl.lock_config(owner="library.CustomA")
+ezpl = Ezpl(
+    log_file="app.log",
+    log_level="INFO",
+    intercept_stdlib=True,  # capture library stdlib loggers
+    lock_config=True,       # prevent any library from reconfiguring
+)
+ezpl.info("Application started")
+```
 
-# Library can update only with matching owner/token
-ezpl.configure(level="DEBUG", force=True, token=token)
+```python
+# In library code — use lib_mode, never touch Ezpl directly
+from ezplog.lib_mode import get_logger, get_printer
 
-# In the application entrypoint
-app_ezpl = Ezpl()
-app_ezpl.unlock_config(force=True)  # Take control at app level
-app_ezpl.configure(level="INFO")
-app_ezpl.lock_config(owner="app.main")
+log = get_logger(__name__)
+printer = get_printer()
+
+def run() -> None:
+    log.info("Library running")       # forwarded if app uses intercept_stdlib=True
+    printer.success("Library ready")  # forwarded once app initialized Ezpl
 ```
 
 Guideline:
 
-- Libraries should set safe defaults and avoid hard-locking forever.
-- The application entrypoint should always decide final configuration.
+- Libraries should use `lib_mode` and never call `Ezpl()` directly.
+- The application entrypoint is the sole owner of `Ezpl` configuration.
 
 ## Environment-Specific Configuration
 
@@ -525,15 +534,16 @@ ezpl = Ezpl(
 )
 ```
 
-### 6. Use Configuration Locking in Libraries
+### 6. Use Configuration Locking at Application Startup
 
 ```python
-# In library code
-ezpl = Ezpl()
-token = ezpl.lock_config(owner="library.CustomA")
+# In application entrypoint — lock after configuring
+from ezplog import Ezpl
 
-# Later, if the same library needs to adjust config:
-ezpl.configure(level="DEBUG", force=True, token=token)
+ezpl = Ezpl(log_file="app.log", log_level="INFO", lock_config=True)
+token = Ezpl._config_lock_token  # store if you need to unlock later
+
+# Libraries using lib_mode are not affected — they forward output transparently
 ```
 
 ### 7. Document Your Configuration
