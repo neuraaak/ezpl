@@ -1,35 +1,36 @@
-# 🚀 Ezpl
+# Ezplog
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
-[![Platform](https://img.shields.io/badge/OS-Independent-lightgray.svg?style=for-the-badge)](https://pypi.org/project/ezpl/)
-[![Version](https://img.shields.io/badge/Version-2.0.1-orange.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
-[![PyPI](https://img.shields.io/badge/PyPI-ezplog-green.svg?style=for-the-badge&logo=pypi)](https://pypi.org/project/ezplog/)
-[![Docs](https://img.shields.io/badge/Docs-Online-blue.svg?style=for-the-badge&logo=readthedocs)](https://neuraaak.github.io/ezplog/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg?style=for-the-badge)](https://github.com/neuraaak/ezplog)
-[![Tests](https://img.shields.io/badge/Tests-377%2F377%20passing-success.svg?style=for-the-badge)](https://neuraaak.github.io/ezplog/coverage)
+[![PyPI version](https://img.shields.io/pypi/v/ezplog?style=flat&logo=pypi&logoColor=white)](https://pypi.org/project/ezplog/)
+[![Python versions](https://img.shields.io/pypi/pyversions/ezplog?style=flat&logo=python&logoColor=white)](https://pypi.org/project/ezplog/)
+[![PyPI status](https://img.shields.io/pypi/status/ezplog?style=flat&logo=pypi&logoColor=white)](https://pypi.org/project/ezplog/)
+[![License](https://img.shields.io/github/license/neuraaak/ezplog?style=flat&logo=github&logoColor=white)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/neuraaak/ezplog/publish-pypi.yml?style=flat&label=publish&logo=githubactions&logoColor=white)](https://github.com/neuraaak/ezplog/actions/workflows/publish-pypi.yml)
+[![Docs](https://img.shields.io/badge/docs-Github%20Pages-blue?style=flat&logo=materialformkdocs&logoColor=white)](https://neuraaak.github.io/ezplog/)
+[![uv](https://img.shields.io/badge/package%20manager-uv-DE5FE9?style=flat&logo=uv&logoColor=white)](https://github.com/astral-sh/uv)
+[![linter](https://img.shields.io/badge/linter-ruff-orange?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![type checker](https://img.shields.io/badge/type%20checker-ty-orange?style=flat&logo=astral&logoColor=white)](https://github.com/astral-sh/ty)
 
 ![Logo](docs/assets/logo-min.png)
 
-**Ezpl** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
+**Ezplog** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
 
 ## 📦 Installation
 
 ```bash
-pip install ezpl
+pip install ezplog
 ```
 
 Or from source:
 
 ```bash
 git clone https://github.com/neuraaak/ezplog.git
-cd ezpl && pip install .
+cd ezplog && pip install .
 ```
 
 ## 🚀 Quick Start
 
 ```python
-from ezpl import Ezpl
+from ezplog import Ezpl
 
 # Initialize
 ezpl = Ezpl(log_file="app.log")
