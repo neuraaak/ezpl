@@ -4,8 +4,8 @@
 # ///////////////////////////////////////////////////////////////
 
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 # ///////////////////////////////////////////////////////////////
 # 📦 PROJECT METADATA
@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ezplog"
-version = "2.0.1"
+version = "2.0.2"
 description = "Modern Python logging framework with Rich console output and loguru file logging, featuring advanced display capabilities, configuration management, and a simple typed API."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -111,49 +111,35 @@ PyPI = "https://pypi.org/project/ezplog/"
 ezpl = "ezplog.cli.main:cli"
 
 # ///////////////////////////////////////////////////////////////
-# 📦 SETUPTOOLS CONFIGURATION
+# 📦 HATCHLING CONFIGURATION
 # Package discovery and inclusion/exclusion patterns
 # ///////////////////////////////////////////////////////////////
 
-[tool.setuptools]
-include-package-data = true
+[tool.hatch.build.targets.wheel]
+packages = ["src/ezplog", "src/ezpl"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["ezpl*", "ezplog*"]
+[tool.hatch.build.targets.sdist]
 exclude = [
-    "tests*",
-    "build*",
-    "dist*",
-    "*.egg-info*",
-    ".pytest_cache*",
-    ".mypy_cache*",
-    ".ruff_cache*",
-    ".cursor*",
-    ".benchmarks*",
-    "coverage*",
-    "htmlcov*",
-    ".venv*",
-    "venv*",
-    "__pycache__*",
-    "**/__pycache__*",
-    ".git*",
+    "tests",
+    "docs",
+    "examples",
+    "htmlcov",
+    ".hooks",
+    ".venv",
+    "venv",
+    ".git",
+    ".ruff_cache",
+    ".pytest_cache",
+    ".cursor",
+    "_temp",
     "*.pyc",
     "*.pyo",
-    "*.pyd",
-    ".coverage",
     "*.log",
+    ".coverage",
+    "coverage.xml",
     ".DS_Store",
     "Thumbs.db",
-    "docs*",
-    "examples*",
-    "_temp*",
-    ".hooks*",
 ]
-
-[tool.setuptools.package-data]
-ezplog = ["py.typed"]
-ezpl = ["py.typed"]
 
 # ///////////////////////////////////////////////////////////////
 # 🎨 CODE FORMATTING & LINTING TOOLS

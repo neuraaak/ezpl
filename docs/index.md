@@ -1,9 +1,14 @@
-# ezplog
+# Ezplog
 
-[![PyPI](https://img.shields.io/badge/PyPI-ezplog-orange.svg)](https://pypi.org/project/ezplog/)
-[![Python versions](https://img.shields.io/pypi/pyversions/ezplog)](https://pypi.org/project/ezplog/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgray.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/neuraaak/ezplog/blob/main/LICENSE)
+[![PyPI version](https://img.shields.io/pypi/v/ezplog?style=flat&logo=pypi&logoColor=white)](https://pypi.org/project/ezplog/)
+[![Python versions](https://img.shields.io/pypi/pyversions/ezplog?style=flat&logo=python&logoColor=white)](https://pypi.org/project/ezplog/)
+[![PyPI status](https://img.shields.io/pypi/status/ezplog?style=flat&logo=pypi&logoColor=white)](https://pypi.org/project/ezplog/)
+[![License](https://img.shields.io/github/license/neuraaak/ezplog?style=flat&logo=github&logoColor=white)](https://github.com/neuraaak/ezplog/blob/main/LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/neuraaak/ezplog/publish-pypi.yml?style=flat&label=publish&logo=githubactions&logoColor=white)](https://github.com/neuraaak/ezplog/actions/workflows/publish-pypi.yml)
+[![Docs](https://img.shields.io/badge/docs-Github%20Pages-blue?style=flat&logo=materialformkdocs&logoColor=white)](https://neuraaak.github.io/ezplog/)
+[![uv](https://img.shields.io/badge/package%20manager-uv-DE5FE9?style=flat&logo=uv&logoColor=white)](https://github.com/astral-sh/uv)
+[![linter](https://img.shields.io/badge/linter-ruff-orange?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![type checker](https://img.shields.io/badge/type%20checker-ty-orange?style=flat&logo=astral&logoColor=white)](https://github.com/astral-sh/ty)
 
 ![Ezpl Logo](https://raw.githubusercontent.com/neuraaak/ezplog/refs/heads/main/docs/assets/logo-min.png)
 
