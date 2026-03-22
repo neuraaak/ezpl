@@ -131,7 +131,7 @@ exclude = [
     ".ruff_cache",
     ".pytest_cache",
     ".cursor",
-    "_temp",
+    ".tmp",
     "*.pyc",
     "*.pyo",
     "*.log",
