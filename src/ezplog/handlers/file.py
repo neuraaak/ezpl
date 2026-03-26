@@ -462,3 +462,12 @@ class EzLogger(LoggingHandler):
     def __repr__(self) -> str:
         """Detailed string representation of the file logger."""
         return f"EzLogger(file={self._log_file}, level={self._level}, logger_id={self._logger_id})"
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "EzLogger",
+]

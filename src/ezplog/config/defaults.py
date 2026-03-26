@@ -84,7 +84,7 @@ class DefaultConfiguration:
     # ///////////////////////////////////////////////////////////////
 
     FILE_LOGGER_LEVEL = "INFO"
-    LOG_FORMAT = "{time:YYYY-MM-DD HH:mm:ss} | {level:<10} | {module}:{function}:{line} - {message}"
+    _LOG_FORMAT = "{time:YYYY-MM-DD HH:mm:ss} | {level:<10} | {module}:{function}:{line} - {message}"
 
     # Rotation settings (optional - None means no rotation)
     LOG_ROTATION = None  # e.g., "10 MB", "1 day", "500 KB", "12:00", "1 week"
@@ -102,8 +102,8 @@ class DefaultConfiguration:
     # EXPORT DEFAULTS
     # ///////////////////////////////////////////////////////////////
 
-    EXPORT_BATCH_FILE = "export_env.bat"  # Windows
-    EXPORT_SHELL_FILE = "export_env.sh"  # Unix/Linux/macOS
+    _EXPORT_BATCH_FILE = "export_env.bat"  # Windows
+    _EXPORT_SHELL_FILE = "export_env.sh"  # Unix/Linux/macOS
 
     # ///////////////////////////////////////////////////////////////
     # CLASS METHODS
@@ -128,7 +128,7 @@ class DefaultConfiguration:
             "indent-symbol": cls.INDENT_SYMBOL,
             "base-indent-symbol": cls.BASE_INDENT_SYMBOL,
             "file-logger-level": cls.FILE_LOGGER_LEVEL,
-            "log-format": cls.LOG_FORMAT,
+            "log-format": cls._LOG_FORMAT,
             "log-rotation": cls.LOG_ROTATION,
             "log-retention": cls.LOG_RETENTION,
             "log-compression": cls.LOG_COMPRESSION,
@@ -173,8 +173,17 @@ class DefaultConfiguration:
         """
         return {
             "file-logger-level": cls.FILE_LOGGER_LEVEL,
-            "log-format": cls.LOG_FORMAT,
+            "log-format": cls._LOG_FORMAT,
             "log-rotation": cls.LOG_ROTATION,
             "log-retention": cls.LOG_RETENTION,
             "log-compression": cls.LOG_COMPRESSION,
         }
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "DefaultConfiguration",
+]
