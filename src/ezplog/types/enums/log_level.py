@@ -214,3 +214,12 @@ class LogLevel(Enum):
             "CRITICAL": "bold magenta on red",
         }
         return styles.get(self.name, "")
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "LogLevel",
+]

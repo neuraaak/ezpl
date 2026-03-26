@@ -59,6 +59,7 @@ from .core.exceptions import (
 )
 from .ezpl import Ezpl
 from .handlers import EzLogger, EzPrinter, RichWizard
+from .handlers.wizard.dynamic import DynamicLayeredProgress, StageConfig
 from .lib_mode import get_logger, get_printer
 from .types import (
     PATTERN_COLORS,
@@ -137,6 +138,8 @@ __all__ = [
     "EzPrinter",
     "EzLogger",
     "RichWizard",
+    "DynamicLayeredProgress",
+    "StageConfig",
     # Configuration exports
     "ConfigurationManager",
     # Type aliases exports

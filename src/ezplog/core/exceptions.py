@@ -219,3 +219,18 @@ class HandlerError(EzplError):
         """
         super().__init__(message, "HANDLER_ERROR")
         self.handler_name = handler_name
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "ConfigurationError",
+    "EzplError",
+    "FileOperationError",
+    "HandlerError",
+    "InitializationError",
+    "LoggingError",
+    "ValidationError",
+]

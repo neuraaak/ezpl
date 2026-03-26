@@ -127,3 +127,12 @@ class LoggerProtocol(Protocol):
     def close(self) -> None:
         """Close the logger and release resources."""
         ...
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "LoggerProtocol",
+]
