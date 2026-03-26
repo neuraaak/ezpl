@@ -65,7 +65,7 @@ class _LazyWizard:
         real = self._get_real()
         if real is not None:
             return getattr(real, name)
-        return lambda *args, **kwargs: None
+        return lambda *_args, **_kwargs: None
 
 
 class _LazyPrinter:
@@ -373,3 +373,13 @@ def get_printer() -> _LazyPrinter:
         ...     printer.debug("detail")
     """
     return _PRINTER
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "get_logger",
+    "get_printer",
+]

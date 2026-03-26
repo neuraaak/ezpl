@@ -172,3 +172,12 @@ class PrinterProtocol(Protocol):
     def wizard(self) -> Any:
         """Get RichWizard instance for advanced features."""
         ...
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "PrinterProtocol",
+]

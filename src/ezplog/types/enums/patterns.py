@@ -101,3 +101,15 @@ def get_pattern_color_by_name(pattern_name: str) -> str:
         return get_pattern_color(pattern)
     except KeyError:
         return "white"
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "PATTERN_COLORS",
+    "Pattern",
+    "get_pattern_color",
+    "get_pattern_color_by_name",
+]

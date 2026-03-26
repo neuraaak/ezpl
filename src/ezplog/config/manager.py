@@ -40,7 +40,7 @@ class ConfigurationManager:
     saving, and merging configuration from multiple sources.
     """
 
-    ENV_MAPPINGS = {
+    _ENV_MAPPINGS = {
         "EZPL_LOG_LEVEL": "log-level",
         "EZPL_LOG_FILE": "log-file",
         "EZPL_LOG_DIR": "log-dir",
@@ -116,7 +116,7 @@ class ConfigurationManager:
         """
         user_env_vars = self._load_user_env_file()
 
-        for env_var, config_key in self.ENV_MAPPINGS.items():
+        for env_var, config_key in self._ENV_MAPPINGS.items():
             value = os.getenv(env_var)
             if value is None:
                 value = user_env_vars.get(env_var)
@@ -243,7 +243,7 @@ class ConfigurationManager:
 
     def get_log_format(self) -> str:
         """Get the current log format."""
-        return cast(str, self.get("log-format", DefaultConfiguration.LOG_FORMAT))
+        return cast(str, self.get("log-format", DefaultConfiguration._LOG_FORMAT))
 
     def get_log_rotation(self) -> str | None:
         """Get the current log rotation setting."""
@@ -361,7 +361,7 @@ class ConfigurationManager:
             with open(output_path, "w", encoding="utf-8") as f:
                 if platform == "windows":
                     # Generate Batch script for Windows
-                    for env_var, config_key in self.ENV_MAPPINGS.items():
+                    for env_var, config_key in self._ENV_MAPPINGS.items():
                         value = self._config.get(config_key)
                         if value is None:
                             continue
@@ -369,7 +369,7 @@ class ConfigurationManager:
                 else:
                     # Generate Bash script for Unix/Linux/macOS
                     f.write("#!/bin/bash\n")
-                    for env_var, config_key in self.ENV_MAPPINGS.items():
+                    for env_var, config_key in self._ENV_MAPPINGS.items():
                         value = self._config.get(config_key)
                         if value is None:
                             continue
@@ -392,3 +392,12 @@ class ConfigurationManager:
     def __repr__(self) -> str:
         """Detailed string representation of the configuration."""
         return f"ConfigurationManager(config_file={self._config_file}, config={self._config})"
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "ConfigurationManager",
+]

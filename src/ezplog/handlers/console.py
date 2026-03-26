@@ -50,7 +50,7 @@ class EzPrinter(LoggingHandler, IndentationManager):
     - Access to RichWizard for advanced display features
     """
 
-    MAX_INDENT = 10  # Maximum indentation level
+    _MAX_INDENT = 10  # Maximum indentation level
 
     # ///////////////////////////////////////////////////////////////
     # INIT
@@ -329,7 +329,7 @@ class EzPrinter(LoggingHandler, IndentationManager):
 
     def add_indent(self) -> None:
         """Increase the indentation level by one (with maximum limit)."""
-        self._indent = min(self._indent + 1, self.MAX_INDENT)
+        self._indent = min(self._indent + 1, self._MAX_INDENT)
 
     def del_indent(self) -> None:
         """Decrease the indentation level by one, ensuring it doesn't go below zero."""
@@ -455,3 +455,12 @@ class EzPrinter(LoggingHandler, IndentationManager):
     def __repr__(self) -> str:
         """Detailed string representation of the console printer."""
         return f"EzPrinter(level={self._level}, indent={self._indent}, indent_step={self._indent_step})"
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "EzPrinter",
+]
