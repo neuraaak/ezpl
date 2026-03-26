@@ -79,3 +79,12 @@ class RichWizard(
     def __repr__(self) -> str:
         """Detailed string representation of the Rich Wizard."""
         return "RichWizard(console=Console())"
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "RichWizard",
+]

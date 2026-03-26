@@ -80,7 +80,7 @@ class StageConfig(_StageConfigRequired, total=False):
 # ///////////////////////////////////////////////////////////////
 
 
-class ConditionalStatusColumn(TextColumn):
+class _ConditionalStatusColumn(TextColumn):
     """A text column that only shows status if the field exists."""
 
     def __init__(self):
@@ -101,7 +101,7 @@ class ConditionalStatusColumn(TextColumn):
         return Text("")
 
 
-class ConditionalDetailsColumn(TextColumn):
+class _ConditionalDetailsColumn(TextColumn):
     """A text column that only shows details if the field exists."""
 
     def __init__(self):
@@ -148,13 +148,13 @@ class DynamicLayeredProgress:
         """
         self._console = console
         self._progress_prefix = progress_prefix
-        self.stages = stages
-        self.show_time = show_time
-        self.progress: Progress | None = None
-        self.task_ids: dict[str, TaskID] = {}
-        self.active_layers: list[TaskID] = []
-        self.completed_layers: list[TaskID] = []
-        self.layer_metadata: dict[
+        self._stages = stages
+        self._show_time = show_time
+        self._progress: Progress | None = None
+        self._task_ids: dict[str, TaskID] = {}
+        self._active_layers: list[TaskID] = []
+        self._completed_layers: list[TaskID] = []
+        self._layer_metadata: dict[
             TaskID, dict[str, Any]
         ] = {}  # Store additional layer info
         self._emergency_stopped = False
@@ -162,37 +162,37 @@ class DynamicLayeredProgress:
         self._lock = threading.Lock()
 
         # Hierarchy attributes (initialized in _setup_hierarchy)
-        self.has_main_layer: bool = False
-        self.main_layer_name: str | None = None
-        self.sub_layers: list[StageConfig] = []
+        self._has_main_layer: bool = False
+        self._main_layer_name: str | None = None
+        self._sub_layers: list[StageConfig] = []
 
         # Detect main layer and setup hierarchy
         self._setup_hierarchy()
 
     def _setup_hierarchy(self) -> None:
         """Setup layer hierarchy and detect main layer."""
-        self.has_main_layer = False
-        self.main_layer_name = None
-        self.sub_layers = []
+        self._has_main_layer = False
+        self._main_layer_name = None
+        self._sub_layers = []
 
         # Detect main layer
-        for stage in self.stages:
+        for stage in self._stages:
             if stage.get("type") == "main":
-                self.has_main_layer = True
-                self.main_layer_name = stage.get("name", "main")
+                self._has_main_layer = True
+                self._main_layer_name = stage.get("name", "main")
                 break
 
         # If main layer found, setup sub-layers
-        if self.has_main_layer:
-            self.sub_layers = [
-                stage for stage in self.stages if stage.get("type") != "main"
+        if self._has_main_layer:
+            self._sub_layers = [
+                stage for stage in self._stages if stage.get("type") != "main"
             ]
             # Auto-configure main layer steps if not provided
-            for stage in self.stages:
+            for stage in self._stages:
                 if stage.get("type") == "main" and "steps" not in stage:
                     stage["steps"] = [
                         s.get("name", f"Step {i + 1}")
-                        for i, s in enumerate(self.sub_layers)
+                        for i, s in enumerate(self._sub_layers)
                     ]
 
     def _create_progress_bar(self) -> Progress:
@@ -204,12 +204,12 @@ class DynamicLayeredProgress:
             TextColumn("[bold blue]{task.description}"),
             BarColumn(),
             TaskProgressColumn(),
-            ConditionalDetailsColumn(),  # Conditional details column
-            ConditionalStatusColumn(),  # Conditional status column
+            _ConditionalDetailsColumn(),  # Conditional details column
+            _ConditionalStatusColumn(),  # Conditional status column
         ]
 
         # Check if we have any download layers to add download columns
-        has_download = any(stage.get("type") == "download" for stage in self.stages)
+        has_download = any(stage.get("type") == "download" for stage in self._stages)
         if has_download:
             columns.extend(
                 [
@@ -218,7 +218,7 @@ class DynamicLayeredProgress:
                 ]
             )
 
-        if self.show_time:
+        if self._show_time:
             columns.extend(
                 [
                     TimeElapsedColumn(),
@@ -237,27 +237,27 @@ class DynamicLayeredProgress:
         Returns:
             Task ID of the created layer
         """
-        layer_name = layer_config.get("name", f"Layer_{len(self.task_ids)}")
+        layer_name = layer_config.get("name", f"Layer_{len(self._task_ids)}")
         layer_type = layer_config.get("type", "progress")
         layer_desc = layer_config.get("description", layer_name)
         layer_style = layer_config.get("style", "default")
 
         # Determine layer prefix and styling based on hierarchy
-        if self.has_main_layer and layer_type == "main":
+        if self._has_main_layer and layer_type == "main":
             # Main layer: bold and prominent
             layer_style = "bold " + layer_style if layer_style != "default" else "bold"
-        elif self.has_main_layer and layer_type != "main":
+        elif self._has_main_layer and layer_type != "main":
             # Sub-layer: add indentation and use softer colors
             layer_desc = f"  ├─ {layer_desc}"
 
-        if not self.progress:
+        if not self._progress:
             return -1
 
         if layer_type == "steps":
             # Handle step-based layer
             steps = layer_config.get("steps", [])
             steps_total = len(steps)
-            task_id = self.progress.add_task(
+            task_id = self._progress.add_task(
                 f"[{layer_style}]{layer_desc}",
                 total=steps_total,
                 steps=steps,  # Store steps for later use
@@ -265,7 +265,7 @@ class DynamicLayeredProgress:
             )
         elif layer_type == "spinner":
             # Handle spinner layer (indeterminate progress)
-            task_id = self.progress.add_task(
+            task_id = self._progress.add_task(
                 f"[{layer_style}]{layer_desc}",
                 total=None,  # Indeterminate
                 details="",  # Initialize details field
@@ -274,7 +274,7 @@ class DynamicLayeredProgress:
             # Handle download layer with speed and size info
             total_size = layer_config.get("total_size", 100)
             filename = layer_config.get("filename", "")
-            task_id = self.progress.add_task(
+            task_id = self._progress.add_task(
                 f"[{layer_style}]{layer_desc}",
                 total=total_size,
                 details="",  # Initialize details field
@@ -284,7 +284,7 @@ class DynamicLayeredProgress:
             # Handle main layer (special case)
             steps = layer_config.get("steps", [])
             main_total = len(steps)
-            task_id = self.progress.add_task(
+            task_id = self._progress.add_task(
                 f"[{layer_style}]{layer_desc}",
                 total=main_total,
                 steps=steps,  # Store steps for later use
@@ -293,23 +293,23 @@ class DynamicLayeredProgress:
         else:
             # Handle regular progress layer
             progress_total: int | None = layer_config.get("total")
-            task_id = self.progress.add_task(
+            task_id = self._progress.add_task(
                 f"[{layer_style}]{layer_desc}",
                 total=progress_total,
                 details="",  # Initialize details field
             )
 
         # Store layer metadata
-        self.layer_metadata[task_id] = {
+        self._layer_metadata[task_id] = {
             "name": layer_name,
             "type": layer_type,
             "config": layer_config,
             "is_main": layer_type == "main",
-            "is_sub": self.has_main_layer and layer_type != "main",
+            "is_sub": self._has_main_layer and layer_type != "main",
         }
 
-        self.active_layers.append(task_id)
-        self.task_ids[layer_name] = task_id
+        self._active_layers.append(task_id)
+        self._task_ids[layer_name] = task_id
         return task_id
 
     def update_layer(self, layer_name: str, progress: int, details: str = "") -> None:
@@ -321,14 +321,14 @@ class DynamicLayeredProgress:
             details: Additional details to display
         """
         with self._lock:
-            if not self.progress:
+            if not self._progress:
                 return
 
-            task_id = self.task_ids.get(layer_name)
+            task_id = self._task_ids.get(layer_name)
             if task_id is None:
                 return
 
-            metadata = self.layer_metadata.get(task_id)
+            metadata = self._layer_metadata.get(task_id)
             if metadata is None:
                 return
 
@@ -349,7 +349,7 @@ class DynamicLayeredProgress:
             progress: Progress value
             details: Additional details
         """
-        if not self.progress:
+        if not self._progress:
             return
 
         # Update the layer based on its type
@@ -366,26 +366,26 @@ class DynamicLayeredProgress:
                 current_step = steps[progress]
                 step_progress = f"Step {progress + 1}/{len(steps)}: {current_step}"
 
-                self.progress.update(
+                self._progress.update(
                     task_id,
                     completed=progress,
                     description=f"{task.description} - {step_progress}",
                     details=details,
                 )
             else:
-                self.progress.update(task_id, completed=progress, details=details)
+                self._progress.update(task_id, completed=progress, details=details)
         elif metadata["type"] == "spinner":
             # Handle spinner layer - update details message
-            self.progress.update(
+            self._progress.update(
                 task_id,
                 details=details,  # Use details consistently
             )
         elif metadata["type"] == "download":
             # Handle download layer - update progress and details
-            self.progress.update(task_id, completed=progress, details=details)
+            self._progress.update(task_id, completed=progress, details=details)
         else:
             # Handle regular progress layer
-            self.progress.update(task_id, completed=progress, details=details)
+            self._progress.update(task_id, completed=progress, details=details)
 
     def complete_layer(self, layer_name: str) -> None:
         """Mark a layer as completed and animate its success.
@@ -394,43 +394,43 @@ class DynamicLayeredProgress:
             layer_name: Name of the layer to complete
         """
         with self._lock:
-            if not self.progress:
+            if not self._progress:
                 return
 
-            task_id = self.task_ids.get(layer_name)
+            task_id = self._task_ids.get(layer_name)
             if task_id is None:
                 return
 
             # Mark as completed based on layer type
-            metadata = self.layer_metadata.get(task_id)
+            metadata = self._layer_metadata.get(task_id)
             if metadata is None:
                 return
 
             if metadata["type"] == "steps":
                 steps = metadata["config"].get("steps", [])
-                self.progress.update(task_id, completed=len(steps))
+                self._progress.update(task_id, completed=len(steps))
             elif metadata["type"] == "spinner":
                 # For spinners, just mark as completed (no progress to update)
                 pass
             else:
                 total = metadata["config"].get("total", 100)
-                self.progress.update(task_id, completed=total)
+                self._progress.update(task_id, completed=total)
 
             # Don't remove main layer - it stays for reference
             if metadata.get("is_main", False):
                 # Just mark as completed but keep it visible
-                self.completed_layers.append(task_id)
+                self._completed_layers.append(task_id)
                 return
 
             # Remove the layer (only for sub-layers)
-            self.completed_layers.append(task_id)
+            self._completed_layers.append(task_id)
             metadata["state"] = "completed"
 
             # Animate success for this specific layer
             self._animate_layer_success(task_id)
 
             # Update main layer progress if it exists
-            if self.has_main_layer:
+            if self._has_main_layer:
                 self._update_main_layer_progress()
 
     @staticmethod
@@ -456,9 +456,9 @@ class DynamicLayeredProgress:
         Returns:
             The task object, or None if not found
         """
-        if not self.progress:
+        if not self._progress:
             return None
-        tasks = getattr(self.progress, "_tasks", {})
+        tasks = getattr(self._progress, "_tasks", {})
         return tasks.get(task_id)
 
     def _has_task(self, task_id: TaskID) -> bool:
@@ -478,7 +478,7 @@ class DynamicLayeredProgress:
         Args:
             task_id: Task ID to animate
         """
-        if not self.progress:
+        if not self._progress:
             return
 
         # Flash green 2 times
@@ -494,7 +494,7 @@ class DynamicLayeredProgress:
                 else:  # Normal green
                     success_description = Text(clean_description, style="bold green")
 
-                self.progress.update(
+                self._progress.update(
                     task_id,
                     description=success_description,  # type: ignore[arg-type]
                 )
@@ -506,31 +506,31 @@ class DynamicLayeredProgress:
         if task is not None:
             clean_description = self._clean_description(str(task.description))
             faded_description = Text(clean_description, style="dim")
-            self.progress.update(task_id, description=faded_description)  # type: ignore[arg-type]
+            self._progress.update(task_id, description=faded_description)  # type: ignore[arg-type]
             time.sleep(0.3)  # Brief fade out
 
         # Remove the layer after animation
         if self._has_task(task_id):
-            self.progress.remove_task(task_id)
-            if task_id in self.active_layers:
-                self.active_layers.remove(task_id)
+            self._progress.remove_task(task_id)
+            if task_id in self._active_layers:
+                self._active_layers.remove(task_id)
             # Remove from task_ids dict
-            for name, tid in list(self.task_ids.items()):
+            for name, tid in list(self._task_ids.items()):
                 if tid == task_id:
-                    del self.task_ids[name]
+                    del self._task_ids[name]
                     break
 
     def _update_main_layer_progress(self) -> None:
         """Update main layer progress based on completed sub-layers."""
-        if not self.has_main_layer or not self.main_layer_name:
+        if not self._has_main_layer or not self._main_layer_name:
             return
 
-        if not self.progress:
+        if not self._progress:
             return
 
         # Find main layer task
         main_task_id: TaskID | None = None
-        for tid, metadata in self.layer_metadata.items():
+        for tid, metadata in self._layer_metadata.items():
             if metadata.get("is_main", False):
                 main_task_id = tid
                 break
@@ -541,12 +541,12 @@ class DynamicLayeredProgress:
         # Calculate progress based on completed sub-layers only (exclude main layer)
         completed_sub_layers = sum(
             1
-            for tid in self.completed_layers
-            if not self.layer_metadata.get(tid, {}).get("is_main", False)
+            for tid in self._completed_layers
+            if not self._layer_metadata.get(tid, {}).get("is_main", False)
         )
 
         # Update main layer
-        self.progress.update(main_task_id, completed=completed_sub_layers)
+        self._progress.update(main_task_id, completed=completed_sub_layers)
 
     def handle_error(self, layer_name: str, error: str) -> None:
         """Handle errors in a specific layer.
@@ -556,10 +556,10 @@ class DynamicLayeredProgress:
             error: Error message to display
         """
         with self._lock:
-            if not self.progress:
+            if not self._progress:
                 return
 
-            task_id = self.task_ids.get(layer_name)
+            task_id = self._task_ids.get(layer_name)
             if task_id is None:
                 return
 
@@ -569,7 +569,7 @@ class DynamicLayeredProgress:
                 error_description = Text(f"❌ {task.description}", style="red")
                 error_details = Text(f"Error: {error}", style="red")
 
-                self.progress.update(
+                self._progress.update(
                     task_id,
                     description=error_description,  # type: ignore[arg-type]
                     details=error_details,
@@ -582,13 +582,13 @@ class DynamicLayeredProgress:
             error_message: The error message to display
         """
         with self._lock:
-            if not self.progress:
+            if not self._progress:
                 return
 
             # Create failure animation sequence: flash red 3 times
             for flash in range(3):
                 # Apply flash effect to all active layers
-                for task_id in list(self.active_layers):
+                for task_id in list(self._active_layers):
                     task = self._get_task(task_id)
                     if task is not None:
                         clean_description = self._clean_description(
@@ -610,7 +610,7 @@ class DynamicLayeredProgress:
                                 f"Stopped: {error_message}", style="red"
                             )
 
-                        self.progress.update(
+                        self._progress.update(
                             task_id,
                             description=error_description,  # type: ignore[arg-type]
                             details=error_details,
@@ -620,21 +620,21 @@ class DynamicLayeredProgress:
                 time.sleep(0.15)
 
             # Final state: settle on clean error display
-            for task_id in list(self.active_layers):
+            for task_id in list(self._active_layers):
                 task = self._get_task(task_id)
                 if task is not None:
                     clean_description = self._clean_description(str(task.description))
                     error_description = Text(clean_description, style="bold red")
                     error_details = Text(f"Stopped: {error_message}", style="red")
 
-                    self.progress.update(
+                    self._progress.update(
                         task_id,
                         description=error_description,  # type: ignore[arg-type]
                         details=error_details,
                     )
 
             # Stop the progress bar to freeze the display
-            self.progress.stop()
+            self._progress.stop()
 
             # Mark as emergency stopped
             self._emergency_stopped = True
@@ -658,25 +658,25 @@ class DynamicLayeredProgress:
 
     def start(self) -> None:
         """Start the progress bar and create initial layers."""
-        self.progress = self._create_progress_bar()
-        self.progress.start()
+        self._progress = self._create_progress_bar()
+        self._progress.start()
 
         # Create layers in order: main layer first, then sub-layers
-        if self.has_main_layer:
+        if self._has_main_layer:
             # Create main layer first
             main_stage = next(
-                (stage for stage in self.stages if stage.get("type") == "main"), None
+                (stage for stage in self._stages if stage.get("type") == "main"), None
             )
             if main_stage:
                 self._create_layer(main_stage)
 
             # Then create sub-layers
-            for stage in self.stages:
+            for stage in self._stages:
                 if stage.get("type") != "main":
                     self._create_layer(stage)
         else:
             # No main layer, create all layers in order
-            for stage in self.stages:
+            for stage in self._stages:
                 self._create_layer(stage)
 
     def stop(self, success: bool = True, show_success_animation: bool = True) -> None:
@@ -686,7 +686,7 @@ class DynamicLayeredProgress:
             success: Whether this stop represents a successful completion
             show_success_animation: Whether to show success animations
         """
-        if not self.progress:
+        if not self._progress:
             return
 
         if success and show_success_animation:
@@ -694,19 +694,19 @@ class DynamicLayeredProgress:
             time.sleep(0.5)
         elif not success:
             # ERROR/WARNING CASE: Freeze current state
-            for task_id in list(self.active_layers):
+            for task_id in list(self._active_layers):
                 task = self._get_task(task_id)
                 if task is not None:
                     clean_description = self._clean_description(str(task.description))
                     error_description = Text(clean_description, style="bold orange")
 
-                    self.progress.update(
+                    self._progress.update(
                         task_id,
                         description=error_description,  # type: ignore[arg-type]
                     )
 
         # Stop the underlying Rich progress
-        self.progress.stop()
+        self._progress.stop()
 
 
 class DynamicProgressMixin:
@@ -786,3 +786,14 @@ class DynamicProgressMixin:
                     self._console.print(
                         f"\n[bold red]🚨 EMERGENCY STOP: {emergency_msg}[/bold red]"
                     )
+
+
+# ///////////////////////////////////////////////////////////////
+# PUBLIC API
+# ///////////////////////////////////////////////////////////////
+
+__all__ = [
+    "DynamicLayeredProgress",
+    "DynamicProgressMixin",
+    "StageConfig",
+]
