@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 # Local imports
-from .log_parser import LogEntry, LogParser
+from ._log_parser import LogEntry, LogParser
 
 # ///////////////////////////////////////////////////////////////
 # CLASSES

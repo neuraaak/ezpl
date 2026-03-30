@@ -15,10 +15,10 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Local imports
-from .config import config_group
-from .info import info_command
-from .logs import logs_group
-from .version import version_command
+from ._config import config_group
+from ._info import info_command
+from ._logs import logs_group
+from ._version import version_command
 
 # ///////////////////////////////////////////////////////////////
 # PUBLIC API

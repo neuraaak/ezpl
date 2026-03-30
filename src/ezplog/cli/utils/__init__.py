@@ -18,9 +18,9 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Local imports
-from .env_manager import UserEnvManager
-from .log_parser import LogEntry, LogParser
-from .log_stats import LogStatistics
+from ._env_manager import UserEnvManager
+from ._log_parser import LogEntry, LogParser
+from ._log_stats import LogStatistics
 
 # ///////////////////////////////////////////////////////////////
 # PUBLIC API
