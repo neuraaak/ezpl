@@ -29,8 +29,8 @@ from rich.table import Table
 # Local imports
 from ...config import ConfigurationManager
 from .._console import console
-from ..utils.log_parser import LogParser
-from ..utils.log_stats import LogStatistics
+from ..utils._log_parser import LogParser
+from ..utils._log_stats import LogStatistics
 
 # ///////////////////////////////////////////////////////////////
 # HELPER FUNCTIONS

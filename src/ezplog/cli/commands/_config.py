@@ -25,7 +25,7 @@ from rich.table import Table
 from ...config import ConfigurationManager
 from ...core.exceptions import FileOperationError
 from .._console import console
-from ..utils.env_manager import UserEnvManager
+from ..utils._env_manager import UserEnvManager
 
 # ///////////////////////////////////////////////////////////////
 # COMMAND GROUP

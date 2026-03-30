@@ -23,9 +23,9 @@ from rich.panel import Panel
 from rich.text import Text
 
 # Local imports
-from ..version import __version__
+from .._version import __version__
 from ._console import console
-from .commands import config, info, logs, version
+from .commands import _config, _info, _logs, _version
 
 # ///////////////////////////////////////////////////////////////
 # CLI GROUP
@@ -84,16 +84,16 @@ def _display_welcome() -> None:
 
 
 # Logs group
-cli.add_command(logs.logs_group)
+cli.add_command(_logs.logs_group)
 
 # Config group
-cli.add_command(config.config_group)
+cli.add_command(_config.config_group)
 
 # Version command
-cli.add_command(version.version_command)
+cli.add_command(_version.version_command)
 
 # Info command
-cli.add_command(info.info_command)
+cli.add_command(_info.info_command)
 
 
 # ///////////////////////////////////////////////////////////////
