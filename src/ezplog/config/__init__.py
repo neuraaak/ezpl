@@ -15,7 +15,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Local imports
-from .defaults import DefaultConfiguration
+from ._defaults import DefaultConfiguration
 from .manager import ConfigurationManager
 
 # ///////////////////////////////////////////////////////////////

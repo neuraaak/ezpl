@@ -25,7 +25,7 @@ from typing import Any, cast
 
 # Local imports
 from ..core.exceptions import FileOperationError, ValidationError
-from .defaults import DefaultConfiguration
+from ._defaults import DefaultConfiguration
 
 # ///////////////////////////////////////////////////////////////
 # CLASSES

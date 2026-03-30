@@ -86,10 +86,10 @@ repos:
         pass_filenames: false
         always_run: true
 
-      # Step 5 — keep version.py in sync with pyproject.toml
+      # Step 5 — keep _version.py in sync with pyproject.toml
       # Only triggered when pyproject.toml is staged.
       - id: sync-version
-        name: "Sync version.py ← pyproject.toml"
+        name: "Sync _version.py ← pyproject.toml"
         language: system
         entry: uv run --no-sync python .scripts/dev/update_version.py
         files: ^pyproject\.toml$

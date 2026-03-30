@@ -20,11 +20,11 @@ from rich.console import Console
 
 # Local imports
 from ...types import Pattern, get_pattern_color
+from ._json import JsonMixin
+from ._panels import PanelMixin
+from ._progress import ProgressMixin
+from ._tables import TableMixin
 from .dynamic import DynamicProgressMixin
-from .json import JsonMixin
-from .panels import PanelMixin
-from .progress import ProgressMixin
-from .tables import TableMixin
 
 # ///////////////////////////////////////////////////////////////
 # CLASSES

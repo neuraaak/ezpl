@@ -21,8 +21,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 # Local imports
-from ezplog.cli.utils.env_manager import UserEnvManager
-from ezplog.cli.utils.log_stats import LogStatistics
+from ezplog.cli.utils import LogStatistics, UserEnvManager
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
