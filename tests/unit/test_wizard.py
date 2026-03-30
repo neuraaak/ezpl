@@ -224,7 +224,7 @@ class TestProgressBars:
         self,
     ) -> None:
         """Progress context managers should type task IDs as TaskID."""
-        from ezplog.handlers.wizard.progress import ProgressMixin
+        from ezplog.handlers.wizard._progress import ProgressMixin
 
         methods = [
             "progress",
