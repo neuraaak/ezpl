@@ -488,15 +488,13 @@ class DynamicLayeredProgress:
                 clean_description = self._clean_description(str(task.description))
 
                 if flash % 2 == 0:  # Green flash
-                    success_description = Text(
-                        clean_description, style="bold green on green"
-                    )
+                    success_description = f"[bold green on green]{clean_description}[/]"
                 else:  # Normal green
-                    success_description = Text(clean_description, style="bold green")
+                    success_description = f"[bold green]{clean_description}[/]"
 
                 self._progress.update(
                     task_id,
-                    description=success_description,  # type: ignore[arg-type]
+                    description=success_description,
                 )
 
             time.sleep(0.1)  # Quick flash
@@ -505,8 +503,8 @@ class DynamicLayeredProgress:
         task = self._get_task(task_id)
         if task is not None:
             clean_description = self._clean_description(str(task.description))
-            faded_description = Text(clean_description, style="dim")
-            self._progress.update(task_id, description=faded_description)  # type: ignore[arg-type]
+            faded_description = f"[dim]{clean_description}[/]"
+            self._progress.update(task_id, description=faded_description)
             time.sleep(0.3)  # Brief fade out
 
         # Remove the layer after animation
@@ -566,12 +564,12 @@ class DynamicLayeredProgress:
             # Update with error styling using Rich Text objects
             task = self._get_task(task_id)
             if task is not None:
-                error_description = Text(f"❌ {task.description}", style="red")
-                error_details = Text(f"Error: {error}", style="red")
+                error_description = f"[red]❌ {task.description}[/]"
+                error_details = f"[red]Error: {error}[/]"
 
                 self._progress.update(
                     task_id,
-                    description=error_description,  # type: ignore[arg-type]
+                    description=error_description,
                     details=error_details,
                 )
 
@@ -596,23 +594,17 @@ class DynamicLayeredProgress:
                         )
 
                         if flash % 2 == 0:  # Red flash
-                            error_description = Text(
-                                clean_description, style="bold red on red"
+                            error_description = (
+                                f"[bold red on red]{clean_description}[/]"
                             )
-                            error_details = Text(
-                                f"Stopped: {error_message}", style="red on red"
-                            )
+                            error_details = f"[red on red]Stopped: {error_message}[/]"
                         else:  # Normal red
-                            error_description = Text(
-                                clean_description, style="bold red"
-                            )
-                            error_details = Text(
-                                f"Stopped: {error_message}", style="red"
-                            )
+                            error_description = f"[bold red]{clean_description}[/]"
+                            error_details = f"[red]Stopped: {error_message}[/]"
 
                         self._progress.update(
                             task_id,
-                            description=error_description,  # type: ignore[arg-type]
+                            description=error_description,
                             details=error_details,
                         )
 
@@ -624,12 +616,12 @@ class DynamicLayeredProgress:
                 task = self._get_task(task_id)
                 if task is not None:
                     clean_description = self._clean_description(str(task.description))
-                    error_description = Text(clean_description, style="bold red")
-                    error_details = Text(f"Stopped: {error_message}", style="red")
+                    error_description = f"[bold red]{clean_description}[/]"
+                    error_details = f"[red]Stopped: {error_message}[/]"
 
                     self._progress.update(
                         task_id,
-                        description=error_description,  # type: ignore[arg-type]
+                        description=error_description,
                         details=error_details,
                     )
 
@@ -698,11 +690,11 @@ class DynamicLayeredProgress:
                 task = self._get_task(task_id)
                 if task is not None:
                     clean_description = self._clean_description(str(task.description))
-                    error_description = Text(clean_description, style="bold orange")
+                    error_description = f"[bold orange]{clean_description}[/]"
 
                     self._progress.update(
                         task_id,
-                        description=error_description,  # type: ignore[arg-type]
+                        description=error_description,
                     )
 
         # Stop the underlying Rich progress

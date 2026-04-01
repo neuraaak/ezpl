@@ -12,7 +12,7 @@
 
 ![Logo](docs/assets/logo-min.png)
 
-**Ezplog** is a modern Python logging framework with **Rich** console output and **loguru** file logging, featuring advanced display capabilities, configuration management, and a simple typed API suitable for professional and industrial applications.
+**ezplog** is a modern Python logging framework combining Rich console rendering and loguru file logging with an explicit app/lib compatibility model.
 
 ## 📦 Installation
 
@@ -32,8 +32,8 @@ cd ezplog && pip install .
 ```python
 from ezplog import Ezpl
 
-# Initialize
-ezpl = Ezpl(log_file="app.log")
+# Initialize once in the application entrypoint
+ezpl = Ezpl(log_file="app.log", hook_logger=True, hook_printer=True)
 printer = ezpl.get_printer()
 logger = ezpl.get_logger()
 
@@ -53,13 +53,13 @@ printer.wizard.table([{"Name": "Alice", "Age": 30}], title="Users")
 ## 🎯 Key Features
 
 - **✅ Singleton Pattern**: One global instance for the whole application
-- **✅ Rich Console Output**: Beautiful formatting with colors, panels, tables, and progress bars
-- **✅ File Logging**: Structured logs with rotation, retention, and compression
-- **✅ RichWizard**: Advanced display capabilities (panels, tables, JSON, dynamic progress bars)
-- **✅ Configuration Management**: JSON config, environment variables, and runtime configuration
-- **✅ CLI Tools**: Command-line interface for logs, config, and statistics
+- **✅ Rich Console Output**: Colors, panels, tables, JSON, and progress bars
+- **✅ File Logging**: Rotation, retention, and compression via loguru
+- **✅ Explicit Compatibility Hooks**: Fine control between app mode and lib mode
+- **✅ Configuration Management**: Arguments, environment variables, file, and runtime updates
+- **✅ CLI Tools**: Commands for logs and configuration
 - **✅ Full Type Hints**: Complete typing support for IDEs and linters
-- **✅ Robust Error Handling**: Never crashes, even with problematic input
+- **✅ Robust Fallbacks**: Safe behavior even with problematic message objects
 
 ## 📚 Documentation
 
@@ -68,6 +68,7 @@ Complete documentation is available at **[neuraaak.github.io/ezplog](https://neu
 | Section                                                                   | Description                                    |
 | ------------------------------------------------------------------------- | ---------------------------------------------- |
 | **[Getting Started](https://neuraaak.github.io/ezplog/getting-started/)** | Installation, basic usage, and first steps     |
+| **[Explanations](https://neuraaak.github.io/ezplog/explanations/)**       | Design rationale, trade-offs, and architecture |
 | **[API Reference](https://neuraaak.github.io/ezplog/api/)**               | Complete API documentation with examples       |
 | **[CLI Reference](https://neuraaak.github.io/ezplog/cli/)**               | Command-line interface guide                   |
 | **[User Guides](https://neuraaak.github.io/ezplog/guides/)**              | Configuration, development, and testing guides |
@@ -75,29 +76,23 @@ Complete documentation is available at **[neuraaak.github.io/ezplog](https://neu
 
 ## 🧪 Testing
 
-Comprehensive test suite with **377 tests** covering unit, integration, and robustness scenarios — **65% code coverage**.
-
-| Metric      | Value                         |
-| ----------- | ----------------------------- |
-| Total tests | 377                           |
-| Passing     | 377 (100%)                    |
-| Coverage    | 65%                           |
-| Test types  | Unit, Integration, Robustness |
+Comprehensive test suite covering unit, integration, and robustness scenarios.
+Coverage is generated automatically in documentation workflows.
 
 ```bash
 # Install dev dependencies
-pip install -e ".[dev]"
+uv sync --extra dev
 
 # Run all tests
-pytest tests/
+uv run pytest tests/
 
 # Run specific test types
-python tests/run_tests.py --type unit
-python tests/run_tests.py --type integration
-python tests/run_tests.py --type robustness
+uv run pytest tests/unit/
+uv run pytest tests/integration/
+uv run pytest tests/robustness/
 
 # With coverage
-python tests/run_tests.py --coverage
+uv run pytest --cov=src/ezplog --cov-report=term --cov-report=html
 ```
 
 See **[Testing Guide](https://neuraaak.github.io/ezplog/guides/testing/)** for complete details.
@@ -108,31 +103,23 @@ For contributors and developers:
 
 ```bash
 # Install in development mode with all dependencies
-pip install -e ".[dev]"
+uv sync --extra dev --extra docs --extra test
 
 # Install pre-commit hooks (code formatting, linting)
-pip install pre-commit
-pre-commit install
+uv run pre-commit install
 
-# Install Git hooks (auto-formatting, auto-tagging)
-# Linux/macOS:
-./.hooks/install.sh
-
-# Windows:
-.hooks\install.bat
-
-# Or manually:
-git config core.hooksPath .hooks
+# Run quality checks
+uv run ruff check src tests
+uv run ty check
 ```
 
-Source code uses a `src/` layout (`src/ezpl`).
+Source code uses a `src/` layout (`src/ezplog`).
 
 **Git Hooks:**
 
-- **pre-commit**: Automatically formats and lints code with ruff before commit
-- **post-commit**: Automatically creates version tags after commit
+- **pre-commit**: Automatically formats and lints code before commit
 
-See **[Development Guide](https://neuraaak.github.io/ezplog/guides/development/)** and **[.hooks/README.md](.hooks/README.md)** for detailed hook documentation.
+See **[Development Guide](https://neuraaak.github.io/ezplog/guides/development/)** for full details.
 
 ## 🎨 Main Components
 
@@ -151,9 +138,9 @@ See **[Development Guide](https://neuraaak.github.io/ezplog/guides/development/)
 ## 🔧 Quick API Reference
 
 ```python
-from ezpl import Ezpl, Printer, Logger
+from ezplog import Ezpl, Printer, Logger
 
-ezpl = Ezpl()
+ezpl = Ezpl(hook_logger=True, hook_printer=True)
 printer: Printer = ezpl.get_printer()
 logger: Logger = ezpl.get_logger()
 
@@ -168,6 +155,7 @@ logger.info(), logger.debug(), logger.warning(), logger.error()
 # Configuration
 ezpl.set_level("DEBUG")
 ezpl.configure(log_rotation="10 MB", log_retention="7 days")
+ezpl.set_compatibility_hooks(hook_logger=True, logger_names=["vendor.payment"])
 ```
 
 ## 🛡️ Robustness
@@ -192,4 +180,4 @@ MIT License – See [LICENSE](LICENSE) file for details.
 
 ---
 
-**Ezpl** – Modern, typed, robust and beautiful logging for Python. 🚀
+**ezplog** - Modern, typed, robust and beautiful logging for Python.
