@@ -221,28 +221,28 @@ jobs:
   # Each job runs in parallel after auto-tag completes.
   # The called workflows must define `on: workflow_call:` with matching inputs.
 
-  # trigger-publish:
-  #   name: Trigger Publish
-  #   needs: auto-tag
-  #   if: needs.auto-tag.outputs.new_tag == 'true'
-  #   uses: ./.github/workflows/publish-pypi.yml
-  #   secrets: inherit
-  #   with:
-  #     version: ${{ needs.auto-tag.outputs.version }}
-  #     tag: ${{ needs.auto-tag.outputs.tag_name }}
-  #     package_name: ${{ needs.auto-tag.outputs.package_name }}
-  #     python_version: ${{ needs.auto-tag.outputs.python_version }}
-  #     is_prerelease: ${{ needs.auto-tag.outputs.is_prerelease }}
+  trigger-publish:
+    name: Trigger Publish
+    needs: auto-tag
+    if: needs.auto-tag.outputs.new_tag == 'true'
+    uses: ./.github/workflows/publish-pypi.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.auto-tag.outputs.version }}
+      tag: ${{ needs.auto-tag.outputs.tag_name }}
+      package_name: ${{ needs.auto-tag.outputs.package_name }}
+      python_version: ${{ needs.auto-tag.outputs.python_version }}
+      is_prerelease: ${{ needs.auto-tag.outputs.is_prerelease }}
 
-  # trigger-deploy-docs:
-  #   name: Trigger Deploy Docs
-  #   needs: [auto-tag, trigger-publish]
-  #   if: needs.auto-tag.outputs.new_tag == 'true'
-  #   uses: ./.github/workflows/docs.yml
-  #   secrets: inherit
-  #   with:
-  #     version: ${{ needs.auto-tag.outputs.version }}
-  #     tag: ${{ needs.auto-tag.outputs.tag_name }}
-  #     package_name: ${{ needs.auto-tag.outputs.package_name }}
-  #     python_version: ${{ needs.auto-tag.outputs.python_version }}
-  #     is_prerelease: ${{ needs.auto-tag.outputs.is_prerelease }}
+  trigger-deploy-docs:
+    name: Trigger Deploy Docs
+    needs: [auto-tag, trigger-publish]
+    if: needs.auto-tag.outputs.new_tag == 'true'
+    uses: ./.github/workflows/docs.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.auto-tag.outputs.version }}
+      tag: ${{ needs.auto-tag.outputs.tag_name }}
+      package_name: ${{ needs.auto-tag.outputs.package_name }}
+      python_version: ${{ needs.auto-tag.outputs.python_version }}
+      is_prerelease: ${{ needs.auto-tag.outputs.is_prerelease }}
