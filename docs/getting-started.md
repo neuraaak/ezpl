@@ -11,39 +11,39 @@ Build a working ezplog setup in less than 5 minutes.
 
 1. Install ezplog.
 
-```bash
-pip install ezplog
-```
+   ```bash
+   pip install ezplog
+   ```
 
-1. Initialize app mode once.
+2. Initialize app mode once.
 
-```python
-from ezplog import Ezpl
+   ```python
+   from ezplog import Ezpl
 
-ezpl = Ezpl(
-    log_file="app.log",
-    hook_logger=True,
-    hook_printer=True,
-)
+   ezpl = Ezpl(
+       log_file="app.log",
+       hook_logger=True,
+       hook_printer=True,
+   )
 
-ezpl.info("Application started")
-ezpl.get_printer().success("Ready")
-ezpl.get_logger().info("Written to app.log")
-```
+   ezpl.info("Application started")
+   ezpl.get_printer().success("Ready")
+   ezpl.get_logger().info("Written to app.log")
+   ```
 
-1. Verify library compatibility.
+3. Verify library compatibility.
 
-```python
-from ezplog.lib_mode import get_logger, get_printer
+   ```python
+   from ezplog.lib_mode import get_logger, get_printer
 
-library_logger = get_logger("demo.library")
-library_printer = get_printer()
+   library_logger = get_logger("demo.library")
+   library_printer = get_printer()
 
-library_logger.info("Library logger message")
-library_printer.success("Library printer message")
-```
+   library_logger.info("Library logger message")
+   library_printer.success("Library printer message")
+   ```
 
-## ✅ Result
+## ✅ What you built
 
 You now have one app-level logging configuration with unified console and file output.
 Library loggers and printers are routed through explicit compatibility hooks.
@@ -53,5 +53,5 @@ Library loggers and printers are routed through explicit compatibility hooks.
 - [How to configure compatibility hooks](guides/configuration.md)
 - [How to contribute changes locally](guides/development.md)
 - [How to run and extend tests](guides/testing.md)
-- [App mode vs lib mode](explanations/dual-mode.md)
+- [App mode vs lib mode](concepts/dual-mode.md)
 - [Ezpl API](api/reference/ezpl.md)

@@ -42,7 +42,7 @@ ezpl.get_printer().success("Ready")
 | :------------------------------------ | :------------------------------------------------------ |
 | [Getting Started](getting-started.md) | Tutorial for a working setup in a few minutes.          |
 | [User Guides](guides/index.md)        | Task-focused configuration and operational recipes.     |
-| [Explanations](explanations/index.md) | Architecture rationale and mode interactions.           |
+| [Concepts](concepts/index.md)         | Architecture rationale and mode interactions.           |
 | [API Reference](api/index.md)         | Curated API map and auto-generated technical reference. |
 | [CLI Reference](cli/index.md)         | Command and option reference for the CLI.               |
 | [Examples](examples/index.md)         | Copy-paste runnable scenarios.                          |

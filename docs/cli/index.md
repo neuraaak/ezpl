@@ -22,7 +22,7 @@ ezpl [OPTIONS] COMMAND [ARGS]...
 | `logs`   | View, search, analyze, and export log files.  |
 | `config` | Read, update, and reset configuration values. |
 
-## ⚙️ logs commands
+## 📋 logs commands
 
 | Command            | Key options                                                      |
 | :----------------- | :--------------------------------------------------------------- |
@@ -34,7 +34,7 @@ ezpl [OPTIONS] COMMAND [ARGS]...
 | `ezpl logs clean`  | `--file/-f`, `--days/-d`, `--size/-s`, `--confirm/-y`            |
 | `ezpl logs export` | `--file/-f`, `--format/-F`, `--output/-o`                        |
 
-## ⚙️ config commands
+## 📋 config commands
 
 | Command                     | Key options     |
 | :-------------------------- | :-------------- |
