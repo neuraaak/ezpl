@@ -20,6 +20,7 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
 from pathlib import Path
+from unittest.mock import patch
 
 # Third-party imports
 import pytest
@@ -52,6 +53,30 @@ class TestCLIWithEzpl:
         result = cli_runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
         assert "version" in result.output.lower() or "ezpl" in result.output.lower()
+
+    def test_should_display_version_when_short_version_flag_is_given(
+        self, cli_runner: CliRunner
+    ) -> None:
+        """Test short version flag."""
+        result = cli_runner.invoke(cli, ["-v"])
+        assert result.exit_code == 0
+        assert "version" in result.output.lower() or "ezpl" in result.output.lower()
+
+    def test_should_open_docs_when_docs_command_is_invoked(
+        self, cli_runner: CliRunner
+    ) -> None:
+        """Test docs command."""
+        with patch(
+            "ezplog.cli.commands._docs.webbrowser.open", return_value=True
+        ) as mocked_open:
+            result = cli_runner.invoke(cli, ["docs"])
+
+        assert result.exit_code == 0
+        assert (
+            "documentation" in result.output.lower()
+            or "https://" in result.output.lower()
+        )
+        mocked_open.assert_called_once_with("https://neuraaak.github.io/ezplog/", new=2)
 
     def test_should_display_info_when_info_command_is_invoked(
         self, cli_runner: CliRunner

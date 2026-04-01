@@ -73,7 +73,7 @@ The library supports two usage modes depending on whether the code is an **appli
 ```python
 from ezplog import Ezpl
 
-ezpl = Ezpl(log_file="app.log", intercept_stdlib=True)
+ezpl = Ezpl(log_file="app.log", hook_logger=True)
 ezpl.info("Application started")
 ```
 
@@ -88,7 +88,7 @@ printer = get_printer()         # _LazyPrinter: delegates to Ezpl when initializ
 
 Key files:
 
-- `app_mode.py` — `InterceptHandler`: bridges stdlib `logging` calls into loguru (used when `intercept_stdlib=True`)
+- `app_mode.py` — `InterceptHandler`: bridges stdlib `logging` calls into loguru (used when `hook_logger=True`)
 - `lib_mode.py` — `get_logger()`, `get_printer()`, `_LazyPrinter`, `_LazyWizard`
 
 ### Configuration Priority

@@ -13,7 +13,7 @@ the loguru pipeline (and thus through EzLogger if configured).
 
 Simplest usage via Ezpl (recommended):
 
-    ezpl = Ezpl(log_file="app.log", intercept_stdlib=True)
+    ezpl = Ezpl(log_file="app.log", hook_logger=True)
 
 Manual installation (for fine-grained control):
 
@@ -59,7 +59,7 @@ class InterceptHandler(logging.Handler):
         >>> import logging
         >>> from ezpl import Ezpl, InterceptHandler
         >>> # Option 1 — automatic via Ezpl
-        >>> ezpl = Ezpl(log_file="app.log", intercept_stdlib=True)
+        >>> ezpl = Ezpl(log_file="app.log", hook_logger=True)
         >>> # Option 2 — manual installation
         >>> logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     """
@@ -84,9 +84,11 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).log(
-            level, record.getMessage()
-        )
+        # Bind task="logger" so records pass EzLogger's file sink filter.
+        logger.bind(task="logger").opt(
+            depth=depth,
+            exception=record.exc_info,
+        ).log(level, record.getMessage())
 
 
 # ///////////////////////////////////////////////////////////////

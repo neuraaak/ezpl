@@ -64,7 +64,7 @@ class TestLogLevels:
     def test_should_not_crash_when_warning_message_is_printed_via_warning_method(
         self,
     ) -> None:
-        """Test warn() alias for warning()."""
+        """Test warning() method."""
         ezpl = Ezpl()
         printer = ezpl.get_printer()
         printer.warning("Warn message")

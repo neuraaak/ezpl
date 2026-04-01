@@ -1,7 +1,9 @@
 # Explanations
 
-In-depth conceptual documentation for ezplog. These pages build mental models — they explain the _why_ behind design decisions, not just the _how_.
+Conceptual pages that explain design choices and trade-offs in ezplog.
 
-| Page                                 | Question answered                                                  |
-| ------------------------------------ | ------------------------------------------------------------------ |
-| [App Mode vs Lib Mode](dual-mode.md) | Which usage mode should I use, and why does the distinction exist? |
+## 📚 Available topics
+
+| Page                                 | Question answered                                                                         |
+| :----------------------------------- | :---------------------------------------------------------------------------------------- |
+| [App mode vs lib mode](dual-mode.md) | Why does ezplog separate host application responsibilities from library responsibilities? |

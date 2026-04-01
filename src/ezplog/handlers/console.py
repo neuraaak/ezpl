@@ -206,10 +206,6 @@ class EzPrinter(LoggingHandler, IndentationManager):
         """Log a warning message with pattern format."""
         self.print_pattern(Pattern.WARN, message, "WARNING")
 
-    def warn(self, message: Any) -> None:
-        """Alias for warning(). Log a warning message with pattern format."""
-        self.warning(message)
-
     def error(self, message: Any) -> None:
         """Log an error message with pattern format."""
         self.print_pattern(Pattern.ERROR, message, "ERROR")

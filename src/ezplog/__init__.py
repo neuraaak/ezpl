@@ -24,7 +24,7 @@ suitable for professional and industrial applications.
 *App mode* — configure once at application level:
 
     >>> from ezplog import Ezpl
-    >>> ezpl = Ezpl(log_file="app.log", intercept_stdlib=True, lock_config=True)
+    >>> ezpl = Ezpl(log_file="app.log", hook_logger=True, lock_config=True)
     >>> ezpl.info("Application started")           # direct facade
     >>> ezpl.get_printer().success("Ready")        # advanced usage
 

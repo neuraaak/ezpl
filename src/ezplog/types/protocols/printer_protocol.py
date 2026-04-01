@@ -37,7 +37,7 @@ class PrinterProtocol(Protocol):
     consistent API and type safety.
 
     **Required Methods:**
-        - Logging methods: info(), debug(), success(), warning(), warn(), error(), critical()
+        - Logging methods: info(), debug(), success(), warning(), error(), critical()
         - Pattern methods: tip(), system(), install(), detect(), config(), deps()
         - Enhanced methods: print_pattern(), print_json()
         - Utility methods: set_level(), log()
@@ -65,10 +65,6 @@ class PrinterProtocol(Protocol):
 
     def warning(self, message: Any) -> None:
         """Log a warning message."""
-        ...
-
-    def warn(self, message: Any) -> None:
-        """Alias for warning(). Log a warning message."""
         ...
 
     def error(self, message: Any) -> None:

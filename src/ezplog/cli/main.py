@@ -25,7 +25,7 @@ from rich.text import Text
 # Local imports
 from .._version import __version__
 from ._console import console
-from .commands import _config, _info, _logs, _version
+from .commands import _config, _docs, _info, _logs, _version
 
 # ///////////////////////////////////////////////////////////////
 # CLI GROUP
@@ -38,7 +38,9 @@ from .commands import _config, _info, _logs, _version
     context_settings={"help_option_names": ["-h", "--help"]},
 )
 @click.version_option(
-    version=__version__,
+    __version__,
+    "-v",
+    "--version",
     prog_name="Ezpl CLI",
     message="%(prog)s version %(version)s",
 )
@@ -94,6 +96,9 @@ cli.add_command(_version.version_command)
 
 # Info command
 cli.add_command(_info.info_command)
+
+# Docs command
+cli.add_command(_docs.docs_command)
 
 
 # ///////////////////////////////////////////////////////////////
