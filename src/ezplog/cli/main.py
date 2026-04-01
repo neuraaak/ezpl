@@ -15,10 +15,8 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Standard library imports
-import click
-
 # Third-party imports
+import click
 from rich.panel import Panel
 from rich.text import Text
 
@@ -85,25 +83,16 @@ def _display_welcome() -> None:
 # ///////////////////////////////////////////////////////////////
 
 
-# Logs group
+# Register commands and groups
 cli.add_command(_logs.logs_group)
-
-# Config group
 cli.add_command(_config.config_group)
-
-# Version command
 cli.add_command(_version.version_command)
-
-# Info command
 cli.add_command(_info.info_command)
-
-# Docs command
 cli.add_command(_docs.docs_command)
 
 
 # ///////////////////////////////////////////////////////////////
 # MAIN ENTRY POINT
-# ///////////////////////////////////////////////////////////////
 # ///////////////////////////////////////////////////////////////
 
 

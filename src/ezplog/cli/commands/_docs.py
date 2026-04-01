@@ -3,9 +3,7 @@
 # Project: ezpl
 # ///////////////////////////////////////////////////////////////
 
-"""
-CLI command for opening ezplog online documentation.
-"""
+"""CLI command for opening ezqt-widgets online documentation."""
 
 from __future__ import annotations
 
@@ -15,6 +13,7 @@ from __future__ import annotations
 # Standard library imports
 import webbrowser
 
+# Third-party imports
 import click
 
 # ///////////////////////////////////////////////////////////////

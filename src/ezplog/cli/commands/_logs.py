@@ -21,9 +21,8 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import click
-
 # Third-party imports
+import click
 from rich.table import Table
 
 # Local imports
