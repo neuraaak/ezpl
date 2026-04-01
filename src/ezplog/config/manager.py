@@ -365,7 +365,8 @@ class ConfigurationManager:
                         value = self._config.get(config_key)
                         if value is None:
                             continue
-                        f.write(f"set {env_var}={value}\n")
+                        safe_value = str(value).replace('"', '""')
+                        f.write(f'set "{env_var}={safe_value}"\n')
                 else:
                     # Generate Bash script for Unix/Linux/macOS
                     f.write("#!/bin/bash\n")
