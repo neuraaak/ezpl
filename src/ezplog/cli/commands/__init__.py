@@ -16,6 +16,7 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # Local imports
 from ._config import config_group
+from ._docs import docs_command
 from ._info import info_command
 from ._logs import logs_group
 from ._version import version_command
@@ -30,4 +31,5 @@ __all__ = [
     "config_group",
     "version_command",
     "info_command",
+    "docs_command",
 ]

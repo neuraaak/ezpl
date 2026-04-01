@@ -25,7 +25,7 @@ Usage pattern in a library:
     printer = get_printer()          # lazy EzPrinter proxy, silent by default
 
     def initialize():
-        log.info("Service ready")        # captured if app uses intercept_stdlib=True
+        log.info("Service ready")        # captured if app enables logger hooks
         printer.success("Service ready") # delegated to real EzPrinter if app initialized Ezpl
 """
 
@@ -57,7 +57,7 @@ class _LazyWizard:
     def _get_real(self) -> Any:
         from .ezpl import Ezpl
 
-        if Ezpl.is_initialized():
+        if Ezpl.is_initialized() and Ezpl.is_lib_printer_hook_enabled():
             return Ezpl().get_printer().wizard
         return None
 
@@ -88,7 +88,7 @@ class _LazyPrinter:
     def _get_real(self) -> Any:
         from .ezpl import Ezpl
 
-        if Ezpl.is_initialized():
+        if Ezpl.is_initialized() and Ezpl.is_lib_printer_hook_enabled():
             return Ezpl().get_printer()
         return None
 
@@ -154,10 +154,6 @@ class _LazyPrinter:
         real = self._get_real()
         if real is not None:
             real.warning(message)
-
-    def warn(self, message: Any) -> None:
-        """Alias for warning()."""
-        self.warning(message)
 
     def error(self, message: Any) -> None:
         """Log an error message (no-op if Ezpl not initialized)."""
@@ -319,7 +315,7 @@ def get_logger(name: str) -> logging.Logger:
 
     The returned logger has a NullHandler attached so that no output is
     produced when the host application has not configured any handler.
-    When the host application uses Ezpl with intercept_stdlib=True, all
+    When the host application enables logger hooks in Ezpl, all
     records emitted by this logger are automatically forwarded to the
     Rich/loguru pipeline.
 

@@ -130,7 +130,7 @@ class EzLogger(LoggingHandler):
             self._logger_id = self._logger.add(
                 sink=self._log_file,
                 level=self._level,
-                format=self._custom_formatter,  # type: ignore[arg-type]
+                format=self._custom_formatter,
                 filter=lambda record: record["extra"]["task"] == "logger",
                 encoding="utf-8",
                 rotation=self._rotation if self._rotation else None,
@@ -248,10 +248,6 @@ class EzLogger(LoggingHandler):
         """Log a warning message."""
         message = safe_str_convert(message)
         self._logger.warning(message, *args, **kwargs)
-
-    def warn(self, message: Any, *args, **kwargs) -> None:
-        """Alias for warning(). Log a warning message."""
-        self.warning(message, *args, **kwargs)
 
     def error(self, message: Any, *args, **kwargs) -> None:
         """Log an error message."""
@@ -372,7 +368,7 @@ class EzLogger(LoggingHandler):
     # FORMATTING METHODS
     # ///////////////////////////////////////////////////////////////
 
-    def _custom_formatter(self, record: dict[str, Any]) -> str:
+    def _custom_formatter(self, record: Any) -> str:
         """
         Custom formatter for file output.
 
@@ -383,6 +379,9 @@ class EzLogger(LoggingHandler):
             Formatted log message (always returns a string, never raises an exception)
         """
         try:
+            if not isinstance(record, dict):
+                return "????-??-?? ??:??:?? | FORMAT_ERR | unknown:unknown:? - [FORMAT ERROR: InvalidRecord]\n"
+
             level = (
                 record.get("level", {}).name
                 if hasattr(record.get("level", {}), "name")

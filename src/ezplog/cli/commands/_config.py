@@ -15,10 +15,8 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Standard library imports
-import click
-
 # Third-party imports
+import click
 from rich.table import Table
 
 # Local imports

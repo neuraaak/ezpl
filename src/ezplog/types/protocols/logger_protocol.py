@@ -34,7 +34,7 @@ class LoggerProtocol(Protocol):
     consistent API and type safety.
 
     **Required Methods:**
-        - Logging methods: info(), debug(), success(), warning(), warn(), error(), critical(), trace(), bind()
+        - Logging methods: info(), debug(), success(), warning(), error(), critical(), trace(), bind()
         - Utility methods: set_level(), log(), add_separator()
         - Getter methods: get_logger(), get_log_file()
 
@@ -65,10 +65,6 @@ class LoggerProtocol(Protocol):
 
     def warning(self, message: Any, *args, **kwargs) -> None:
         """Log a warning message."""
-        ...
-
-    def warn(self, message: Any, *args, **kwargs) -> None:
-        """Alias for warning(). Log a warning message."""
         ...
 
     def error(self, message: Any, *args, **kwargs) -> None:
