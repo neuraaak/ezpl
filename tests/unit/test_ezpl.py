@@ -28,6 +28,7 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
 import json
+import logging
 import os
 from pathlib import Path
 from unittest.mock import patch
@@ -38,6 +39,7 @@ import pytest
 # Local imports
 from ezplog import Ezpl
 from ezplog.core.exceptions import FileOperationError, ValidationError
+from ezplog.lib_mode import get_logger, get_printer
 
 # ///////////////////////////////////////////////////////////////
 # TESTS
@@ -367,6 +369,139 @@ class TestConfiguration:
             ezpl.reload_config()
             # Config should be reloaded
             assert ezpl is not None
+
+    def test_should_persist_log_file_when_configure_is_called_with_persist_true(
+        self,
+        temp_config_file: Path,
+        temp_dir: Path,
+    ) -> None:
+        """configure(persist=True, log_file=...) should persist the new path."""
+        new_log_file = temp_dir / "persisted.log"
+
+        with patch(
+            "ezplog.config.manager.DefaultConfiguration.CONFIG_FILE", temp_config_file
+        ):
+            ezpl = Ezpl()
+            applied = ezpl.configure(log_file=new_log_file, persist=True)
+
+        assert applied is True
+        assert ezpl.get_log_file() == new_log_file
+
+        saved_config = json.loads(temp_config_file.read_text(encoding="utf-8"))
+        assert saved_config.get("log-file") == str(new_log_file)
+
+
+class TestStdlibInterception:
+    """Tests for stdlib interception behavior."""
+
+    def test_should_write_stdlib_logs_to_file_when_logger_hook_is_enabled(
+        self, temp_log_file: Path
+    ) -> None:
+        """Stdlib loggers should be bridged to EzLogger file output in app mode."""
+        root_logger = logging.getLogger()
+        original_handlers = list(root_logger.handlers)
+        original_level = root_logger.level
+        marker = "stdlib-bridge-marker"
+
+        try:
+            Ezpl(log_file=temp_log_file, hook_logger=True)
+            stdlib_logger = logging.getLogger("tests.stdlib.bridge")
+            stdlib_logger.info(marker)
+
+            # Force sink flush/close before reading the file.
+            Ezpl.reset()
+
+            content = temp_log_file.read_text(encoding="utf-8")
+            assert marker in content
+        finally:
+            root_logger.handlers = original_handlers
+            root_logger.setLevel(original_level)
+
+
+class TestCompatibilityHooks:
+    """Tests for app/lib compatibility hooks."""
+
+    def test_should_delegate_lib_printer_when_hooks_use_default_values(self) -> None:
+        """lib_mode printer should delegate to Ezpl printer by default."""
+        ezpl = Ezpl()
+
+        with patch.object(ezpl.get_printer(), "info") as mocked_info:
+            get_printer().info("lib-printer-default")
+
+        mocked_info.assert_called_once_with("lib-printer-default")
+
+    def test_should_not_delegate_lib_printer_when_hook_printer_is_disabled(
+        self,
+    ) -> None:
+        """lib_mode printer should stay silent when printer hook is disabled."""
+        ezpl = Ezpl()
+        ezpl.set_compatibility_hooks(hook_logger=False, hook_printer=False)
+
+        with patch.object(ezpl.get_printer(), "info") as mocked_info:
+            get_printer().info("lib-printer-disabled")
+
+        mocked_info.assert_not_called()
+
+    def test_should_capture_lib_mode_logger_when_logger_hook_is_enabled(
+        self, temp_log_file: Path
+    ) -> None:
+        """lib_mode stdlib logger should be captured when logger hook is enabled."""
+        marker = "lib-mode-hook-enabled"
+        ezpl = Ezpl(log_file=temp_log_file)
+        ezpl.set_compatibility_hooks(hook_logger=True, hook_printer=True)
+
+        get_logger("tests.libmode.hook.enabled").info(marker)
+
+        Ezpl.reset()
+        content = temp_log_file.read_text(encoding="utf-8")
+        assert marker in content
+
+    def test_should_not_capture_lib_mode_logger_when_logger_hook_is_disabled(
+        self, temp_log_file: Path
+    ) -> None:
+        """lib_mode stdlib logger should remain silent when logger hook is disabled."""
+        marker = "lib-mode-hook-disabled"
+        ezpl = Ezpl(log_file=temp_log_file)
+        ezpl.set_compatibility_hooks(hook_logger=False, hook_printer=True)
+
+        get_logger("tests.libmode.hook.disabled").info(marker)
+
+        Ezpl.reset()
+        content = temp_log_file.read_text(encoding="utf-8")
+        assert marker not in content
+
+    def test_should_capture_named_classic_logger_when_explicitly_hooked(
+        self, temp_log_file: Path
+    ) -> None:
+        """A classic logger with propagate=False should be capturable via named hook."""
+        logger_name = "tests.classic.named"
+        marker = "classic-named-hook"
+        classic_logger = logging.getLogger(logger_name)
+        original_handlers = list(classic_logger.handlers)
+        original_level = classic_logger.level
+        original_propagate = classic_logger.propagate
+
+        try:
+            classic_logger.handlers = []
+            classic_logger.propagate = False
+            classic_logger.setLevel(logging.INFO)
+
+            ezpl = Ezpl(log_file=temp_log_file)
+            ezpl.set_compatibility_hooks(
+                hook_logger=True,
+                hook_printer=True,
+                logger_names=[logger_name],
+            )
+
+            classic_logger.info(marker)
+
+            Ezpl.reset()
+            content = temp_log_file.read_text(encoding="utf-8")
+            assert marker in content
+        finally:
+            classic_logger.handlers = original_handlers
+            classic_logger.propagate = original_propagate
+            classic_logger.setLevel(original_level)
 
 
 class TestGetters:

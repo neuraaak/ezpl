@@ -14,10 +14,8 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
-# Standard library imports
-import click
-
 # Third-party imports
+import click
 from rich.panel import Panel
 from rich.text import Text
 
@@ -47,7 +45,6 @@ def version_command(full: bool) -> None:
     """
     version = getattr(ezpl, "__version__", "unknown")
     author = getattr(ezpl, "__author__", "unknown")
-    license_type = getattr(ezpl, "__license__", "unknown")
 
     if full:
         # Full version info
@@ -58,8 +55,6 @@ def version_command(full: bool) -> None:
 
         text.append("Author: ", style="dim")
         text.append(f"{author}\n", style="white")
-        text.append("License: ", style="dim")
-        text.append(f"{license_type}\n", style="white")
 
         url = getattr(ezpl, "__url__", None)
         if url:

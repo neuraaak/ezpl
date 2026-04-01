@@ -74,6 +74,8 @@ class Ezpl:
     _printer: EzPrinter
     _logger: EzLogger
     _config_manager: ConfigurationManager
+    _lib_printer_hook_enabled: bool = True
+    _stdlib_hook_targets: set[str | None] = set()
 
     # ///////////////////////////////////////////////////////////////
     # INIT
@@ -103,7 +105,9 @@ class Ezpl:
         base_indent_symbol: str | None = None,
         *,
         lock_config: bool = False,
-        intercept_stdlib: bool = False,
+        hook_logger: bool = True,
+        hook_printer: bool = True,
+        logger_names: list[str] | None = None,
     ) -> Ezpl:
         """
         Creates and returns a new instance of Ezpl if none exists.
@@ -132,9 +136,12 @@ class Ezpl:
             * `lock_config` (bool): If True, lock configuration immediately after init.
                 Subsequent configure() calls will be blocked unless a valid token is used.
                 The lock token is stored in Ezpl._config_lock_token.
-            * `intercept_stdlib` (bool): If True, install an InterceptHandler on the root
-                stdlib logger so that all library loggers using logging.getLogger(__name__)
-                are automatically forwarded to the loguru pipeline.
+            * `hook_logger` (bool): If True, install stdlib logging bridge(s) so
+                classic loggers are forwarded to the loguru pipeline.
+            * `hook_printer` (bool): If True, allow ezpl.lib_mode.get_printer()
+                to delegate to the real EzPrinter instance once initialized.
+            * `logger_names` (list[str] | None): Optional stdlib logger names to
+                bridge explicitly. When omitted, the root logger is used.
 
         **Returns:**
 
@@ -277,8 +284,11 @@ class Ezpl:
                     if lock_config:
                         cls._config_lock_token = cls.lock_config()
 
-                    if intercept_stdlib:
-                        cls._install_intercept_handler()
+                    cls._set_compatibility_hooks(
+                        hook_logger=hook_logger,
+                        hook_printer=hook_printer,
+                        logger_names=logger_names,
+                    )
 
         # Type narrowing: _instance is guaranteed to be set at this point
         if cls._instance is None:
@@ -554,9 +564,39 @@ class Ezpl:
             except (EzplError, OSError, RuntimeError) as e:
                 logger.error(f"Error during cleanup: {e}")
             cls._instance = None
+        cls._remove_all_intercept_handlers()
+        cls._lib_printer_hook_enabled = True
         # Also reset configuration lock
         cls._config_locked = False
         cls._config_lock_token = None
+
+    def set_compatibility_hooks(
+        self,
+        *,
+        hook_logger: bool = True,
+        hook_printer: bool = True,
+        logger_names: list[str] | None = None,
+    ) -> None:
+        """
+        Configure compatibility hooks between Ezpl and classic logging/lib_mode.
+
+        Args:
+            hook_logger: If True, bridge stdlib logging records to Ezpl.
+                If False, remove previously installed stdlib bridges.
+            hook_printer: If True, ezpl.lib_mode.get_printer() delegates to
+                Ezpl's real printer once initialized. If False, it stays silent.
+            logger_names: Optional stdlib logger names to hook explicitly.
+                When omitted, root logger is targeted.
+
+        Notes:
+            - This method is safe to call multiple times (idempotent behavior).
+            - Hooking named loggers is useful for libraries with propagate=False.
+        """
+        type(self)._set_compatibility_hooks(
+            hook_logger=hook_logger,
+            hook_printer=hook_printer,
+            logger_names=logger_names,
+        )
 
     # ------------------------------------------------
     # CONFIG LOCK CONTROL
@@ -621,28 +661,100 @@ class Ezpl:
         return cls._config_locked
 
     @classmethod
+    def is_lib_printer_hook_enabled(cls) -> bool:
+        """Return True when lib_mode printer proxy is allowed to delegate."""
+        return cls._lib_printer_hook_enabled
+
+    @classmethod
     def _can_write_config(cls) -> bool:
         """Return True when configuration writes are allowed."""
         return not cls._config_locked
 
     @classmethod
-    def _install_intercept_handler(cls) -> None:
+    def _set_compatibility_hooks(
+        cls,
+        *,
+        hook_logger: bool,
+        hook_printer: bool,
+        logger_names: list[str] | None = None,
+    ) -> None:
+        """Apply logger/printer compatibility hooks with idempotent semantics."""
+        cls._lib_printer_hook_enabled = hook_printer
+
+        targets: list[str | None] = (
+            [None] if logger_names is None else list(dict.fromkeys(logger_names))
+        )
+
+        if hook_logger:
+            for logger_name in targets:
+                cls._install_intercept_handler(logger_name)
+            return
+
+        if logger_names is None:
+            cls._remove_all_intercept_handlers()
+            return
+
+        for logger_name in targets:
+            cls._remove_intercept_handler(logger_name)
+
+    @classmethod
+    def _install_intercept_handler(cls, logger_name: str | None = None) -> None:
         """
-        Install InterceptHandler on the root stdlib logger.
+        Install InterceptHandler on a stdlib logger.
 
-        After this call, all records emitted via logging.getLogger(__name__)
-        — including those from ezpl.lib_mode.get_logger() — are forwarded
-        to the loguru pipeline.
+        Args:
+            logger_name: Name of the stdlib logger to hook. When None,
+                install on the root logger.
 
-        This method is idempotent: calling it multiple times installs the
-        handler only once.
+        Notes:
+            This method is idempotent: calling it multiple times installs the
+            handler only once for a given target logger.
         """
         import logging as _logging
 
-        root = _logging.getLogger()
-        if not any(isinstance(h, InterceptHandler) for h in root.handlers):
-            root.addHandler(InterceptHandler())
-            root.setLevel(0)
+        target = (
+            _logging.getLogger()
+            if logger_name is None
+            else _logging.getLogger(logger_name)
+        )
+        if not any(isinstance(h, InterceptHandler) for h in target.handlers):
+            target.addHandler(InterceptHandler())
+        target.setLevel(0)
+
+        # Ensure named loggers can still bubble to parent handlers if needed.
+        if logger_name is not None:
+            target.propagate = True
+
+        cls._stdlib_hook_targets.add(logger_name)
+
+    @classmethod
+    def _remove_intercept_handler(cls, logger_name: str | None = None) -> None:
+        """Remove InterceptHandler instances from a stdlib logger."""
+        import logging as _logging
+
+        target = (
+            _logging.getLogger()
+            if logger_name is None
+            else _logging.getLogger(logger_name)
+        )
+        target.handlers = [
+            handler
+            for handler in target.handlers
+            if not isinstance(handler, InterceptHandler)
+        ]
+        cls._stdlib_hook_targets.discard(logger_name)
+
+    @classmethod
+    def _remove_all_intercept_handlers(cls) -> None:
+        """Remove InterceptHandler from all tracked stdlib logger targets."""
+        tracked_targets = list(cls._stdlib_hook_targets)
+        if None not in tracked_targets:
+            tracked_targets.append(None)
+
+        for logger_name in tracked_targets:
+            cls._remove_intercept_handler(logger_name)
+
+        cls._stdlib_hook_targets.clear()
 
     def set_log_file(self, log_file: Path | str) -> None:
         """
@@ -971,7 +1083,6 @@ class Ezpl:
             **kwargs: Configuration options (alternative to config_dict):
                 - log_file or log-file: Path to log file
                 - printer_level or printer-level: Printer log level
-                - logger_level or file-logger-level: File logger level
                 - file_logger_level or file-logger-level: File logger level
                 - level or log-level: Set both printer and logger level
                 - log_rotation or log-rotation: Rotation setting (e.g., "10 MB", "1 day")
@@ -1003,7 +1114,6 @@ class Ezpl:
         key_mapping = {
             "log_file": "log-file",
             "printer_level": "printer-level",
-            "logger_level": "file-logger-level",
             "file_logger_level": "file-logger-level",
             "level": "log-level",
             "log_rotation": "log-rotation",
@@ -1019,14 +1129,14 @@ class Ezpl:
             normalized_key = key_mapping.get(key, key)
             normalized_config[normalized_key] = value
 
-        # Extract log-file before update — set_log_file() owns that write
+        # Extract log-file before update — set_log_file() owns that write.
+        # Keep it persisted in config when requested.
         new_log_file = normalized_config.pop("log-file", None)
+        if new_log_file is not None:
+            normalized_config["log-file"] = str(Path(new_log_file))
 
         # Update configuration manager
         self._config_manager.update(normalized_config)
-        if persist:
-            self._config_manager.save()
-
         # Apply changes to handlers
         if new_log_file is not None:
             self.set_log_file(new_log_file)
@@ -1053,6 +1163,9 @@ class Ezpl:
         )
         if indent_changed:
             self._rebuild_printer()
+
+        if persist:
+            self._config_manager.save()
 
         return True
 

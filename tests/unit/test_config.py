@@ -366,8 +366,22 @@ class TestExport:
 
         assert output_file.exists()
         content = output_file.read_text(encoding="utf-8")
-        assert "set EZPL_LOG_LEVEL=DEBUG" in content
+        assert 'set "EZPL_LOG_LEVEL=DEBUG"' in content
         assert "set log-level=" not in content
+
+    def test_should_quote_windows_batch_values_when_value_contains_special_chars(
+        self, temp_dir: Path
+    ) -> None:
+        """Windows export should keep values safe in batch files."""
+        config = ConfigurationManager()
+        config.set("log-level", 'INFO&echo "x"')
+        output_file = temp_dir / "config_special.bat"
+
+        with patch("sys.platform", "win32"):
+            config.export_to_script(output_file, platform="windows")
+
+        content = output_file.read_text(encoding="utf-8")
+        assert 'set "EZPL_LOG_LEVEL=INFO&echo ""x"""' in content
 
     def test_should_generate_unix_bash_script_when_unix_platform_is_specified(
         self, temp_dir: Path

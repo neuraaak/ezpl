@@ -40,28 +40,18 @@ def safe_str_convert(obj: Any) -> str:
     if isinstance(obj, str):
         return obj
 
-    # Try str() first (most common case)
+    # Try str() first (most common case), then fallback to repr().
     try:
         return str(obj)
-    except (  # noqa: S110
-        Exception
-    ):  # noqa: S110 - Intentional fallback, exception handling is the purpose
-        pass
-
-    # Fallback to repr() if str() fails
-    try:
-        return repr(obj)
-    except (  # noqa: S110
-        Exception
-    ):  # noqa: S110 - Intentional fallback, exception handling is the purpose
-        pass
-
-    # Last resort: type name
-    try:
-        return f"<{type(obj).__name__} object>"
     except Exception:
-        # Ultimate fallback - should never happen
-        return "<unknown object>"
+        try:
+            return repr(obj)
+        except Exception:
+            try:
+                return f"<{type(obj).__name__} object>"
+            except Exception:
+                # Ultimate fallback - should never happen
+                return "<unknown object>"
 
 
 def _sanitize_base(message: Any) -> str:

@@ -18,9 +18,8 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
-import click
-
 # Third-party imports
+import click
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -49,7 +48,6 @@ def info_command() -> None:
         ezpl_version = getattr(ezpl, "__version__", "unknown")
         author = getattr(ezpl, "__author__", "unknown")
         maintainer = getattr(ezpl, "__maintainer__", "unknown")
-        license_type = getattr(ezpl, "__license__", "unknown")
         description = getattr(ezpl, "__description__", "unknown")
         url = getattr(ezpl, "__url__", "unknown")
 
@@ -82,10 +80,6 @@ def info_command() -> None:
         if maintainer != author:
             text.append("Maintainer: ", style="bold")
             text.append(f"{maintainer}\n", style="white")
-
-        # License
-        text.append("License: ", style="bold")
-        text.append(f"{license_type}\n", style="white")
 
         # Description
         text.append("\nDescription:\n", style="bold")
