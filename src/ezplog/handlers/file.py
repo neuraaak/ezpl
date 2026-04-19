@@ -16,6 +16,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
 from typing import Any, cast
@@ -124,6 +125,11 @@ class EzLogger(LoggingHandler):
             logger_id: int | None = self._logger_id
             if logger_id is not None:
                 self._logger.remove(logger_id)
+            else:
+                # First initialization: drop loguru's default stderr sink so
+                # intercepted stdlib records only go to the file, not the console.
+                with suppress(ValueError):
+                    logger.remove(0)
 
             # Call loguru.add() with keyword arguments directly
             # Note: loguru.add() accepts keyword arguments, not a dict
