@@ -88,7 +88,7 @@ class EzLogger(LoggingHandler):
         # Validate and create parent directory
         try:
             self._log_file.parent.mkdir(parents=True, exist_ok=True)
-        except (PermissionError, OSError) as e:
+        except OSError as e:
             raise FileOperationError(
                 f"Cannot create log directory: {e}",
                 str(self._log_file.parent),
@@ -102,7 +102,7 @@ class EzLogger(LoggingHandler):
             # Write test
             with open(self._log_file, "a", encoding="utf-8") as f:
                 f.write("")
-        except (PermissionError, OSError) as e:
+        except OSError as e:
             raise FileOperationError(
                 f"Cannot write to log file: {e}", str(self._log_file), "write"
             ) from e
@@ -230,45 +230,49 @@ class EzLogger(LoggingHandler):
     # LOGGING METHODS (API primaire - delegates to loguru)
     # ///////////////////////////////////////////////////////////////
 
+    # NOTE: every wrapper below uses `opt(depth=1)` so loguru attributes the
+    # record to the actual caller (user code) rather than to this method.
+    # Without it, every log line reports `file:info:<line>` etc.
+
     def trace(self, message: Any, *args, **kwargs) -> None:
         """Log a trace message."""
         message = safe_str_convert(message)
-        self._logger.trace(message, *args, **kwargs)
+        self._logger.opt(depth=1).trace(message, *args, **kwargs)
 
     def debug(self, message: Any, *args, **kwargs) -> None:
         """Log a debug message."""
         message = safe_str_convert(message)
-        self._logger.debug(message, *args, **kwargs)
+        self._logger.opt(depth=1).debug(message, *args, **kwargs)
 
     def info(self, message: Any, *args, **kwargs) -> None:
         """Log an info message."""
         message = safe_str_convert(message)
-        self._logger.info(message, *args, **kwargs)
+        self._logger.opt(depth=1).info(message, *args, **kwargs)
 
     def success(self, message: Any, *args, **kwargs) -> None:
         """Log a success message."""
         message = safe_str_convert(message)
-        self._logger.success(message, *args, **kwargs)
+        self._logger.opt(depth=1).success(message, *args, **kwargs)
 
     def warning(self, message: Any, *args, **kwargs) -> None:
         """Log a warning message."""
         message = safe_str_convert(message)
-        self._logger.warning(message, *args, **kwargs)
+        self._logger.opt(depth=1).warning(message, *args, **kwargs)
 
     def error(self, message: Any, *args, **kwargs) -> None:
         """Log an error message."""
         message = safe_str_convert(message)
-        self._logger.error(message, *args, **kwargs)
+        self._logger.opt(depth=1).error(message, *args, **kwargs)
 
     def critical(self, message: Any, *args, **kwargs) -> None:
         """Log a critical message."""
         message = safe_str_convert(message)
-        self._logger.critical(message, *args, **kwargs)
+        self._logger.opt(depth=1).critical(message, *args, **kwargs)
 
     def exception(self, message: Any, *args, **kwargs) -> None:
         """Log an exception with traceback."""
         message = safe_str_convert(message)
-        self._logger.exception(message, *args, **kwargs)
+        self._logger.opt(depth=1, exception=True).log("ERROR", message, *args, **kwargs)
 
     # ///////////////////////////////////////////////////////////////
     # LOGURU-SPECIFIC METHODS (delegation)
@@ -443,12 +447,18 @@ class EzLogger(LoggingHandler):
             module = str(record.get("module", "unknown"))
             line = str(record.get("line", "?"))
 
-            return (
+            # NOTE: loguru applies `.format_map(record)` on the value returned by a
+            # callable formatter, so any literal `{` / `}` in the interpolated content
+            # (e.g. boto3 debug payloads like {'Bucket': ...}) would be re-parsed as
+            # placeholders -> KeyError / "Max string recursion exceeded". Doubling
+            # braces neutralizes them since nothing here needs to remain a placeholder.
+            formatted = (
                 f"{timestamp} | "
                 f"{log_level.label:<10} | "
                 f"{module}:{fn}:{line} - "
                 f"{message}\n"
             )
+            return formatted.replace("{", "{{").replace("}", "}}")
         except Exception as e:
             # Safe fallback
             try:
