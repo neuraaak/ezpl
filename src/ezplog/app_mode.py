@@ -29,6 +29,7 @@ from __future__ import annotations
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
 # Standard library imports
+import inspect
 import logging
 from typing import TYPE_CHECKING
 
@@ -77,14 +78,24 @@ class InterceptHandler(logging.Handler):
         except ValueError:
             level = str(record.levelno)
 
-        # Walk up the call stack to find the actual caller — skip logging internals
-        frame: types.FrameType | None = logging.currentframe()
-        depth = 2
-        while frame is not None and frame.f_code.co_filename == logging.__file__:
+        # Walk up the call stack to find the actual caller — skip both
+        # `emit` itself and all stdlib `logging` machinery (handlers, Logger._log,
+        # callHandlers, etc.). This is loguru's canonical InterceptHandler recipe:
+        # start at the current frame (depth=0) and keep walking while we're
+        # either still in `emit` or inside the stdlib logging module.
+        frame: types.FrameType | None = inspect.currentframe()
+        depth = 0
+        while frame is not None and (
+            depth == 0 or frame.f_code.co_filename == logging.__file__
+        ):
             frame = frame.f_back
             depth += 1
 
         # Bind task="logger" so records pass EzLogger's file sink filter.
+        # NOTE: brace escaping (`{` -> `{{`) is handled centrally by EzLogger's
+        # custom formatter, which is the single source of truth for all entry
+        # paths (intercept, direct calls, third-party binds). Do not escape
+        # here or braces would be doubled in the final output.
         logger.bind(task="logger").opt(
             depth=depth,
             exception=record.exc_info,
