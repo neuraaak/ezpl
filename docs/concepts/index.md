@@ -1,4 +1,4 @@
-# Explanations
+# Concepts
 
 Conceptual pages that explain design choices and trade-offs in ezplog.
 

@@ -22,11 +22,11 @@ Configure ezplog so application logs and library logs follow one consistent poli
     )
     ```
 
-??? note "Why explicit hooks"
-    Keeping compatibility settings explicit at startup makes runtime behavior predictable
-    and easier to test.
+    ??? note "Why explicit hooks"
+        Keeping compatibility settings explicit at startup makes runtime behavior predictable
+        and easier to test.
 
-1. Narrow stdlib interception when you only want selected namespaces.
+2. Narrow stdlib interception when you only want selected namespaces.
 
     ```python
     ezpl.set_compatibility_hooks(
@@ -36,7 +36,7 @@ Configure ezplog so application logs and library logs follow one consistent poli
     )
     ```
 
-1. Lock runtime configuration after bootstrap.
+3. Lock runtime configuration after bootstrap.
 
     ```python
     from ezplog import Ezpl
@@ -47,7 +47,7 @@ Configure ezplog so application logs and library logs follow one consistent poli
     Ezpl.unlock_config(token)
     ```
 
-1. Persist intentional runtime updates.
+4. Persist intentional runtime updates.
 
     ```python
     ezpl.configure(

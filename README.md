@@ -4,19 +4,24 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/ezplog?style=flat&logo=python&logoColor=white)](https://pypi.org/project/ezplog/)
 [![PyPI status](https://img.shields.io/pypi/status/ezplog?style=flat&logo=pypi&logoColor=white)](https://pypi.org/project/ezplog/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat&logo=github&logoColor=white)](https://github.com/neuraaak/ezplog/blob/main/LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/neuraaak/ezplog/publish-pypi.yml?style=flat&label=publish&logo=githubactions&logoColor=white)](https://github.com/neuraaak/ezplog/actions/workflows/publish-pypi.yml)
-[![Docs](https://img.shields.io/badge/docs-Github%20Pages-blue?style=flat&logo=materialformkdocs&logoColor=white)](https://neuraaak.github.io/ezplog/)
+[![CI](https://img.shields.io/github/actions/workflow/status/neuraaak/ezplog/ci.yml?style=flat&label=ci&logo=githubactions&logoColor=white)](https://github.com/neuraaak/ezplog/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat&logo=materialformkdocs&logoColor=white)](https://neuraaak.github.io/ezplog/)
 [![uv](https://img.shields.io/badge/package%20manager-uv-DE5FE9?style=flat&logo=uv&logoColor=white)](https://github.com/astral-sh/uv)
-[![linter](https://img.shields.io/badge/linter-ruff-orange?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
-[![type checker](https://img.shields.io/badge/type%20checker-ty-orange?style=flat&logo=astral&logoColor=white)](https://github.com/astral-sh/ty)
+[![linter](https://img.shields.io/badge/linter-ruff-D7FF64?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![type checker](https://img.shields.io/badge/type%20checker-ty-261230?style=flat&logo=astral&logoColor=white)](https://github.com/astral-sh/ty)
+[![tests](https://img.shields.io/badge/tests-pytest-0A9EDC?style=flat&logo=pytest&logoColor=white)](https://github.com/pytest-dev/pytest)
 
-![Logo](docs/assets/logo-min.png)
+![Ezplog Logo](https://raw.githubusercontent.com/neuraaak/ezplog/refs/heads/main/docs/assets/logo-min.png)
 
 **ezplog** is a modern Python logging framework combining Rich console rendering and loguru file logging with an explicit app/lib compatibility model.
 
 ## 📦 Installation
 
 ```bash
+# With uv (recommended)
+uv add ezcompiler
+
+# With pip
 pip install ezplog
 ```
 
@@ -24,7 +29,10 @@ Or from source:
 
 ```bash
 git clone https://github.com/neuraaak/ezplog.git
-cd ezplog && pip install .
+cd ezplog
+
+uv pip install -e .   # uv
+pip install -e .      # pip
 ```
 
 ## 🚀 Quick Start
@@ -68,7 +76,7 @@ Complete documentation is available at **[neuraaak.github.io/ezplog](https://neu
 | Section                                                                   | Description                                    |
 | ------------------------------------------------------------------------- | ---------------------------------------------- |
 | **[Getting Started](https://neuraaak.github.io/ezplog/getting-started/)** | Installation, basic usage, and first steps     |
-| **[Explanations](https://neuraaak.github.io/ezplog/explanations/)**       | Design rationale, trade-offs, and architecture |
+| **[Concepts](https://neuraaak.github.io/ezplog/concepts/)**               | Design rationale, trade-offs, and architecture |
 | **[API Reference](https://neuraaak.github.io/ezplog/api/)**               | Complete API documentation with examples       |
 | **[CLI Reference](https://neuraaak.github.io/ezplog/cli/)**               | Command-line interface guide                   |
 | **[User Guides](https://neuraaak.github.io/ezplog/guides/)**              | Configuration, development, and testing guides |
@@ -157,6 +165,30 @@ ezpl.set_level("DEBUG")
 ezpl.configure(log_rotation="10 MB", log_retention="7 days")
 ezpl.set_compatibility_hooks(hook_logger=True, logger_names=["vendor.payment"])
 ```
+
+## 💻 CLI Usage
+
+The `ezpl` command provides tools for log inspection and configuration management.
+
+```bash
+# View recent log entries
+ezpl logs view --lines 50
+
+# Search for errors across log files
+ezpl logs search --pattern "error|exception" --level ERROR
+
+# Export logs to JSON
+ezpl logs export --format json --output logs.json
+
+# Read or update configuration
+ezpl config get --show-env
+ezpl config set log-level DEBUG
+
+# Open the documentation site
+ezpl docs
+```
+
+See the **[CLI Reference](https://neuraaak.github.io/ezplog/cli/)** for the full command and option listing.
 
 ## 🛡️ Robustness
 

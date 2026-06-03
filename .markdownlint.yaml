@@ -20,6 +20,11 @@ MD041: false
 # inside admonitions/tabs, which markdownlint can falsely report as indented.
 MD046: false
 
+# Spaces inside code span — disabled: markdownlint cannot parse pymdownx.details
+# admonition blocks and misidentifies indented fenced code fence markers (```) as
+# inline code spans with leading/trailing spaces. This is a false positive.
+MD038: false
+
 # Ordered list style — allow any increment (1. 1. 1.) for maintainability
 MD029:
   style: ordered
