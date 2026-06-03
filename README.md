@@ -19,7 +19,7 @@
 
 ```bash
 # With uv (recommended)
-uv add ezcompiler
+uv add ezplog
 
 # With pip
 pip install ezplog
