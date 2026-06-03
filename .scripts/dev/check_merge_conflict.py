@@ -1,6 +1,6 @@
 # ///////////////////////////////////////////////////////////////
 # CHECK_MERGE_CONFLICT - Pre-commit hook: merge conflict marker detector
-# Project: ezcompiler
+# Project: ezplog
 # ///////////////////////////////////////////////////////////////
 
 """Pre-commit hook: detect merge conflict markers in staged files."""
