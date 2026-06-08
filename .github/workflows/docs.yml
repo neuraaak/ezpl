@@ -31,15 +31,15 @@ jobs:
       - run: uv sync --frozen --extra docs --extra test
 
       - name: Generate coverage report
-        run: uv run --frozen --no-build pytest --cov=src/ezplog --cov-report=html --cov-report=xml -q
+        run: uv run --frozen pytest --cov=src/ezplog --cov-report=html --cov-report=xml -q
 
       - name: Enforce import contracts
-        run: PYTHONPATH=src uv run --frozen --no-build lint-imports
+        run: PYTHONPATH=src uv run --frozen lint-imports
 
       - name: Generate architecture graph
         run: |
           if [ -f ".scripts/dev/generate_architecture_graph.py" ]; then
-            uv run --frozen --no-build python .scripts/dev/generate_architecture_graph.py
+            uv run --frozen python .scripts/dev/generate_architecture_graph.py
           fi
 
       - name: Generate changelog
@@ -109,8 +109,8 @@ jobs:
         env:
           DOCS_VERSION: ${{ steps.docs_version.outputs.version }}
         run: |
-          uv run --frozen --no-build mike deploy --push --update-aliases "$DOCS_VERSION" latest
-          uv run --frozen --no-build mike set-default --push latest
+          uv run --frozen mike deploy --push --update-aliases "$DOCS_VERSION" latest
+          uv run --frozen mike set-default --push latest
 
       - name: Preview mode summary
         if: github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_call' && github.ref_name != 'main')
