@@ -28,7 +28,7 @@ jobs:
         with:
           enable-cache: true
 
-      - run: uv sync --frozen --no-build --extra docs --extra test
+      - run: uv sync --frozen --extra docs --extra test
 
       - name: Generate coverage report
         run: uv run --frozen --no-build pytest --cov=src/ezplog --cov-report=html --cov-report=xml -q

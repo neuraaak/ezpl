@@ -66,7 +66,7 @@ jobs:
         with:
           enable-cache: true
 
-      - run: uv sync --frozen --no-build --extra dev
+      - run: uv sync --frozen --extra dev
 
       - name: Enforce import contracts
         run: PYTHONPATH=src uv run --frozen --no-build lint-imports
