@@ -2,10 +2,14 @@ name: Auto Tag
 
 on:
   push:
-    branches: [main]
+    branches: ["**"]
   workflow_dispatch:
 
 permissions: {}
+
+concurrency:
+  group: auto-tag-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   auto-tag:
@@ -39,6 +43,16 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           TAG_NAME="v$VERSION"
+
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            SAFE_BRANCH=$(echo "${GITHUB_REF_NAME}" | tr '/_' '--')
+            TAG_NAME="preview-${SAFE_BRANCH}-${GITHUB_SHA::7}"
+            echo "tag_created=true" >> $GITHUB_OUTPUT
+            echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+            echo "ℹ️ Non-main branch: no git tag pushed. Propagating version only to downstream workflows."
+            exit 0
+          fi
+
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
           LATEST_TAG="v${MAJOR}-latest"
 
@@ -94,7 +108,7 @@ jobs:
 
   trigger-deploy-docs:
     name: Trigger Deploy Docs
-    needs: [auto-tag, trigger-publish]
+    needs: auto-tag
     if: needs.auto-tag.outputs.tag_created == 'true'
     permissions:
       contents: write
