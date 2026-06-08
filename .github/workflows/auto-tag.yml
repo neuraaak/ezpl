@@ -9,7 +9,7 @@ permissions: {}
 
 concurrency:
   group: auto-tag-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   auto-tag:
@@ -19,6 +19,7 @@ jobs:
       contents: write
     outputs:
       tag_created: ${{ steps.create_tags.outputs.tag_created }}
+      tags_updated: ${{ steps.create_tags.outputs.tags_updated }}
       version: ${{ steps.version.outputs.version }}
       tag_name: ${{ steps.create_tags.outputs.tag_name }}
 
@@ -73,6 +74,7 @@ jobs:
               git tag -f "$LATEST_TAG"
               git push origin --force "$TAG_NAME"
               git push origin --force "$LATEST_TAG"
+              echo "tags_updated=true" >> $GITHUB_OUTPUT
               echo "🔄 Tags moved to HEAD: $TAG_NAME, $LATEST_TAG (no publish — version unchanged)"
             fi
           else
@@ -81,6 +83,7 @@ jobs:
             git push origin "$TAG_NAME"
             git push origin --force "$LATEST_TAG"
             TAG_CREATED="true"
+            echo "tags_updated=true" >> $GITHUB_OUTPUT
             echo "✅ Tags pushed: $TAG_NAME, $LATEST_TAG"
           fi
 
@@ -108,8 +111,14 @@ jobs:
 
   trigger-deploy-docs:
     name: Trigger Deploy Docs
-    needs: auto-tag
-    if: needs.auto-tag.outputs.tag_created == 'true'
+    needs: [auto-tag, trigger-publish]
+    if: |
+      always() &&
+      needs.auto-tag.result == 'success' &&
+      needs.auto-tag.outputs.tags_updated == 'true' &&
+      (needs.trigger-publish.result == 'success' || needs.trigger-publish.result == 'skipped')
     permissions:
       contents: write
     uses: ./.github/workflows/docs.yml
+    with:
+      deploy: true
