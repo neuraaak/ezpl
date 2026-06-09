@@ -1,46 +1,56 @@
 # CI Workflow
 
-`ci.yml` runs on every push to `main` and on every pull request. It is the primary
-quality gate — release workflows never run if this one is red.
+`ci.yml` runs on every push (all branches), every pull request, and manually via
+`workflow_dispatch`. It is the primary quality gate — release workflows never run
+if this one is red.
 
 ## Triggers
 
 | Event               | Branches |
 | ------------------- | -------- |
-| `push`              | `main`   |
+| `push`              | all      |
 | `pull_request`      | all      |
 | `workflow_dispatch` | manual   |
 
-Concurrent runs on the same ref are cancelled automatically (new push supersedes
-the old run). Deploy jobs are never affected because they live in separate workflows.
+Concurrent runs on the same ref are cancelled automatically (`cancel-in-progress: true`,
+group `ci-$ref`). Deploy jobs are never affected because they live in separate workflows.
 
 ## Jobs
 
 ```text
-quality ──► test (3.11 / 3.12 / 3.13, parallel)
+lint ──┐
+       ├──► test (Python 3.13)
+type-check ──┘
 ```
 
-### `quality` — Lint & Type Check
+`lint` and `type-check` run in parallel; `test` needs both.
 
-Runs first and gates the test matrix. Steps:
+### `lint` — Lint & Format Check
 
-1. `uv sync --frozen --extra dev` — frozen install from `uv.lock`
+Timeout: 15 min. Steps:
+
+1. `uv sync --frozen --extra dev`
 2. `ruff check .` — lint
-3. `ruff format --check .` — format check
-4. `uv run ty check` — type check (configured via `[tool.ty]` in `pyproject.toml`)
-5. `uv run pyright` — type check complémentaire (configured via `[tool.pyright]`)
-6. `PYTHONPATH=src uv run lint-imports` — import-linter contracts (couches hexagonales)
+3. `ruff format --check .` — format check (read-only, never auto-fixes)
 
-### `test` — pytest matrix
+### `type-check` — Type Check & Import Contracts
 
-Runs only after `quality` passes. Covers Python 3.11, 3.12, 3.13 in parallel
-(`fail-fast: false` so all cells report even if one fails).
+Timeout: 15 min. Steps:
+
+1. `uv sync --frozen --extra dev`
+2. `uv run ty check` — type check (configured via `[tool.ty]` in `pyproject.toml`)
+3. `uv run pyright` — type check complémentaire (configured via `[tool.pyright]`)
+4. `PYTHONPATH=src uv run lint-imports` — import-linter contracts (couches hexagonales)
+
+### `test` — pytest
+
+Needs: `[lint, type-check]`. Timeout: 25 min. Python **3.13 only** (`fail-fast: false`).
 
 Steps:
 
 1. `uv sync --frozen --extra dev`
 2. `uv run pytest` — reads `pyproject.toml`, applies `--cov-fail-under=70`
-3. Upload `coverage.xml` + `htmlcov/` as artifact (Python 3.11 cell only)
+3. Upload `coverage.xml` + `htmlcov/` as artifact — **always** (even on failure), retained 7 days
 
 ## Local equivalent
 
