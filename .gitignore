@@ -266,3 +266,6 @@ temp_projects/
 # Configuration locale utilisateur
 local_config/
 user_settings/
+
+# Plans et specs superpowers (workflow de dev, hors documentation publiée)
+.superpowers/
