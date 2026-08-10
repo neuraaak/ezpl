@@ -142,13 +142,15 @@ class EzPrinter(LoggingHandler, IndentationManager):
         self._level_numeric = LogLevel.get_no(self._level)
         self._level_manually_set = True
 
-    def log(self, level: str, message: Any) -> None:
+    def log(self, level: str, message: Any, *args: Any, **kwargs: Any) -> None:
         """
         Log a message with the specified level.
 
         Args:
             level: The log level
             message: The message to log (any type, will be safely converted to string)
+            *args: Positional arguments for loguru-style `{}` formatting
+            **kwargs: Keyword arguments for loguru-style `{}` formatting
 
         Raises:
             ValidationError: If the level is invalid
@@ -159,6 +161,7 @@ class EzPrinter(LoggingHandler, IndentationManager):
         # Convert message to string robustly
         message = safe_str_convert(message)
         message = sanitize_for_console(message)
+        message = self._apply_format(message, args, kwargs)
 
         try:
             level_numeric = LogLevel.get_no(level)
@@ -167,6 +170,7 @@ class EzPrinter(LoggingHandler, IndentationManager):
 
             # Map log levels to patterns for consistent output
             pattern_map = {
+                "TRACE": Pattern.TRACE,
                 "DEBUG": Pattern.DEBUG,
                 "INFO": Pattern.INFO,
                 "SUCCESS": Pattern.SUCCESS,
@@ -187,31 +191,59 @@ class EzPrinter(LoggingHandler, IndentationManager):
                 raise ValueError(f"Failed to print logging error: {e}") from e
 
     # ///////////////////////////////////////////////////////////////
+    # PRIVATE HELPER METHODS
+    # ///////////////////////////////////////////////////////////////
+
+    @staticmethod
+    def _apply_format(
+        message: str, args: tuple[Any, ...], kwargs: dict[str, Any]
+    ) -> str:
+        """
+        Apply loguru-style `{}` formatting when arguments are supplied.
+
+        Returns the message untouched when no arguments are given, so that
+        literal braces are preserved. Any formatting failure falls back to the
+        raw message: a logging call must never break the caller.
+        """
+        if not args and not kwargs:
+            return message
+        try:
+            return message.format(*args, **kwargs)
+        except (IndexError, KeyError, ValueError):
+            return message
+
+    # ///////////////////////////////////////////////////////////////
     # LOGGING METHODS (API primaire)
     # ///////////////////////////////////////////////////////////////
 
-    def info(self, message: Any) -> None:
+    def info(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log an informational message with pattern format."""
+        message = self._apply_format(safe_str_convert(message), args, kwargs)
         self.print_pattern(Pattern.INFO, message, "INFO")
 
-    def debug(self, message: Any) -> None:
+    def debug(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log a debug message with pattern format."""
+        message = self._apply_format(safe_str_convert(message), args, kwargs)
         self.print_pattern(Pattern.DEBUG, message, "DEBUG")
 
-    def success(self, message: Any) -> None:
+    def success(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log a success message with pattern format."""
+        message = self._apply_format(safe_str_convert(message), args, kwargs)
         self.print_pattern(Pattern.SUCCESS, message, "INFO")
 
-    def warning(self, message: Any) -> None:
+    def warning(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log a warning message with pattern format."""
+        message = self._apply_format(safe_str_convert(message), args, kwargs)
         self.print_pattern(Pattern.WARN, message, "WARNING")
 
-    def error(self, message: Any) -> None:
+    def error(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log an error message with pattern format."""
+        message = self._apply_format(safe_str_convert(message), args, kwargs)
         self.print_pattern(Pattern.ERROR, message, "ERROR")
 
-    def critical(self, message: Any) -> None:
+    def critical(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log a critical message with pattern format."""
+        message = self._apply_format(safe_str_convert(message), args, kwargs)
         self.print_pattern(Pattern.ERROR, message, "CRITICAL")
 
     # ------------------------------------------------

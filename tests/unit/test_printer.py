@@ -21,8 +21,12 @@ from __future__ import annotations
 # ///////////////////////////////////////////////////////////////
 # IMPORTS
 # ///////////////////////////////////////////////////////////////
+# Third-party imports
+import pytest
+
 # Local imports
 from ezplog import Ezpl
+from ezplog.handlers.console import EzPrinter
 from ezplog.types import Pattern
 
 # ///////////////////////////////////////////////////////////////
@@ -453,3 +457,45 @@ class TestTypeConversion:
 
         printer.info(CustomObject())
         # Verify no exception raised
+
+
+@pytest.mark.unit
+def test_apply_format_positional(capsys):
+    printer = EzPrinter(level="DEBUG")
+    printer.info("valeur={}", 42)
+    assert "valeur=42" in capsys.readouterr().out
+
+
+@pytest.mark.unit
+def test_apply_format_keyword(capsys):
+    printer = EzPrinter(level="DEBUG")
+    printer.info("user={user}", user="alice")
+    assert "user=alice" in capsys.readouterr().out
+
+
+@pytest.mark.unit
+def test_apply_format_without_args_is_literal(capsys):
+    printer = EzPrinter(level="DEBUG")
+    printer.info("accolades {litterales} conservees")
+    assert "{litterales}" in capsys.readouterr().out
+
+
+@pytest.mark.unit
+def test_apply_format_malformed_falls_back_to_raw(capsys):
+    printer = EzPrinter(level="DEBUG")
+    printer.info("accolade non fermee {", 1)
+    assert "accolade non fermee {" in capsys.readouterr().out
+
+
+@pytest.mark.unit
+def test_apply_format_missing_key_falls_back_to_raw(capsys):
+    printer = EzPrinter(level="DEBUG")
+    printer.info("valeur={absente}", autre=1)
+    assert "{absente}" in capsys.readouterr().out
+
+
+@pytest.mark.unit
+def test_log_accepts_trace_level(capsys):
+    printer = EzPrinter(level="TRACE")
+    printer.log("TRACE", "message de trace")
+    assert "message de trace" in capsys.readouterr().out
