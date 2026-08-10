@@ -640,3 +640,37 @@ class TestConfigLockV2:
 
         assert Ezpl.unlock_config(token) is True
         assert Ezpl.is_locked() is False
+
+
+@pytest.mark.unit
+def test_facade_exposes_new_methods(ezpl_instance):
+    assert hasattr(ezpl_instance, "trace")
+    assert hasattr(ezpl_instance, "exception")
+    assert hasattr(ezpl_instance, "log")
+
+
+@pytest.mark.unit
+def test_facade_delegates_to_printer(ezpl_instance, mocker):
+    printer = mocker.patch.object(ezpl_instance, "_printer")
+
+    ezpl_instance.info("v={}", 1)
+    printer.info.assert_called_once_with("v={}", 1)
+
+    ezpl_instance.trace("t")
+    printer.trace.assert_called_once_with("t")
+
+    ezpl_instance.exception("e")
+    printer.exception.assert_called_once_with("e")
+
+    ezpl_instance.error("boum", exc_info=True)
+    printer.error.assert_called_once_with("boum", exc_info=True)
+
+    ezpl_instance.log("TRACE", "m")
+    printer.log.assert_called_once_with("TRACE", "m")
+
+
+@pytest.mark.unit
+def test_facade_does_not_write_to_file(ezpl_instance, mocker):
+    logger = mocker.patch.object(ezpl_instance, "_logger")
+    ezpl_instance.info("console uniquement")
+    logger.info.assert_not_called()

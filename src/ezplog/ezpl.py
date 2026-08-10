@@ -495,29 +495,67 @@ class Ezpl:
     # FACADE METHODS
     # ///////////////////////////////////////////////////////////////
 
-    def debug(self, message: Any) -> None:
+    def trace(self, message: Any, *args: Any, **kwargs: Any) -> None:
+        """Log a trace message to the console printer."""
+        self._printer.trace(message, *args, **kwargs)
+
+    def debug(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log a debug message to the console printer."""
-        self._printer.debug(message)
+        self._printer.debug(message, *args, **kwargs)
 
-    def info(self, message: Any) -> None:
+    def info(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log an info message to the console printer."""
-        self._printer.info(message)
+        self._printer.info(message, *args, **kwargs)
 
-    def success(self, message: Any) -> None:
+    def success(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log a success message to the console printer."""
-        self._printer.success(message)
+        self._printer.success(message, *args, **kwargs)
 
-    def warning(self, message: Any) -> None:
+    def warning(self, message: Any, *args: Any, **kwargs: Any) -> None:
         """Log a warning message to the console printer."""
-        self._printer.warning(message)
+        self._printer.warning(message, *args, **kwargs)
 
-    def error(self, message: Any) -> None:
-        """Log an error message to the console printer."""
-        self._printer.error(message)
+    def error(
+        self, message: Any, *args: Any, exc_info: bool = False, **kwargs: Any
+    ) -> None:
+        """Log an error message to the console printer.
 
-    def critical(self, message: Any) -> None:
-        """Log a critical message to the console printer."""
-        self._printer.critical(message)
+        Args:
+            message: Message to display.
+            *args: Positional arguments for `{}` formatting.
+            exc_info: If True, also render the active exception traceback.
+            **kwargs: Keyword arguments for `{}` formatting.
+        """
+        self._printer.error(message, *args, exc_info=exc_info, **kwargs)
+
+    def critical(
+        self, message: Any, *args: Any, exc_info: bool = False, **kwargs: Any
+    ) -> None:
+        """Log a critical message to the console printer.
+
+        Args:
+            message: Message to display.
+            *args: Positional arguments for `{}` formatting.
+            exc_info: If True, also render the active exception traceback.
+            **kwargs: Keyword arguments for `{}` formatting.
+        """
+        self._printer.critical(message, *args, exc_info=exc_info, **kwargs)
+
+    def exception(self, message: Any, *args: Any, **kwargs: Any) -> None:
+        """Log an error message with the active exception traceback (console)."""
+        self._printer.exception(message, *args, **kwargs)
+
+    def log(self, level: str, message: Any, *args: Any, **kwargs: Any) -> None:
+        """Log a message at the given level to the console printer.
+
+        Args:
+            level: Log level name (TRACE, DEBUG, INFO, SUCCESS, WARNING,
+                ERROR, CRITICAL).
+            message: Message to display.
+            *args: Positional arguments for `{}` formatting.
+            **kwargs: Keyword arguments for `{}` formatting.
+        """
+        self._printer.log(level, message, *args, **kwargs)
 
     # ///////////////////////////////////////////////////////////////
 
