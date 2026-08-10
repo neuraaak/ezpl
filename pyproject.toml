@@ -57,6 +57,7 @@ dev = [
     "ty>=0.0.13",
     "pyright>=1.1.0",
     "pre-commit>=3.0.0",
+    "poethepoet>=0.32",
     "import-linter>=2.0.0",
     "grimp>=2.3.0",
 
@@ -109,6 +110,37 @@ PyPI = "https://pypi.org/project/ezplog/"
 
 [project.scripts]
 ezpl = "ezplog.cli.main:cli"
+
+# ///////////////////////////////////////////////////////////////
+# ⚡ POE TASKS
+# Developer commands: run with `uv run poe <task>`
+# ///////////////////////////////////////////////////////////////
+
+[tool.poe.tasks]
+lint = "ruff check src tests"
+lint-fix = "ruff check --fix src tests"
+format = "ruff format src tests"
+format-check = "ruff format --check src tests"
+imports = "lint-imports"
+security = "bandit -c pyproject.toml -r src"
+test = "pytest"
+test-unit = "pytest -m unit"
+test-fast = "pytest -n auto -m 'not slow'"
+docs = "mkdocs serve"
+docs-build = "mkdocs build --strict"
+graph = "python .scripts/dev/generate_architecture_graph.py"
+version = "python .scripts/dev/update_version.py"
+build = "uv build"
+
+[tool.poe.tasks.typecheck]
+help = "Run pyright then ty"
+sequence = ["pyright", "ty check"]
+default_item_type = "cmd"
+
+[tool.poe.tasks.check]
+help = "Full local quality gate (mirrors CI)"
+sequence = ["format-check", "lint", "typecheck", "imports", "test"]
+default_item_type = "ref"
 
 # ///////////////////////////////////////////////////////////////
 # 📦 HATCHLING CONFIGURATION
