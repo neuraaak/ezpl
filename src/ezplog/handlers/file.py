@@ -64,6 +64,9 @@ class EzLogger(LoggingHandler):
         rotation: RotationSpec = None,
         retention: RetentionSpec = None,
         compression: CompressionSpec = None,
+        *,
+        backtrace: bool = True,
+        diagnose: bool = False,
     ) -> None:
         """
         Initialize the file logger handler.
@@ -77,6 +80,10 @@ class EzLogger(LoggingHandler):
                 files to keep (int), timedelta, or a cleanup callable
             compression: Compression format name (see SUPPORTED_COMPRESSIONS)
                 or a callable applied to the rotated file path
+            backtrace: If True, extend tracebacks beyond the catching point
+            diagnose: If True, include local variable values in tracebacks.
+                Defaults to False, unlike loguru: locals routinely hold
+                secrets, and log files are archived and shipped elsewhere.
 
         Raises:
             ValidationError: If the provided level is invalid
@@ -101,6 +108,8 @@ class EzLogger(LoggingHandler):
         self._rotation: RotationSpec = rotation
         self._retention: RetentionSpec = retention
         self._compression: CompressionSpec = compression
+        self._backtrace = backtrace
+        self._diagnose = diagnose
 
         # Validate and create parent directory
         try:
@@ -159,6 +168,8 @@ class EzLogger(LoggingHandler):
                 rotation=self._rotation if self._rotation else None,
                 retention=self._retention if self._retention else None,
                 compression=self._compression if self._compression else None,
+                backtrace=self._backtrace,
+                diagnose=self._diagnose,
             )
         except Exception as e:
             raise LoggingError(f"Failed to initialize file logger: {e}", "file") from e
@@ -191,6 +202,16 @@ class EzLogger(LoggingHandler):
     def compression(self) -> CompressionSpec:
         """Return current compression setting."""
         return self._compression
+
+    @property
+    def backtrace(self) -> bool:
+        """Return whether tracebacks extend beyond the catching point."""
+        return self._backtrace
+
+    @property
+    def diagnose(self) -> bool:
+        """Return whether local variable values appear in tracebacks."""
+        return self._diagnose
 
     def mark_level_as_configured(self) -> None:
         """Mark the current level as coming from configuration (not manual set)."""

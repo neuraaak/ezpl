@@ -532,3 +532,33 @@ def test_logger_accepts_callable_compression(tmp_path):
 
     logger = EzLogger(log_file=tmp_path / "e.log", compression=my_compressor)
     assert logger.compression is my_compressor
+
+
+@pytest.mark.unit
+def test_diagnose_defaults_to_false(tmp_path):
+    from ezplog.handlers.file import EzLogger
+
+    logger = EzLogger(log_file=tmp_path / "f.log")
+    assert logger.diagnose is False
+
+
+@pytest.mark.unit
+def test_backtrace_defaults_to_true(tmp_path):
+    from ezplog.handlers.file import EzLogger
+
+    logger = EzLogger(log_file=tmp_path / "g.log")
+    assert logger.backtrace is True
+
+
+@pytest.mark.unit
+def test_traceback_options_reach_loguru_add(tmp_path, mocker):
+    from loguru._logger import Logger as LoguruLogger
+
+    from ezplog.handlers.file import EzLogger
+
+    add = mocker.patch.object(LoguruLogger, "add", return_value=1)
+    EzLogger(log_file=tmp_path / "h.log", diagnose=True, backtrace=False)
+
+    kwargs = add.call_args.kwargs
+    assert kwargs["diagnose"] is True
+    assert kwargs["backtrace"] is False

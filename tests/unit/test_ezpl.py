@@ -674,3 +674,16 @@ def test_facade_does_not_write_to_file(ezpl_instance, mocker):
     logger = mocker.patch.object(ezpl_instance, "_logger")
     ezpl_instance.info("console uniquement")
     logger.info.assert_not_called()
+
+
+@pytest.mark.unit
+def test_configure_normalizes_traceback_keys(ezpl_instance, mocker):
+    manager = mocker.patch.object(ezpl_instance, "_config_manager")
+    ezpl_instance.configure(log_diagnose=True, log_backtrace=False)
+
+    manager.update.assert_called_once()
+    (applied_config,), _ = manager.update.call_args
+    assert applied_config["log-diagnose"] is True
+    assert applied_config["log-backtrace"] is False
+    assert "log_diagnose" not in applied_config
+    assert "log_backtrace" not in applied_config

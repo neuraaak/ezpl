@@ -1126,6 +1126,11 @@ class Ezpl:
                 - log_rotation or log-rotation: Rotation setting (e.g., "10 MB", "1 day")
                 - log_retention or log-retention: Retention period (e.g., "7 days")
                 - log_compression or log-compression: Compression format (e.g., "zip", "gz")
+                - log_backtrace or log-backtrace: Extend tracebacks beyond the
+                  catching point (default True)
+                - log_diagnose or log-diagnose: Include local variable values in
+                  tracebacks (default False — enabling this may leak secrets
+                  into the log file)
                 - indent_step or indent-step: Indentation step size
                 - indent_symbol or indent-symbol: Symbol for indentation
                 - base_indent_symbol or base-indent-symbol: Base indentation symbol
@@ -1157,6 +1162,8 @@ class Ezpl:
             "log_rotation": "log-rotation",
             "log_retention": "log-retention",
             "log_compression": "log-compression",
+            "log_backtrace": "log-backtrace",
+            "log_diagnose": "log-diagnose",
             "indent_step": "indent-step",
             "indent_symbol": "indent-symbol",
             "base_indent_symbol": "base-indent-symbol",
