@@ -486,3 +486,49 @@ class TestDirectoryCreation:
         log_file.parent.mkdir(parents=True, exist_ok=True)
         logger_handler = EzLogger(log_file, level="INFO")
         assert logger_handler.get_log_file() == log_file
+
+
+@pytest.mark.unit
+def test_logger_accepts_timedelta_rotation(tmp_path):
+    from datetime import timedelta
+
+    from ezplog.handlers.file import EzLogger
+
+    logger = EzLogger(log_file=tmp_path / "a.log", rotation=timedelta(hours=6))
+    assert logger.rotation == timedelta(hours=6)
+
+
+@pytest.mark.unit
+def test_logger_accepts_int_retention(tmp_path):
+    from ezplog.handlers.file import EzLogger
+
+    logger = EzLogger(log_file=tmp_path / "b.log", retention=10)
+    assert logger.retention == 10
+
+
+@pytest.mark.unit
+def test_logger_accepts_valid_compression(tmp_path):
+    from ezplog.handlers.file import EzLogger
+
+    logger = EzLogger(log_file=tmp_path / "c.log", compression="zip")
+    assert logger.compression == "zip"
+
+
+@pytest.mark.unit
+def test_logger_rejects_invalid_compression(tmp_path):
+    from ezplog.core.exceptions import ValidationError
+    from ezplog.handlers.file import EzLogger
+
+    with pytest.raises(ValidationError):
+        EzLogger(log_file=tmp_path / "d.log", compression="zpi")
+
+
+@pytest.mark.unit
+def test_logger_accepts_callable_compression(tmp_path):
+    from ezplog.handlers.file import EzLogger
+
+    def my_compressor(_path: str) -> None:
+        return None
+
+    logger = EzLogger(log_file=tmp_path / "e.log", compression=my_compressor)
+    assert logger.compression is my_compressor

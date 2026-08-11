@@ -88,7 +88,7 @@ class DefaultConfiguration:
 
     # Rotation settings (optional - None means no rotation)
     LOG_ROTATION = None  # e.g., "10 MB", "1 day", "500 KB", "12:00", "1 week"
-    LOG_RETENTION = None  # e.g., "7 days", "1 month", "10 files"
+    LOG_RETENTION = None  # e.g., "7 days", "1 month", or 10 (keep 10 files)
     LOG_COMPRESSION = None  # e.g., "zip", "gz", "tar.gz"
 
     # ///////////////////////////////////////////////////////////////

@@ -352,3 +352,12 @@ def test_pattern_trace_exists():
 @pytest.mark.unit
 def test_pattern_trace_has_color():
     assert PATTERN_COLORS[Pattern.TRACE] == "dim cyan"
+
+
+@pytest.mark.unit
+def test_supported_compressions_exported():
+    from ezplog.types import SUPPORTED_COMPRESSIONS
+
+    assert "zip" in SUPPORTED_COMPRESSIONS
+    assert "tar.gz" in SUPPORTED_COMPRESSIONS
+    assert "zpi" not in SUPPORTED_COMPRESSIONS
