@@ -90,6 +90,8 @@ class TestInitialization:
             log_rotation="10 MB",
             log_retention="7 days",
             log_compression="zip",
+            log_backtrace=False,
+            log_diagnose=True,
             indent_step=4,
             indent_symbol="  ",
             base_indent_symbol=">",
@@ -98,6 +100,9 @@ class TestInitialization:
         # Verify levels are set correctly
         assert ezpl._printer._level == "INFO"
         assert ezpl._logger._level == "WARNING"
+        # Verify backtrace/diagnose are forwarded to the file logger
+        assert ezpl._logger.backtrace is False
+        assert ezpl._logger.diagnose is True
 
     def test_should_initialize_with_valid_defaults_when_no_parameters_are_given(
         self,
@@ -345,6 +350,28 @@ class TestConfiguration:
         # So log-level in config might be INFO, but printer-level is DEBUG
         assert config.get("printer-level") == "DEBUG"
         assert config.get("log-rotation") == "10 MB"
+
+    def test_should_rebuild_file_sink_when_log_diagnose_is_configured(
+        self,
+    ) -> None:
+        """Test that configure(log_diagnose=...) rebuilds the file sink with the new value."""
+        ezpl = Ezpl()
+        assert ezpl._logger.diagnose is False
+        ezpl.configure(log_diagnose=True)
+        config = ezpl.get_config()
+        assert config.get("log-diagnose") is True
+        assert ezpl._logger.diagnose is True
+
+    def test_should_rebuild_file_sink_when_log_backtrace_is_configured(
+        self,
+    ) -> None:
+        """Test that configure(log_backtrace=...) rebuilds the file sink with the new value."""
+        ezpl = Ezpl()
+        assert ezpl._logger.backtrace is True
+        ezpl.configure(log_backtrace=False)
+        config = ezpl.get_config()
+        assert config.get("log-backtrace") is False
+        assert ezpl._logger.backtrace is False
 
     def test_should_reload_config_from_updated_file_when_reload_config_is_called(
         self,

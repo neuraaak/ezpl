@@ -100,6 +100,8 @@ class Ezpl:
         log_rotation: str | None = None,
         log_retention: str | None = None,
         log_compression: str | None = None,
+        log_backtrace: bool | None = None,
+        log_diagnose: bool | None = None,
         indent_step: int | None = None,
         indent_symbol: str | None = None,
         base_indent_symbol: str | None = None,
@@ -130,6 +132,8 @@ class Ezpl:
             * `log_rotation` (str, optional): Rotation setting (e.g., "10 MB", "1 day")
             * `log_retention` (str, optional): Retention period (e.g., "7 days")
             * `log_compression` (str, optional): Compression format (e.g., "zip", "gz")
+            * `log_backtrace` (bool, optional): Extend tracebacks beyond the catching point
+            * `log_diagnose` (bool, optional): Include local variable values in tracebacks
             * `indent_step` (int, optional): Indentation step size
             * `indent_symbol` (str, optional): Symbol for indentation
             * `base_indent_symbol` (str, optional): Base indentation symbol
@@ -236,6 +240,16 @@ class Ezpl:
                         if log_compression is not None
                         else cls._config_manager.get_log_compression()
                     )
+                    final_backtrace = (
+                        log_backtrace
+                        if log_backtrace is not None
+                        else cls._config_manager.get_log_backtrace()
+                    )
+                    final_diagnose = (
+                        log_diagnose
+                        if log_diagnose is not None
+                        else cls._config_manager.get_log_diagnose()
+                    )
 
                     # Indent settings
                     final_indent_step = get_config_value(
@@ -270,6 +284,8 @@ class Ezpl:
                         rotation=final_rotation,
                         retention=final_retention,
                         compression=final_compression,
+                        backtrace=final_backtrace,
+                        diagnose=final_diagnose,
                     )
 
                     # Apply global log level with priority: specific > global
@@ -354,6 +370,8 @@ class Ezpl:
             rotation=self._config_manager.get_log_rotation(),
             retention=self._config_manager.get_log_retention(),
             compression=self._config_manager.get_log_compression(),
+            backtrace=self._config_manager.get_log_backtrace(),
+            diagnose=self._config_manager.get_log_diagnose(),
         )
 
     def _rebuild_printer(
@@ -1010,6 +1028,16 @@ class Ezpl:
                 if hasattr(self, "_logger") and self._logger
                 else self._config_manager.get_log_compression()
             )
+            current_backtrace = (
+                self._logger.backtrace
+                if hasattr(self, "_logger") and self._logger
+                else self._config_manager.get_log_backtrace()
+            )
+            current_diagnose = (
+                self._logger.diagnose
+                if hasattr(self, "_logger") and self._logger
+                else self._config_manager.get_log_diagnose()
+            )
 
             # Merge kwargs with default values
             init_params = {
@@ -1018,6 +1046,8 @@ class Ezpl:
                 "rotation": init_kwargs.pop("rotation", current_rotation),
                 "retention": init_kwargs.pop("retention", current_retention),
                 "compression": init_kwargs.pop("compression", current_compression),
+                "backtrace": init_kwargs.pop("backtrace", current_backtrace),
+                "diagnose": init_kwargs.pop("diagnose", current_diagnose),
             }
             init_params.update(init_kwargs)
 
@@ -1196,7 +1226,13 @@ class Ezpl:
         # Reinitialize logger if rotation settings changed
         rotation_changed = any(
             key in normalized_config
-            for key in ["log-rotation", "log-retention", "log-compression"]
+            for key in [
+                "log-rotation",
+                "log-retention",
+                "log-compression",
+                "log-backtrace",
+                "log-diagnose",
+            ]
         )
         if rotation_changed:
             self._rebuild_logger()
